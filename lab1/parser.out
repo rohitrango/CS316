@@ -20,40 +20,32 @@ Rule 14    expression -> M expression
 Rule 15    expression -> LPAREN expression RPAREN
 Rule 16    expression -> NUMBER
 Rule 17    expression -> NAME
-Rule 18    expression -> hval ATHOU hval
-Rule 19    expression -> hval ATHOU dval
-Rule 20    expression -> hval ATHOU af
-Rule 21    expression -> dval ATHOU hval
-Rule 22    expression -> dval ATHOU dval
-Rule 23    expression -> dval ATHOU af
-Rule 24    expression -> af ATHOU hval
-Rule 25    expression -> af ATHOU dval
-Rule 26    expression -> af ATHOU af
-Rule 27    expression -> hval ATHOU
-Rule 28    expression -> dval ATHOU
-Rule 29    expression -> af ATHOU
-Rule 30    expression -> hval
-Rule 31    expression -> hhval
-Rule 32    expression -> dval
-Rule 33    expression -> af
-Rule 34    hhval -> dval AHUN dval
-Rule 35    hhval -> dval AHUN af
-Rule 36    hhval -> dval AHUN
-Rule 37    hval -> af AHUN dval
-Rule 38    hval -> af AHUN af
-Rule 39    hval -> af AHUN
-Rule 40    dval -> ARVAL af
-Rule 41    dval -> ARVAL
-Rule 42    dval -> ATWO
-Rule 43    af -> AFACE
+Rule 18    expression -> dval ATHOU hval
+Rule 19    expression -> dval ATHOU dval
+Rule 20    expression -> dval ATHOU af
+Rule 21    expression -> af ATHOU hval
+Rule 22    expression -> af ATHOU dval
+Rule 23    expression -> af ATHOU af
+Rule 24    expression -> dval ATHOU
+Rule 25    expression -> af ATHOU
+Rule 26    expression -> hval
+Rule 27    expression -> dval
+Rule 28    expression -> af
+Rule 29    hval -> af AHUN dval
+Rule 30    hval -> af AHUN af
+Rule 31    hval -> af AHUN
+Rule 32    dval -> ARVAL af
+Rule 33    dval -> ARVAL
+Rule 34    dval -> ATWO
+Rule 35    af -> AFACE
 
 Terminals, with rules where they appear
 
-AFACE                : 43
-AHUN                 : 34 35 36 37 38 39
-ARVAL                : 40 41
-ATHOU                : 18 19 20 21 22 23 24 25 26 27 28 29
-ATWO                 : 42
+AFACE                : 35
+AHUN                 : 29 30 31
+ARVAL                : 32 33
+ATHOU                : 18 19 20 21 22 23 24 25
+ATWO                 : 34
 D                    : 11
 DIVIDE               : 6
 E                    : 12
@@ -73,11 +65,10 @@ error                :
 
 Nonterminals, with rules where they appear
 
-af                   : 20 23 24 25 26 26 29 33 35 37 38 38 39 40
-dval                 : 19 21 22 22 23 25 28 32 34 34 35 36 37
+af                   : 20 21 22 23 23 25 28 29 30 30 31 32
+dval                 : 18 19 19 20 22 24 27 29
 expression           : 1 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9 10 10 11 11 12 12 13 14 15
-hhval                : 31
-hval                 : 18 18 19 20 21 24 27 30
+hval                 : 18 21 26
 statement            : 0
 
 Parsing method: LALR
@@ -102,198 +93,86 @@ state 0
     (15) expression -> . LPAREN expression RPAREN
     (16) expression -> . NUMBER
     (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
 
-    NAME            shift and go to state 13
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
+    NAME            shift and go to state 10
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
 
-    hhval                          shift and go to state 1
-    expression                     shift and go to state 2
-    af                             shift and go to state 11
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    statement                      shift and go to state 10
+    hval                           shift and go to state 2
+    expression                     shift and go to state 12
+    dval                           shift and go to state 9
+    statement                      shift and go to state 5
+    af                             shift and go to state 1
 
 state 1
 
-    (31) expression -> hhval .
+    (21) expression -> af . ATHOU hval
+    (22) expression -> af . ATHOU dval
+    (23) expression -> af . ATHOU af
+    (25) expression -> af . ATHOU
+    (28) expression -> af .
+    (29) hval -> af . AHUN dval
+    (30) hval -> af . AHUN af
+    (31) hval -> af . AHUN
 
-    PLUS            reduce using rule 31 (expression -> hhval .)
-    MINUS           reduce using rule 31 (expression -> hhval .)
-    TIMES           reduce using rule 31 (expression -> hhval .)
-    DIVIDE          reduce using rule 31 (expression -> hhval .)
-    EXP             reduce using rule 31 (expression -> hhval .)
-    P               reduce using rule 31 (expression -> hhval .)
-    M               reduce using rule 31 (expression -> hhval .)
-    T               reduce using rule 31 (expression -> hhval .)
-    D               reduce using rule 31 (expression -> hhval .)
-    E               reduce using rule 31 (expression -> hhval .)
-    $end            reduce using rule 31 (expression -> hhval .)
-    RPAREN          reduce using rule 31 (expression -> hhval .)
+    ATHOU           shift and go to state 14
+    PLUS            reduce using rule 28 (expression -> af .)
+    MINUS           reduce using rule 28 (expression -> af .)
+    TIMES           reduce using rule 28 (expression -> af .)
+    DIVIDE          reduce using rule 28 (expression -> af .)
+    EXP             reduce using rule 28 (expression -> af .)
+    P               reduce using rule 28 (expression -> af .)
+    M               reduce using rule 28 (expression -> af .)
+    T               reduce using rule 28 (expression -> af .)
+    D               reduce using rule 28 (expression -> af .)
+    E               reduce using rule 28 (expression -> af .)
+    $end            reduce using rule 28 (expression -> af .)
+    RPAREN          reduce using rule 28 (expression -> af .)
+    AHUN            shift and go to state 15
 
 
 state 2
 
-    (2) statement -> expression .
-    (3) expression -> expression . PLUS expression
-    (4) expression -> expression . MINUS expression
-    (5) expression -> expression . TIMES expression
-    (6) expression -> expression . DIVIDE expression
-    (7) expression -> expression . EXP expression
-    (8) expression -> expression . P expression
-    (9) expression -> expression . M expression
-    (10) expression -> expression . T expression
-    (11) expression -> expression . D expression
-    (12) expression -> expression . E expression
+    (26) expression -> hval .
 
-    $end            reduce using rule 2 (statement -> expression .)
-    PLUS            shift and go to state 20
-    MINUS           shift and go to state 16
-    TIMES           shift and go to state 15
-    DIVIDE          shift and go to state 17
-    EXP             shift and go to state 19
-    P               shift and go to state 21
-    M               shift and go to state 23
-    T               shift and go to state 22
-    D               shift and go to state 24
-    E               shift and go to state 18
+    PLUS            reduce using rule 26 (expression -> hval .)
+    MINUS           reduce using rule 26 (expression -> hval .)
+    TIMES           reduce using rule 26 (expression -> hval .)
+    DIVIDE          reduce using rule 26 (expression -> hval .)
+    EXP             reduce using rule 26 (expression -> hval .)
+    P               reduce using rule 26 (expression -> hval .)
+    M               reduce using rule 26 (expression -> hval .)
+    T               reduce using rule 26 (expression -> hval .)
+    D               reduce using rule 26 (expression -> hval .)
+    E               reduce using rule 26 (expression -> hval .)
+    $end            reduce using rule 26 (expression -> hval .)
+    RPAREN          reduce using rule 26 (expression -> hval .)
 
 
 state 3
-
-    (18) expression -> hval . ATHOU hval
-    (19) expression -> hval . ATHOU dval
-    (20) expression -> hval . ATHOU af
-    (27) expression -> hval . ATHOU
-    (30) expression -> hval .
-
-    ATHOU           shift and go to state 25
-    PLUS            reduce using rule 30 (expression -> hval .)
-    MINUS           reduce using rule 30 (expression -> hval .)
-    TIMES           reduce using rule 30 (expression -> hval .)
-    DIVIDE          reduce using rule 30 (expression -> hval .)
-    EXP             reduce using rule 30 (expression -> hval .)
-    P               reduce using rule 30 (expression -> hval .)
-    M               reduce using rule 30 (expression -> hval .)
-    T               reduce using rule 30 (expression -> hval .)
-    D               reduce using rule 30 (expression -> hval .)
-    E               reduce using rule 30 (expression -> hval .)
-    $end            reduce using rule 30 (expression -> hval .)
-    RPAREN          reduce using rule 30 (expression -> hval .)
-
-
-state 4
-
-    (42) dval -> ATWO .
-
-    ATHOU           reduce using rule 42 (dval -> ATWO .)
-    AHUN            reduce using rule 42 (dval -> ATWO .)
-    PLUS            reduce using rule 42 (dval -> ATWO .)
-    MINUS           reduce using rule 42 (dval -> ATWO .)
-    TIMES           reduce using rule 42 (dval -> ATWO .)
-    DIVIDE          reduce using rule 42 (dval -> ATWO .)
-    EXP             reduce using rule 42 (dval -> ATWO .)
-    P               reduce using rule 42 (dval -> ATWO .)
-    M               reduce using rule 42 (dval -> ATWO .)
-    T               reduce using rule 42 (dval -> ATWO .)
-    D               reduce using rule 42 (dval -> ATWO .)
-    E               reduce using rule 42 (dval -> ATWO .)
-    $end            reduce using rule 42 (dval -> ATWO .)
-    RPAREN          reduce using rule 42 (dval -> ATWO .)
-
-
-state 5
-
-    (13) expression -> MINUS . expression
-    (3) expression -> . expression PLUS expression
-    (4) expression -> . expression MINUS expression
-    (5) expression -> . expression TIMES expression
-    (6) expression -> . expression DIVIDE expression
-    (7) expression -> . expression EXP expression
-    (8) expression -> . expression P expression
-    (9) expression -> . expression M expression
-    (10) expression -> . expression T expression
-    (11) expression -> . expression D expression
-    (12) expression -> . expression E expression
-    (13) expression -> . MINUS expression
-    (14) expression -> . M expression
-    (15) expression -> . LPAREN expression RPAREN
-    (16) expression -> . NUMBER
-    (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
-
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 11
-    expression                     shift and go to state 26
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
-
-state 6
 
     (16) expression -> NUMBER .
 
@@ -311,34 +190,87 @@ state 6
     RPAREN          reduce using rule 16 (expression -> NUMBER .)
 
 
+state 4
+
+    (13) expression -> MINUS . expression
+    (3) expression -> . expression PLUS expression
+    (4) expression -> . expression MINUS expression
+    (5) expression -> . expression TIMES expression
+    (6) expression -> . expression DIVIDE expression
+    (7) expression -> . expression EXP expression
+    (8) expression -> . expression P expression
+    (9) expression -> . expression M expression
+    (10) expression -> . expression T expression
+    (11) expression -> . expression D expression
+    (12) expression -> . expression E expression
+    (13) expression -> . MINUS expression
+    (14) expression -> . M expression
+    (15) expression -> . LPAREN expression RPAREN
+    (16) expression -> . NUMBER
+    (17) expression -> . NAME
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
+
+    hval                           shift and go to state 2
+    expression                     shift and go to state 17
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 5
+
+    (0) S' -> statement .
+
+
+
+state 6
+
+    (32) dval -> ARVAL . af
+    (33) dval -> ARVAL .
+    (35) af -> . AFACE
+
+    ATHOU           reduce using rule 33 (dval -> ARVAL .)
+    PLUS            reduce using rule 33 (dval -> ARVAL .)
+    MINUS           reduce using rule 33 (dval -> ARVAL .)
+    TIMES           reduce using rule 33 (dval -> ARVAL .)
+    DIVIDE          reduce using rule 33 (dval -> ARVAL .)
+    EXP             reduce using rule 33 (dval -> ARVAL .)
+    P               reduce using rule 33 (dval -> ARVAL .)
+    M               reduce using rule 33 (dval -> ARVAL .)
+    T               reduce using rule 33 (dval -> ARVAL .)
+    D               reduce using rule 33 (dval -> ARVAL .)
+    E               reduce using rule 33 (dval -> ARVAL .)
+    $end            reduce using rule 33 (dval -> ARVAL .)
+    RPAREN          reduce using rule 33 (dval -> ARVAL .)
+    AFACE           shift and go to state 11
+
+    af                             shift and go to state 18
+
 state 7
-
-    (21) expression -> dval . ATHOU hval
-    (22) expression -> dval . ATHOU dval
-    (23) expression -> dval . ATHOU af
-    (28) expression -> dval . ATHOU
-    (32) expression -> dval .
-    (34) hhval -> dval . AHUN dval
-    (35) hhval -> dval . AHUN af
-    (36) hhval -> dval . AHUN
-
-    ATHOU           shift and go to state 28
-    PLUS            reduce using rule 32 (expression -> dval .)
-    MINUS           reduce using rule 32 (expression -> dval .)
-    TIMES           reduce using rule 32 (expression -> dval .)
-    DIVIDE          reduce using rule 32 (expression -> dval .)
-    EXP             reduce using rule 32 (expression -> dval .)
-    P               reduce using rule 32 (expression -> dval .)
-    M               reduce using rule 32 (expression -> dval .)
-    T               reduce using rule 32 (expression -> dval .)
-    D               reduce using rule 32 (expression -> dval .)
-    E               reduce using rule 32 (expression -> dval .)
-    $end            reduce using rule 32 (expression -> dval .)
-    RPAREN          reduce using rule 32 (expression -> dval .)
-    AHUN            shift and go to state 29
-
-
-state 8
 
     (14) expression -> M . expression
     (3) expression -> . expression PLUS expression
@@ -356,49 +288,40 @@ state 8
     (15) expression -> . LPAREN expression RPAREN
     (16) expression -> . NUMBER
     (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
 
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
 
-    af                             shift and go to state 11
-    expression                     shift and go to state 30
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
+    hval                           shift and go to state 2
+    expression                     shift and go to state 19
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
 
-state 9
+state 8
 
     (15) expression -> LPAREN . expression RPAREN
     (3) expression -> . expression PLUS expression
@@ -416,107 +339,68 @@ state 9
     (15) expression -> . LPAREN expression RPAREN
     (16) expression -> . NUMBER
     (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
 
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
 
-    af                             shift and go to state 11
-    expression                     shift and go to state 31
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
+    hval                           shift and go to state 2
+    expression                     shift and go to state 20
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 9
+
+    (18) expression -> dval . ATHOU hval
+    (19) expression -> dval . ATHOU dval
+    (20) expression -> dval . ATHOU af
+    (24) expression -> dval . ATHOU
+    (27) expression -> dval .
+
+    ATHOU           shift and go to state 21
+    PLUS            reduce using rule 27 (expression -> dval .)
+    MINUS           reduce using rule 27 (expression -> dval .)
+    TIMES           reduce using rule 27 (expression -> dval .)
+    DIVIDE          reduce using rule 27 (expression -> dval .)
+    EXP             reduce using rule 27 (expression -> dval .)
+    P               reduce using rule 27 (expression -> dval .)
+    M               reduce using rule 27 (expression -> dval .)
+    T               reduce using rule 27 (expression -> dval .)
+    D               reduce using rule 27 (expression -> dval .)
+    E               reduce using rule 27 (expression -> dval .)
+    $end            reduce using rule 27 (expression -> dval .)
+    RPAREN          reduce using rule 27 (expression -> dval .)
+
 
 state 10
-
-    (0) S' -> statement .
-
-
-
-state 11
-
-    (24) expression -> af . ATHOU hval
-    (25) expression -> af . ATHOU dval
-    (26) expression -> af . ATHOU af
-    (29) expression -> af . ATHOU
-    (33) expression -> af .
-    (37) hval -> af . AHUN dval
-    (38) hval -> af . AHUN af
-    (39) hval -> af . AHUN
-
-    ATHOU           shift and go to state 32
-    PLUS            reduce using rule 33 (expression -> af .)
-    MINUS           reduce using rule 33 (expression -> af .)
-    TIMES           reduce using rule 33 (expression -> af .)
-    DIVIDE          reduce using rule 33 (expression -> af .)
-    EXP             reduce using rule 33 (expression -> af .)
-    P               reduce using rule 33 (expression -> af .)
-    M               reduce using rule 33 (expression -> af .)
-    T               reduce using rule 33 (expression -> af .)
-    D               reduce using rule 33 (expression -> af .)
-    E               reduce using rule 33 (expression -> af .)
-    $end            reduce using rule 33 (expression -> af .)
-    RPAREN          reduce using rule 33 (expression -> af .)
-    AHUN            shift and go to state 33
-
-
-state 12
-
-    (43) af -> AFACE .
-
-    ATHOU           reduce using rule 43 (af -> AFACE .)
-    AHUN            reduce using rule 43 (af -> AFACE .)
-    PLUS            reduce using rule 43 (af -> AFACE .)
-    MINUS           reduce using rule 43 (af -> AFACE .)
-    TIMES           reduce using rule 43 (af -> AFACE .)
-    DIVIDE          reduce using rule 43 (af -> AFACE .)
-    EXP             reduce using rule 43 (af -> AFACE .)
-    P               reduce using rule 43 (af -> AFACE .)
-    M               reduce using rule 43 (af -> AFACE .)
-    T               reduce using rule 43 (af -> AFACE .)
-    D               reduce using rule 43 (af -> AFACE .)
-    E               reduce using rule 43 (af -> AFACE .)
-    $end            reduce using rule 43 (af -> AFACE .)
-    RPAREN          reduce using rule 43 (af -> AFACE .)
-
-
-state 13
 
     (1) statement -> NAME . EQUALS expression
     (17) expression -> NAME .
 
-    EQUALS          shift and go to state 34
+    EQUALS          shift and go to state 22
     PLUS            reduce using rule 17 (expression -> NAME .)
     MINUS           reduce using rule 17 (expression -> NAME .)
     TIMES           reduce using rule 17 (expression -> NAME .)
@@ -530,665 +414,154 @@ state 13
     $end            reduce using rule 17 (expression -> NAME .)
 
 
+state 11
+
+    (35) af -> AFACE .
+
+    ATHOU           reduce using rule 35 (af -> AFACE .)
+    AHUN            reduce using rule 35 (af -> AFACE .)
+    PLUS            reduce using rule 35 (af -> AFACE .)
+    MINUS           reduce using rule 35 (af -> AFACE .)
+    TIMES           reduce using rule 35 (af -> AFACE .)
+    DIVIDE          reduce using rule 35 (af -> AFACE .)
+    EXP             reduce using rule 35 (af -> AFACE .)
+    P               reduce using rule 35 (af -> AFACE .)
+    M               reduce using rule 35 (af -> AFACE .)
+    T               reduce using rule 35 (af -> AFACE .)
+    D               reduce using rule 35 (af -> AFACE .)
+    E               reduce using rule 35 (af -> AFACE .)
+    $end            reduce using rule 35 (af -> AFACE .)
+    RPAREN          reduce using rule 35 (af -> AFACE .)
+
+
+state 12
+
+    (2) statement -> expression .
+    (3) expression -> expression . PLUS expression
+    (4) expression -> expression . MINUS expression
+    (5) expression -> expression . TIMES expression
+    (6) expression -> expression . DIVIDE expression
+    (7) expression -> expression . EXP expression
+    (8) expression -> expression . P expression
+    (9) expression -> expression . M expression
+    (10) expression -> expression . T expression
+    (11) expression -> expression . D expression
+    (12) expression -> expression . E expression
+
+    $end            reduce using rule 2 (statement -> expression .)
+    PLUS            shift and go to state 28
+    MINUS           shift and go to state 31
+    TIMES           shift and go to state 26
+    DIVIDE          shift and go to state 24
+    EXP             shift and go to state 30
+    P               shift and go to state 27
+    M               shift and go to state 25
+    T               shift and go to state 29
+    D               shift and go to state 32
+    E               shift and go to state 23
+
+
+state 13
+
+    (34) dval -> ATWO .
+
+    ATHOU           reduce using rule 34 (dval -> ATWO .)
+    PLUS            reduce using rule 34 (dval -> ATWO .)
+    MINUS           reduce using rule 34 (dval -> ATWO .)
+    TIMES           reduce using rule 34 (dval -> ATWO .)
+    DIVIDE          reduce using rule 34 (dval -> ATWO .)
+    EXP             reduce using rule 34 (dval -> ATWO .)
+    P               reduce using rule 34 (dval -> ATWO .)
+    M               reduce using rule 34 (dval -> ATWO .)
+    T               reduce using rule 34 (dval -> ATWO .)
+    D               reduce using rule 34 (dval -> ATWO .)
+    E               reduce using rule 34 (dval -> ATWO .)
+    $end            reduce using rule 34 (dval -> ATWO .)
+    RPAREN          reduce using rule 34 (dval -> ATWO .)
+
+
 state 14
 
-    (40) dval -> ARVAL . af
-    (41) dval -> ARVAL .
-    (43) af -> . AFACE
+    (21) expression -> af ATHOU . hval
+    (22) expression -> af ATHOU . dval
+    (23) expression -> af ATHOU . af
+    (25) expression -> af ATHOU .
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
 
-    ATHOU           reduce using rule 41 (dval -> ARVAL .)
-    AHUN            reduce using rule 41 (dval -> ARVAL .)
-    PLUS            reduce using rule 41 (dval -> ARVAL .)
-    MINUS           reduce using rule 41 (dval -> ARVAL .)
-    TIMES           reduce using rule 41 (dval -> ARVAL .)
-    DIVIDE          reduce using rule 41 (dval -> ARVAL .)
-    EXP             reduce using rule 41 (dval -> ARVAL .)
-    P               reduce using rule 41 (dval -> ARVAL .)
-    M               reduce using rule 41 (dval -> ARVAL .)
-    T               reduce using rule 41 (dval -> ARVAL .)
-    D               reduce using rule 41 (dval -> ARVAL .)
-    E               reduce using rule 41 (dval -> ARVAL .)
-    $end            reduce using rule 41 (dval -> ARVAL .)
-    RPAREN          reduce using rule 41 (dval -> ARVAL .)
-    AFACE           shift and go to state 12
+    PLUS            reduce using rule 25 (expression -> af ATHOU .)
+    MINUS           reduce using rule 25 (expression -> af ATHOU .)
+    TIMES           reduce using rule 25 (expression -> af ATHOU .)
+    DIVIDE          reduce using rule 25 (expression -> af ATHOU .)
+    EXP             reduce using rule 25 (expression -> af ATHOU .)
+    P               reduce using rule 25 (expression -> af ATHOU .)
+    M               reduce using rule 25 (expression -> af ATHOU .)
+    T               reduce using rule 25 (expression -> af ATHOU .)
+    D               reduce using rule 25 (expression -> af ATHOU .)
+    E               reduce using rule 25 (expression -> af ATHOU .)
+    $end            reduce using rule 25 (expression -> af ATHOU .)
+    RPAREN          reduce using rule 25 (expression -> af ATHOU .)
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
 
-    af                             shift and go to state 35
+    hval                           shift and go to state 35
+    dval                           shift and go to state 33
+    af                             shift and go to state 34
 
 state 15
 
-    (5) expression -> expression TIMES . expression
-    (3) expression -> . expression PLUS expression
-    (4) expression -> . expression MINUS expression
-    (5) expression -> . expression TIMES expression
-    (6) expression -> . expression DIVIDE expression
-    (7) expression -> . expression EXP expression
-    (8) expression -> . expression P expression
-    (9) expression -> . expression M expression
-    (10) expression -> . expression T expression
-    (11) expression -> . expression D expression
-    (12) expression -> . expression E expression
-    (13) expression -> . MINUS expression
-    (14) expression -> . M expression
-    (15) expression -> . LPAREN expression RPAREN
-    (16) expression -> . NUMBER
-    (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
+    (29) hval -> af AHUN . dval
+    (30) hval -> af AHUN . af
+    (31) hval -> af AHUN .
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
 
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
+    PLUS            reduce using rule 31 (hval -> af AHUN .)
+    MINUS           reduce using rule 31 (hval -> af AHUN .)
+    TIMES           reduce using rule 31 (hval -> af AHUN .)
+    DIVIDE          reduce using rule 31 (hval -> af AHUN .)
+    EXP             reduce using rule 31 (hval -> af AHUN .)
+    P               reduce using rule 31 (hval -> af AHUN .)
+    M               reduce using rule 31 (hval -> af AHUN .)
+    T               reduce using rule 31 (hval -> af AHUN .)
+    D               reduce using rule 31 (hval -> af AHUN .)
+    E               reduce using rule 31 (hval -> af AHUN .)
+    $end            reduce using rule 31 (hval -> af AHUN .)
+    RPAREN          reduce using rule 31 (hval -> af AHUN .)
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
 
-    af                             shift and go to state 11
-    expression                     shift and go to state 36
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
+    dval                           shift and go to state 36
+    af                             shift and go to state 37
 
 state 16
 
-    (4) expression -> expression MINUS . expression
-    (3) expression -> . expression PLUS expression
-    (4) expression -> . expression MINUS expression
-    (5) expression -> . expression TIMES expression
-    (6) expression -> . expression DIVIDE expression
-    (7) expression -> . expression EXP expression
-    (8) expression -> . expression P expression
-    (9) expression -> . expression M expression
-    (10) expression -> . expression T expression
-    (11) expression -> . expression D expression
-    (12) expression -> . expression E expression
-    (13) expression -> . MINUS expression
-    (14) expression -> . M expression
-    (15) expression -> . LPAREN expression RPAREN
-    (16) expression -> . NUMBER
-    (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
+    (17) expression -> NAME .
 
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
+    PLUS            reduce using rule 17 (expression -> NAME .)
+    MINUS           reduce using rule 17 (expression -> NAME .)
+    TIMES           reduce using rule 17 (expression -> NAME .)
+    DIVIDE          reduce using rule 17 (expression -> NAME .)
+    EXP             reduce using rule 17 (expression -> NAME .)
+    P               reduce using rule 17 (expression -> NAME .)
+    M               reduce using rule 17 (expression -> NAME .)
+    T               reduce using rule 17 (expression -> NAME .)
+    D               reduce using rule 17 (expression -> NAME .)
+    E               reduce using rule 17 (expression -> NAME .)
+    $end            reduce using rule 17 (expression -> NAME .)
+    RPAREN          reduce using rule 17 (expression -> NAME .)
 
-    af                             shift and go to state 11
-    expression                     shift and go to state 37
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
 
 state 17
-
-    (6) expression -> expression DIVIDE . expression
-    (3) expression -> . expression PLUS expression
-    (4) expression -> . expression MINUS expression
-    (5) expression -> . expression TIMES expression
-    (6) expression -> . expression DIVIDE expression
-    (7) expression -> . expression EXP expression
-    (8) expression -> . expression P expression
-    (9) expression -> . expression M expression
-    (10) expression -> . expression T expression
-    (11) expression -> . expression D expression
-    (12) expression -> . expression E expression
-    (13) expression -> . MINUS expression
-    (14) expression -> . M expression
-    (15) expression -> . LPAREN expression RPAREN
-    (16) expression -> . NUMBER
-    (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
-
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 11
-    expression                     shift and go to state 38
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
-
-state 18
-
-    (12) expression -> expression E . expression
-    (3) expression -> . expression PLUS expression
-    (4) expression -> . expression MINUS expression
-    (5) expression -> . expression TIMES expression
-    (6) expression -> . expression DIVIDE expression
-    (7) expression -> . expression EXP expression
-    (8) expression -> . expression P expression
-    (9) expression -> . expression M expression
-    (10) expression -> . expression T expression
-    (11) expression -> . expression D expression
-    (12) expression -> . expression E expression
-    (13) expression -> . MINUS expression
-    (14) expression -> . M expression
-    (15) expression -> . LPAREN expression RPAREN
-    (16) expression -> . NUMBER
-    (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
-
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 11
-    expression                     shift and go to state 39
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
-
-state 19
-
-    (7) expression -> expression EXP . expression
-    (3) expression -> . expression PLUS expression
-    (4) expression -> . expression MINUS expression
-    (5) expression -> . expression TIMES expression
-    (6) expression -> . expression DIVIDE expression
-    (7) expression -> . expression EXP expression
-    (8) expression -> . expression P expression
-    (9) expression -> . expression M expression
-    (10) expression -> . expression T expression
-    (11) expression -> . expression D expression
-    (12) expression -> . expression E expression
-    (13) expression -> . MINUS expression
-    (14) expression -> . M expression
-    (15) expression -> . LPAREN expression RPAREN
-    (16) expression -> . NUMBER
-    (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
-
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 11
-    expression                     shift and go to state 40
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
-
-state 20
-
-    (3) expression -> expression PLUS . expression
-    (3) expression -> . expression PLUS expression
-    (4) expression -> . expression MINUS expression
-    (5) expression -> . expression TIMES expression
-    (6) expression -> . expression DIVIDE expression
-    (7) expression -> . expression EXP expression
-    (8) expression -> . expression P expression
-    (9) expression -> . expression M expression
-    (10) expression -> . expression T expression
-    (11) expression -> . expression D expression
-    (12) expression -> . expression E expression
-    (13) expression -> . MINUS expression
-    (14) expression -> . M expression
-    (15) expression -> . LPAREN expression RPAREN
-    (16) expression -> . NUMBER
-    (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
-
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 11
-    expression                     shift and go to state 41
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
-
-state 21
-
-    (8) expression -> expression P . expression
-    (3) expression -> . expression PLUS expression
-    (4) expression -> . expression MINUS expression
-    (5) expression -> . expression TIMES expression
-    (6) expression -> . expression DIVIDE expression
-    (7) expression -> . expression EXP expression
-    (8) expression -> . expression P expression
-    (9) expression -> . expression M expression
-    (10) expression -> . expression T expression
-    (11) expression -> . expression D expression
-    (12) expression -> . expression E expression
-    (13) expression -> . MINUS expression
-    (14) expression -> . M expression
-    (15) expression -> . LPAREN expression RPAREN
-    (16) expression -> . NUMBER
-    (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
-
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 11
-    expression                     shift and go to state 42
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
-
-state 22
-
-    (10) expression -> expression T . expression
-    (3) expression -> . expression PLUS expression
-    (4) expression -> . expression MINUS expression
-    (5) expression -> . expression TIMES expression
-    (6) expression -> . expression DIVIDE expression
-    (7) expression -> . expression EXP expression
-    (8) expression -> . expression P expression
-    (9) expression -> . expression M expression
-    (10) expression -> . expression T expression
-    (11) expression -> . expression D expression
-    (12) expression -> . expression E expression
-    (13) expression -> . MINUS expression
-    (14) expression -> . M expression
-    (15) expression -> . LPAREN expression RPAREN
-    (16) expression -> . NUMBER
-    (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
-
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 11
-    expression                     shift and go to state 43
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
-
-state 23
-
-    (9) expression -> expression M . expression
-    (3) expression -> . expression PLUS expression
-    (4) expression -> . expression MINUS expression
-    (5) expression -> . expression TIMES expression
-    (6) expression -> . expression DIVIDE expression
-    (7) expression -> . expression EXP expression
-    (8) expression -> . expression P expression
-    (9) expression -> . expression M expression
-    (10) expression -> . expression T expression
-    (11) expression -> . expression D expression
-    (12) expression -> . expression E expression
-    (13) expression -> . MINUS expression
-    (14) expression -> . M expression
-    (15) expression -> . LPAREN expression RPAREN
-    (16) expression -> . NUMBER
-    (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
-
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 11
-    expression                     shift and go to state 44
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
-
-state 24
-
-    (11) expression -> expression D . expression
-    (3) expression -> . expression PLUS expression
-    (4) expression -> . expression MINUS expression
-    (5) expression -> . expression TIMES expression
-    (6) expression -> . expression DIVIDE expression
-    (7) expression -> . expression EXP expression
-    (8) expression -> . expression P expression
-    (9) expression -> . expression M expression
-    (10) expression -> . expression T expression
-    (11) expression -> . expression D expression
-    (12) expression -> . expression E expression
-    (13) expression -> . MINUS expression
-    (14) expression -> . M expression
-    (15) expression -> . LPAREN expression RPAREN
-    (16) expression -> . NUMBER
-    (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
-
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 11
-    expression                     shift and go to state 45
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
-
-state 25
-
-    (18) expression -> hval ATHOU . hval
-    (19) expression -> hval ATHOU . dval
-    (20) expression -> hval ATHOU . af
-    (27) expression -> hval ATHOU .
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-
-    PLUS            reduce using rule 27 (expression -> hval ATHOU .)
-    MINUS           reduce using rule 27 (expression -> hval ATHOU .)
-    TIMES           reduce using rule 27 (expression -> hval ATHOU .)
-    DIVIDE          reduce using rule 27 (expression -> hval ATHOU .)
-    EXP             reduce using rule 27 (expression -> hval ATHOU .)
-    P               reduce using rule 27 (expression -> hval ATHOU .)
-    M               reduce using rule 27 (expression -> hval ATHOU .)
-    T               reduce using rule 27 (expression -> hval ATHOU .)
-    D               reduce using rule 27 (expression -> hval ATHOU .)
-    E               reduce using rule 27 (expression -> hval ATHOU .)
-    $end            reduce using rule 27 (expression -> hval ATHOU .)
-    RPAREN          reduce using rule 27 (expression -> hval ATHOU .)
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 46
-    dval                           shift and go to state 47
-    hval                           shift and go to state 48
-
-state 26
 
     (13) expression -> MINUS expression .
     (3) expression -> expression . PLUS expression
@@ -1208,12 +581,12 @@ state 26
     M               reduce using rule 13 (expression -> MINUS expression .)
     $end            reduce using rule 13 (expression -> MINUS expression .)
     RPAREN          reduce using rule 13 (expression -> MINUS expression .)
-    TIMES           shift and go to state 15
-    DIVIDE          shift and go to state 17
-    EXP             shift and go to state 19
-    T               shift and go to state 22
-    D               shift and go to state 24
-    E               shift and go to state 18
+    TIMES           shift and go to state 26
+    DIVIDE          shift and go to state 24
+    EXP             shift and go to state 30
+    T               shift and go to state 29
+    D               shift and go to state 32
+    E               shift and go to state 23
 
   ! TIMES           [ reduce using rule 13 (expression -> MINUS expression .) ]
   ! DIVIDE          [ reduce using rule 13 (expression -> MINUS expression .) ]
@@ -1221,94 +594,32 @@ state 26
   ! T               [ reduce using rule 13 (expression -> MINUS expression .) ]
   ! D               [ reduce using rule 13 (expression -> MINUS expression .) ]
   ! E               [ reduce using rule 13 (expression -> MINUS expression .) ]
-  ! PLUS            [ shift and go to state 20 ]
-  ! MINUS           [ shift and go to state 16 ]
-  ! P               [ shift and go to state 21 ]
-  ! M               [ shift and go to state 23 ]
+  ! PLUS            [ shift and go to state 28 ]
+  ! MINUS           [ shift and go to state 31 ]
+  ! P               [ shift and go to state 27 ]
+  ! M               [ shift and go to state 25 ]
 
 
-state 27
+state 18
 
-    (17) expression -> NAME .
+    (32) dval -> ARVAL af .
 
-    PLUS            reduce using rule 17 (expression -> NAME .)
-    MINUS           reduce using rule 17 (expression -> NAME .)
-    TIMES           reduce using rule 17 (expression -> NAME .)
-    DIVIDE          reduce using rule 17 (expression -> NAME .)
-    EXP             reduce using rule 17 (expression -> NAME .)
-    P               reduce using rule 17 (expression -> NAME .)
-    M               reduce using rule 17 (expression -> NAME .)
-    T               reduce using rule 17 (expression -> NAME .)
-    D               reduce using rule 17 (expression -> NAME .)
-    E               reduce using rule 17 (expression -> NAME .)
-    $end            reduce using rule 17 (expression -> NAME .)
-    RPAREN          reduce using rule 17 (expression -> NAME .)
+    ATHOU           reduce using rule 32 (dval -> ARVAL af .)
+    PLUS            reduce using rule 32 (dval -> ARVAL af .)
+    MINUS           reduce using rule 32 (dval -> ARVAL af .)
+    TIMES           reduce using rule 32 (dval -> ARVAL af .)
+    DIVIDE          reduce using rule 32 (dval -> ARVAL af .)
+    EXP             reduce using rule 32 (dval -> ARVAL af .)
+    P               reduce using rule 32 (dval -> ARVAL af .)
+    M               reduce using rule 32 (dval -> ARVAL af .)
+    T               reduce using rule 32 (dval -> ARVAL af .)
+    D               reduce using rule 32 (dval -> ARVAL af .)
+    E               reduce using rule 32 (dval -> ARVAL af .)
+    $end            reduce using rule 32 (dval -> ARVAL af .)
+    RPAREN          reduce using rule 32 (dval -> ARVAL af .)
 
 
-state 28
-
-    (21) expression -> dval ATHOU . hval
-    (22) expression -> dval ATHOU . dval
-    (23) expression -> dval ATHOU . af
-    (28) expression -> dval ATHOU .
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-
-    PLUS            reduce using rule 28 (expression -> dval ATHOU .)
-    MINUS           reduce using rule 28 (expression -> dval ATHOU .)
-    TIMES           reduce using rule 28 (expression -> dval ATHOU .)
-    DIVIDE          reduce using rule 28 (expression -> dval ATHOU .)
-    EXP             reduce using rule 28 (expression -> dval ATHOU .)
-    P               reduce using rule 28 (expression -> dval ATHOU .)
-    M               reduce using rule 28 (expression -> dval ATHOU .)
-    T               reduce using rule 28 (expression -> dval ATHOU .)
-    D               reduce using rule 28 (expression -> dval ATHOU .)
-    E               reduce using rule 28 (expression -> dval ATHOU .)
-    $end            reduce using rule 28 (expression -> dval ATHOU .)
-    RPAREN          reduce using rule 28 (expression -> dval ATHOU .)
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 49
-    dval                           shift and go to state 50
-    hval                           shift and go to state 51
-
-state 29
-
-    (34) hhval -> dval AHUN . dval
-    (35) hhval -> dval AHUN . af
-    (36) hhval -> dval AHUN .
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-
-    PLUS            reduce using rule 36 (hhval -> dval AHUN .)
-    MINUS           reduce using rule 36 (hhval -> dval AHUN .)
-    TIMES           reduce using rule 36 (hhval -> dval AHUN .)
-    DIVIDE          reduce using rule 36 (hhval -> dval AHUN .)
-    EXP             reduce using rule 36 (hhval -> dval AHUN .)
-    P               reduce using rule 36 (hhval -> dval AHUN .)
-    M               reduce using rule 36 (hhval -> dval AHUN .)
-    T               reduce using rule 36 (hhval -> dval AHUN .)
-    D               reduce using rule 36 (hhval -> dval AHUN .)
-    E               reduce using rule 36 (hhval -> dval AHUN .)
-    $end            reduce using rule 36 (hhval -> dval AHUN .)
-    RPAREN          reduce using rule 36 (hhval -> dval AHUN .)
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 52
-    dval                           shift and go to state 53
-
-state 30
+state 19
 
     (14) expression -> M expression .
     (3) expression -> expression . PLUS expression
@@ -1335,19 +646,19 @@ state 30
     $end            reduce using rule 14 (expression -> M expression .)
     RPAREN          reduce using rule 14 (expression -> M expression .)
 
-  ! PLUS            [ shift and go to state 20 ]
-  ! MINUS           [ shift and go to state 16 ]
-  ! TIMES           [ shift and go to state 15 ]
-  ! DIVIDE          [ shift and go to state 17 ]
-  ! EXP             [ shift and go to state 19 ]
-  ! P               [ shift and go to state 21 ]
-  ! M               [ shift and go to state 23 ]
-  ! T               [ shift and go to state 22 ]
-  ! D               [ shift and go to state 24 ]
-  ! E               [ shift and go to state 18 ]
+  ! PLUS            [ shift and go to state 28 ]
+  ! MINUS           [ shift and go to state 31 ]
+  ! TIMES           [ shift and go to state 26 ]
+  ! DIVIDE          [ shift and go to state 24 ]
+  ! EXP             [ shift and go to state 30 ]
+  ! P               [ shift and go to state 27 ]
+  ! M               [ shift and go to state 25 ]
+  ! T               [ shift and go to state 29 ]
+  ! D               [ shift and go to state 32 ]
+  ! E               [ shift and go to state 23 ]
 
 
-state 31
+state 20
 
     (15) expression -> LPAREN expression . RPAREN
     (3) expression -> expression . PLUS expression
@@ -1361,84 +672,54 @@ state 31
     (11) expression -> expression . D expression
     (12) expression -> expression . E expression
 
-    RPAREN          shift and go to state 54
-    PLUS            shift and go to state 20
-    MINUS           shift and go to state 16
-    TIMES           shift and go to state 15
-    DIVIDE          shift and go to state 17
-    EXP             shift and go to state 19
-    P               shift and go to state 21
-    M               shift and go to state 23
-    T               shift and go to state 22
-    D               shift and go to state 24
-    E               shift and go to state 18
+    RPAREN          shift and go to state 38
+    PLUS            shift and go to state 28
+    MINUS           shift and go to state 31
+    TIMES           shift and go to state 26
+    DIVIDE          shift and go to state 24
+    EXP             shift and go to state 30
+    P               shift and go to state 27
+    M               shift and go to state 25
+    T               shift and go to state 29
+    D               shift and go to state 32
+    E               shift and go to state 23
 
 
-state 32
+state 21
 
-    (24) expression -> af ATHOU . hval
-    (25) expression -> af ATHOU . dval
-    (26) expression -> af ATHOU . af
-    (29) expression -> af ATHOU .
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
+    (18) expression -> dval ATHOU . hval
+    (19) expression -> dval ATHOU . dval
+    (20) expression -> dval ATHOU . af
+    (24) expression -> dval ATHOU .
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
 
-    PLUS            reduce using rule 29 (expression -> af ATHOU .)
-    MINUS           reduce using rule 29 (expression -> af ATHOU .)
-    TIMES           reduce using rule 29 (expression -> af ATHOU .)
-    DIVIDE          reduce using rule 29 (expression -> af ATHOU .)
-    EXP             reduce using rule 29 (expression -> af ATHOU .)
-    P               reduce using rule 29 (expression -> af ATHOU .)
-    M               reduce using rule 29 (expression -> af ATHOU .)
-    T               reduce using rule 29 (expression -> af ATHOU .)
-    D               reduce using rule 29 (expression -> af ATHOU .)
-    E               reduce using rule 29 (expression -> af ATHOU .)
-    $end            reduce using rule 29 (expression -> af ATHOU .)
-    RPAREN          reduce using rule 29 (expression -> af ATHOU .)
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
+    PLUS            reduce using rule 24 (expression -> dval ATHOU .)
+    MINUS           reduce using rule 24 (expression -> dval ATHOU .)
+    TIMES           reduce using rule 24 (expression -> dval ATHOU .)
+    DIVIDE          reduce using rule 24 (expression -> dval ATHOU .)
+    EXP             reduce using rule 24 (expression -> dval ATHOU .)
+    P               reduce using rule 24 (expression -> dval ATHOU .)
+    M               reduce using rule 24 (expression -> dval ATHOU .)
+    T               reduce using rule 24 (expression -> dval ATHOU .)
+    D               reduce using rule 24 (expression -> dval ATHOU .)
+    E               reduce using rule 24 (expression -> dval ATHOU .)
+    $end            reduce using rule 24 (expression -> dval ATHOU .)
+    RPAREN          reduce using rule 24 (expression -> dval ATHOU .)
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
 
-    af                             shift and go to state 55
-    dval                           shift and go to state 56
-    hval                           shift and go to state 57
+    hval                           shift and go to state 41
+    dval                           shift and go to state 39
+    af                             shift and go to state 40
 
-state 33
-
-    (37) hval -> af AHUN . dval
-    (38) hval -> af AHUN . af
-    (39) hval -> af AHUN .
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-
-    ATHOU           reduce using rule 39 (hval -> af AHUN .)
-    PLUS            reduce using rule 39 (hval -> af AHUN .)
-    MINUS           reduce using rule 39 (hval -> af AHUN .)
-    TIMES           reduce using rule 39 (hval -> af AHUN .)
-    DIVIDE          reduce using rule 39 (hval -> af AHUN .)
-    EXP             reduce using rule 39 (hval -> af AHUN .)
-    P               reduce using rule 39 (hval -> af AHUN .)
-    M               reduce using rule 39 (hval -> af AHUN .)
-    T               reduce using rule 39 (hval -> af AHUN .)
-    D               reduce using rule 39 (hval -> af AHUN .)
-    E               reduce using rule 39 (hval -> af AHUN .)
-    $end            reduce using rule 39 (hval -> af AHUN .)
-    RPAREN          reduce using rule 39 (hval -> af AHUN .)
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
-
-    af                             shift and go to state 58
-    dval                           shift and go to state 59
-
-state 34
+state 22
 
     (1) statement -> NAME EQUALS . expression
     (3) expression -> . expression PLUS expression
@@ -1456,149 +737,722 @@ state 34
     (15) expression -> . LPAREN expression RPAREN
     (16) expression -> . NUMBER
     (17) expression -> . NAME
-    (18) expression -> . hval ATHOU hval
-    (19) expression -> . hval ATHOU dval
-    (20) expression -> . hval ATHOU af
-    (21) expression -> . dval ATHOU hval
-    (22) expression -> . dval ATHOU dval
-    (23) expression -> . dval ATHOU af
-    (24) expression -> . af ATHOU hval
-    (25) expression -> . af ATHOU dval
-    (26) expression -> . af ATHOU af
-    (27) expression -> . hval ATHOU
-    (28) expression -> . dval ATHOU
-    (29) expression -> . af ATHOU
-    (30) expression -> . hval
-    (31) expression -> . hhval
-    (32) expression -> . dval
-    (33) expression -> . af
-    (37) hval -> . af AHUN dval
-    (38) hval -> . af AHUN af
-    (39) hval -> . af AHUN
-    (40) dval -> . ARVAL af
-    (41) dval -> . ARVAL
-    (42) dval -> . ATWO
-    (43) af -> . AFACE
-    (34) hhval -> . dval AHUN dval
-    (35) hhval -> . dval AHUN af
-    (36) hhval -> . dval AHUN
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
 
-    MINUS           shift and go to state 5
-    M               shift and go to state 8
-    LPAREN          shift and go to state 9
-    NUMBER          shift and go to state 6
-    NAME            shift and go to state 27
-    ARVAL           shift and go to state 14
-    ATWO            shift and go to state 4
-    AFACE           shift and go to state 12
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
 
-    af                             shift and go to state 11
-    expression                     shift and go to state 60
-    dval                           shift and go to state 7
-    hval                           shift and go to state 3
-    hhval                          shift and go to state 1
+    hval                           shift and go to state 2
+    expression                     shift and go to state 42
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 23
+
+    (12) expression -> expression E . expression
+    (3) expression -> . expression PLUS expression
+    (4) expression -> . expression MINUS expression
+    (5) expression -> . expression TIMES expression
+    (6) expression -> . expression DIVIDE expression
+    (7) expression -> . expression EXP expression
+    (8) expression -> . expression P expression
+    (9) expression -> . expression M expression
+    (10) expression -> . expression T expression
+    (11) expression -> . expression D expression
+    (12) expression -> . expression E expression
+    (13) expression -> . MINUS expression
+    (14) expression -> . M expression
+    (15) expression -> . LPAREN expression RPAREN
+    (16) expression -> . NUMBER
+    (17) expression -> . NAME
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
+
+    hval                           shift and go to state 2
+    expression                     shift and go to state 43
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 24
+
+    (6) expression -> expression DIVIDE . expression
+    (3) expression -> . expression PLUS expression
+    (4) expression -> . expression MINUS expression
+    (5) expression -> . expression TIMES expression
+    (6) expression -> . expression DIVIDE expression
+    (7) expression -> . expression EXP expression
+    (8) expression -> . expression P expression
+    (9) expression -> . expression M expression
+    (10) expression -> . expression T expression
+    (11) expression -> . expression D expression
+    (12) expression -> . expression E expression
+    (13) expression -> . MINUS expression
+    (14) expression -> . M expression
+    (15) expression -> . LPAREN expression RPAREN
+    (16) expression -> . NUMBER
+    (17) expression -> . NAME
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
+
+    hval                           shift and go to state 2
+    expression                     shift and go to state 44
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 25
+
+    (9) expression -> expression M . expression
+    (3) expression -> . expression PLUS expression
+    (4) expression -> . expression MINUS expression
+    (5) expression -> . expression TIMES expression
+    (6) expression -> . expression DIVIDE expression
+    (7) expression -> . expression EXP expression
+    (8) expression -> . expression P expression
+    (9) expression -> . expression M expression
+    (10) expression -> . expression T expression
+    (11) expression -> . expression D expression
+    (12) expression -> . expression E expression
+    (13) expression -> . MINUS expression
+    (14) expression -> . M expression
+    (15) expression -> . LPAREN expression RPAREN
+    (16) expression -> . NUMBER
+    (17) expression -> . NAME
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
+
+    hval                           shift and go to state 2
+    expression                     shift and go to state 45
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 26
+
+    (5) expression -> expression TIMES . expression
+    (3) expression -> . expression PLUS expression
+    (4) expression -> . expression MINUS expression
+    (5) expression -> . expression TIMES expression
+    (6) expression -> . expression DIVIDE expression
+    (7) expression -> . expression EXP expression
+    (8) expression -> . expression P expression
+    (9) expression -> . expression M expression
+    (10) expression -> . expression T expression
+    (11) expression -> . expression D expression
+    (12) expression -> . expression E expression
+    (13) expression -> . MINUS expression
+    (14) expression -> . M expression
+    (15) expression -> . LPAREN expression RPAREN
+    (16) expression -> . NUMBER
+    (17) expression -> . NAME
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
+
+    hval                           shift and go to state 2
+    expression                     shift and go to state 46
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 27
+
+    (8) expression -> expression P . expression
+    (3) expression -> . expression PLUS expression
+    (4) expression -> . expression MINUS expression
+    (5) expression -> . expression TIMES expression
+    (6) expression -> . expression DIVIDE expression
+    (7) expression -> . expression EXP expression
+    (8) expression -> . expression P expression
+    (9) expression -> . expression M expression
+    (10) expression -> . expression T expression
+    (11) expression -> . expression D expression
+    (12) expression -> . expression E expression
+    (13) expression -> . MINUS expression
+    (14) expression -> . M expression
+    (15) expression -> . LPAREN expression RPAREN
+    (16) expression -> . NUMBER
+    (17) expression -> . NAME
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
+
+    hval                           shift and go to state 2
+    expression                     shift and go to state 47
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 28
+
+    (3) expression -> expression PLUS . expression
+    (3) expression -> . expression PLUS expression
+    (4) expression -> . expression MINUS expression
+    (5) expression -> . expression TIMES expression
+    (6) expression -> . expression DIVIDE expression
+    (7) expression -> . expression EXP expression
+    (8) expression -> . expression P expression
+    (9) expression -> . expression M expression
+    (10) expression -> . expression T expression
+    (11) expression -> . expression D expression
+    (12) expression -> . expression E expression
+    (13) expression -> . MINUS expression
+    (14) expression -> . M expression
+    (15) expression -> . LPAREN expression RPAREN
+    (16) expression -> . NUMBER
+    (17) expression -> . NAME
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
+
+    hval                           shift and go to state 2
+    expression                     shift and go to state 48
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 29
+
+    (10) expression -> expression T . expression
+    (3) expression -> . expression PLUS expression
+    (4) expression -> . expression MINUS expression
+    (5) expression -> . expression TIMES expression
+    (6) expression -> . expression DIVIDE expression
+    (7) expression -> . expression EXP expression
+    (8) expression -> . expression P expression
+    (9) expression -> . expression M expression
+    (10) expression -> . expression T expression
+    (11) expression -> . expression D expression
+    (12) expression -> . expression E expression
+    (13) expression -> . MINUS expression
+    (14) expression -> . M expression
+    (15) expression -> . LPAREN expression RPAREN
+    (16) expression -> . NUMBER
+    (17) expression -> . NAME
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
+
+    hval                           shift and go to state 2
+    expression                     shift and go to state 49
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 30
+
+    (7) expression -> expression EXP . expression
+    (3) expression -> . expression PLUS expression
+    (4) expression -> . expression MINUS expression
+    (5) expression -> . expression TIMES expression
+    (6) expression -> . expression DIVIDE expression
+    (7) expression -> . expression EXP expression
+    (8) expression -> . expression P expression
+    (9) expression -> . expression M expression
+    (10) expression -> . expression T expression
+    (11) expression -> . expression D expression
+    (12) expression -> . expression E expression
+    (13) expression -> . MINUS expression
+    (14) expression -> . M expression
+    (15) expression -> . LPAREN expression RPAREN
+    (16) expression -> . NUMBER
+    (17) expression -> . NAME
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
+
+    hval                           shift and go to state 2
+    expression                     shift and go to state 50
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 31
+
+    (4) expression -> expression MINUS . expression
+    (3) expression -> . expression PLUS expression
+    (4) expression -> . expression MINUS expression
+    (5) expression -> . expression TIMES expression
+    (6) expression -> . expression DIVIDE expression
+    (7) expression -> . expression EXP expression
+    (8) expression -> . expression P expression
+    (9) expression -> . expression M expression
+    (10) expression -> . expression T expression
+    (11) expression -> . expression D expression
+    (12) expression -> . expression E expression
+    (13) expression -> . MINUS expression
+    (14) expression -> . M expression
+    (15) expression -> . LPAREN expression RPAREN
+    (16) expression -> . NUMBER
+    (17) expression -> . NAME
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
+
+    hval                           shift and go to state 2
+    expression                     shift and go to state 51
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 32
+
+    (11) expression -> expression D . expression
+    (3) expression -> . expression PLUS expression
+    (4) expression -> . expression MINUS expression
+    (5) expression -> . expression TIMES expression
+    (6) expression -> . expression DIVIDE expression
+    (7) expression -> . expression EXP expression
+    (8) expression -> . expression P expression
+    (9) expression -> . expression M expression
+    (10) expression -> . expression T expression
+    (11) expression -> . expression D expression
+    (12) expression -> . expression E expression
+    (13) expression -> . MINUS expression
+    (14) expression -> . M expression
+    (15) expression -> . LPAREN expression RPAREN
+    (16) expression -> . NUMBER
+    (17) expression -> . NAME
+    (18) expression -> . dval ATHOU hval
+    (19) expression -> . dval ATHOU dval
+    (20) expression -> . dval ATHOU af
+    (21) expression -> . af ATHOU hval
+    (22) expression -> . af ATHOU dval
+    (23) expression -> . af ATHOU af
+    (24) expression -> . dval ATHOU
+    (25) expression -> . af ATHOU
+    (26) expression -> . hval
+    (27) expression -> . dval
+    (28) expression -> . af
+    (32) dval -> . ARVAL af
+    (33) dval -> . ARVAL
+    (34) dval -> . ATWO
+    (35) af -> . AFACE
+    (29) hval -> . af AHUN dval
+    (30) hval -> . af AHUN af
+    (31) hval -> . af AHUN
+
+    MINUS           shift and go to state 4
+    M               shift and go to state 7
+    LPAREN          shift and go to state 8
+    NUMBER          shift and go to state 3
+    NAME            shift and go to state 16
+    ARVAL           shift and go to state 6
+    ATWO            shift and go to state 13
+    AFACE           shift and go to state 11
+
+    hval                           shift and go to state 2
+    expression                     shift and go to state 52
+    dval                           shift and go to state 9
+    af                             shift and go to state 1
+
+state 33
+
+    (22) expression -> af ATHOU dval .
+
+    PLUS            reduce using rule 22 (expression -> af ATHOU dval .)
+    MINUS           reduce using rule 22 (expression -> af ATHOU dval .)
+    TIMES           reduce using rule 22 (expression -> af ATHOU dval .)
+    DIVIDE          reduce using rule 22 (expression -> af ATHOU dval .)
+    EXP             reduce using rule 22 (expression -> af ATHOU dval .)
+    P               reduce using rule 22 (expression -> af ATHOU dval .)
+    M               reduce using rule 22 (expression -> af ATHOU dval .)
+    T               reduce using rule 22 (expression -> af ATHOU dval .)
+    D               reduce using rule 22 (expression -> af ATHOU dval .)
+    E               reduce using rule 22 (expression -> af ATHOU dval .)
+    $end            reduce using rule 22 (expression -> af ATHOU dval .)
+    RPAREN          reduce using rule 22 (expression -> af ATHOU dval .)
+
+
+state 34
+
+    (23) expression -> af ATHOU af .
+    (29) hval -> af . AHUN dval
+    (30) hval -> af . AHUN af
+    (31) hval -> af . AHUN
+
+    PLUS            reduce using rule 23 (expression -> af ATHOU af .)
+    MINUS           reduce using rule 23 (expression -> af ATHOU af .)
+    TIMES           reduce using rule 23 (expression -> af ATHOU af .)
+    DIVIDE          reduce using rule 23 (expression -> af ATHOU af .)
+    EXP             reduce using rule 23 (expression -> af ATHOU af .)
+    P               reduce using rule 23 (expression -> af ATHOU af .)
+    M               reduce using rule 23 (expression -> af ATHOU af .)
+    T               reduce using rule 23 (expression -> af ATHOU af .)
+    D               reduce using rule 23 (expression -> af ATHOU af .)
+    E               reduce using rule 23 (expression -> af ATHOU af .)
+    $end            reduce using rule 23 (expression -> af ATHOU af .)
+    RPAREN          reduce using rule 23 (expression -> af ATHOU af .)
+    AHUN            shift and go to state 15
+
 
 state 35
 
-    (40) dval -> ARVAL af .
+    (21) expression -> af ATHOU hval .
 
-    ATHOU           reduce using rule 40 (dval -> ARVAL af .)
-    AHUN            reduce using rule 40 (dval -> ARVAL af .)
-    PLUS            reduce using rule 40 (dval -> ARVAL af .)
-    MINUS           reduce using rule 40 (dval -> ARVAL af .)
-    TIMES           reduce using rule 40 (dval -> ARVAL af .)
-    DIVIDE          reduce using rule 40 (dval -> ARVAL af .)
-    EXP             reduce using rule 40 (dval -> ARVAL af .)
-    P               reduce using rule 40 (dval -> ARVAL af .)
-    M               reduce using rule 40 (dval -> ARVAL af .)
-    T               reduce using rule 40 (dval -> ARVAL af .)
-    D               reduce using rule 40 (dval -> ARVAL af .)
-    E               reduce using rule 40 (dval -> ARVAL af .)
-    $end            reduce using rule 40 (dval -> ARVAL af .)
-    RPAREN          reduce using rule 40 (dval -> ARVAL af .)
+    PLUS            reduce using rule 21 (expression -> af ATHOU hval .)
+    MINUS           reduce using rule 21 (expression -> af ATHOU hval .)
+    TIMES           reduce using rule 21 (expression -> af ATHOU hval .)
+    DIVIDE          reduce using rule 21 (expression -> af ATHOU hval .)
+    EXP             reduce using rule 21 (expression -> af ATHOU hval .)
+    P               reduce using rule 21 (expression -> af ATHOU hval .)
+    M               reduce using rule 21 (expression -> af ATHOU hval .)
+    T               reduce using rule 21 (expression -> af ATHOU hval .)
+    D               reduce using rule 21 (expression -> af ATHOU hval .)
+    E               reduce using rule 21 (expression -> af ATHOU hval .)
+    $end            reduce using rule 21 (expression -> af ATHOU hval .)
+    RPAREN          reduce using rule 21 (expression -> af ATHOU hval .)
 
 
 state 36
 
-    (5) expression -> expression TIMES expression .
-    (3) expression -> expression . PLUS expression
-    (4) expression -> expression . MINUS expression
-    (5) expression -> expression . TIMES expression
-    (6) expression -> expression . DIVIDE expression
-    (7) expression -> expression . EXP expression
-    (8) expression -> expression . P expression
-    (9) expression -> expression . M expression
-    (10) expression -> expression . T expression
-    (11) expression -> expression . D expression
-    (12) expression -> expression . E expression
+    (29) hval -> af AHUN dval .
 
-    PLUS            reduce using rule 5 (expression -> expression TIMES expression .)
-    MINUS           reduce using rule 5 (expression -> expression TIMES expression .)
-    TIMES           reduce using rule 5 (expression -> expression TIMES expression .)
-    DIVIDE          reduce using rule 5 (expression -> expression TIMES expression .)
-    P               reduce using rule 5 (expression -> expression TIMES expression .)
-    M               reduce using rule 5 (expression -> expression TIMES expression .)
-    T               reduce using rule 5 (expression -> expression TIMES expression .)
-    D               reduce using rule 5 (expression -> expression TIMES expression .)
-    $end            reduce using rule 5 (expression -> expression TIMES expression .)
-    RPAREN          reduce using rule 5 (expression -> expression TIMES expression .)
-    EXP             shift and go to state 19
-    E               shift and go to state 18
-
-  ! EXP             [ reduce using rule 5 (expression -> expression TIMES expression .) ]
-  ! E               [ reduce using rule 5 (expression -> expression TIMES expression .) ]
-  ! PLUS            [ shift and go to state 20 ]
-  ! MINUS           [ shift and go to state 16 ]
-  ! TIMES           [ shift and go to state 15 ]
-  ! DIVIDE          [ shift and go to state 17 ]
-  ! P               [ shift and go to state 21 ]
-  ! M               [ shift and go to state 23 ]
-  ! T               [ shift and go to state 22 ]
-  ! D               [ shift and go to state 24 ]
+    PLUS            reduce using rule 29 (hval -> af AHUN dval .)
+    MINUS           reduce using rule 29 (hval -> af AHUN dval .)
+    TIMES           reduce using rule 29 (hval -> af AHUN dval .)
+    DIVIDE          reduce using rule 29 (hval -> af AHUN dval .)
+    EXP             reduce using rule 29 (hval -> af AHUN dval .)
+    P               reduce using rule 29 (hval -> af AHUN dval .)
+    M               reduce using rule 29 (hval -> af AHUN dval .)
+    T               reduce using rule 29 (hval -> af AHUN dval .)
+    D               reduce using rule 29 (hval -> af AHUN dval .)
+    E               reduce using rule 29 (hval -> af AHUN dval .)
+    $end            reduce using rule 29 (hval -> af AHUN dval .)
+    RPAREN          reduce using rule 29 (hval -> af AHUN dval .)
 
 
 state 37
 
-    (4) expression -> expression MINUS expression .
-    (3) expression -> expression . PLUS expression
-    (4) expression -> expression . MINUS expression
-    (5) expression -> expression . TIMES expression
-    (6) expression -> expression . DIVIDE expression
-    (7) expression -> expression . EXP expression
-    (8) expression -> expression . P expression
-    (9) expression -> expression . M expression
-    (10) expression -> expression . T expression
-    (11) expression -> expression . D expression
-    (12) expression -> expression . E expression
+    (30) hval -> af AHUN af .
 
-    PLUS            reduce using rule 4 (expression -> expression MINUS expression .)
-    MINUS           reduce using rule 4 (expression -> expression MINUS expression .)
-    P               reduce using rule 4 (expression -> expression MINUS expression .)
-    M               reduce using rule 4 (expression -> expression MINUS expression .)
-    $end            reduce using rule 4 (expression -> expression MINUS expression .)
-    RPAREN          reduce using rule 4 (expression -> expression MINUS expression .)
-    TIMES           shift and go to state 15
-    DIVIDE          shift and go to state 17
-    EXP             shift and go to state 19
-    T               shift and go to state 22
-    D               shift and go to state 24
-    E               shift and go to state 18
-
-  ! TIMES           [ reduce using rule 4 (expression -> expression MINUS expression .) ]
-  ! DIVIDE          [ reduce using rule 4 (expression -> expression MINUS expression .) ]
-  ! EXP             [ reduce using rule 4 (expression -> expression MINUS expression .) ]
-  ! T               [ reduce using rule 4 (expression -> expression MINUS expression .) ]
-  ! D               [ reduce using rule 4 (expression -> expression MINUS expression .) ]
-  ! E               [ reduce using rule 4 (expression -> expression MINUS expression .) ]
-  ! PLUS            [ shift and go to state 20 ]
-  ! MINUS           [ shift and go to state 16 ]
-  ! P               [ shift and go to state 21 ]
-  ! M               [ shift and go to state 23 ]
+    PLUS            reduce using rule 30 (hval -> af AHUN af .)
+    MINUS           reduce using rule 30 (hval -> af AHUN af .)
+    TIMES           reduce using rule 30 (hval -> af AHUN af .)
+    DIVIDE          reduce using rule 30 (hval -> af AHUN af .)
+    EXP             reduce using rule 30 (hval -> af AHUN af .)
+    P               reduce using rule 30 (hval -> af AHUN af .)
+    M               reduce using rule 30 (hval -> af AHUN af .)
+    T               reduce using rule 30 (hval -> af AHUN af .)
+    D               reduce using rule 30 (hval -> af AHUN af .)
+    E               reduce using rule 30 (hval -> af AHUN af .)
+    $end            reduce using rule 30 (hval -> af AHUN af .)
+    RPAREN          reduce using rule 30 (hval -> af AHUN af .)
 
 
 state 38
 
-    (6) expression -> expression DIVIDE expression .
+    (15) expression -> LPAREN expression RPAREN .
+
+    PLUS            reduce using rule 15 (expression -> LPAREN expression RPAREN .)
+    MINUS           reduce using rule 15 (expression -> LPAREN expression RPAREN .)
+    TIMES           reduce using rule 15 (expression -> LPAREN expression RPAREN .)
+    DIVIDE          reduce using rule 15 (expression -> LPAREN expression RPAREN .)
+    EXP             reduce using rule 15 (expression -> LPAREN expression RPAREN .)
+    P               reduce using rule 15 (expression -> LPAREN expression RPAREN .)
+    M               reduce using rule 15 (expression -> LPAREN expression RPAREN .)
+    T               reduce using rule 15 (expression -> LPAREN expression RPAREN .)
+    D               reduce using rule 15 (expression -> LPAREN expression RPAREN .)
+    E               reduce using rule 15 (expression -> LPAREN expression RPAREN .)
+    $end            reduce using rule 15 (expression -> LPAREN expression RPAREN .)
+    RPAREN          reduce using rule 15 (expression -> LPAREN expression RPAREN .)
+
+
+state 39
+
+    (19) expression -> dval ATHOU dval .
+
+    PLUS            reduce using rule 19 (expression -> dval ATHOU dval .)
+    MINUS           reduce using rule 19 (expression -> dval ATHOU dval .)
+    TIMES           reduce using rule 19 (expression -> dval ATHOU dval .)
+    DIVIDE          reduce using rule 19 (expression -> dval ATHOU dval .)
+    EXP             reduce using rule 19 (expression -> dval ATHOU dval .)
+    P               reduce using rule 19 (expression -> dval ATHOU dval .)
+    M               reduce using rule 19 (expression -> dval ATHOU dval .)
+    T               reduce using rule 19 (expression -> dval ATHOU dval .)
+    D               reduce using rule 19 (expression -> dval ATHOU dval .)
+    E               reduce using rule 19 (expression -> dval ATHOU dval .)
+    $end            reduce using rule 19 (expression -> dval ATHOU dval .)
+    RPAREN          reduce using rule 19 (expression -> dval ATHOU dval .)
+
+
+state 40
+
+    (20) expression -> dval ATHOU af .
+    (29) hval -> af . AHUN dval
+    (30) hval -> af . AHUN af
+    (31) hval -> af . AHUN
+
+    PLUS            reduce using rule 20 (expression -> dval ATHOU af .)
+    MINUS           reduce using rule 20 (expression -> dval ATHOU af .)
+    TIMES           reduce using rule 20 (expression -> dval ATHOU af .)
+    DIVIDE          reduce using rule 20 (expression -> dval ATHOU af .)
+    EXP             reduce using rule 20 (expression -> dval ATHOU af .)
+    P               reduce using rule 20 (expression -> dval ATHOU af .)
+    M               reduce using rule 20 (expression -> dval ATHOU af .)
+    T               reduce using rule 20 (expression -> dval ATHOU af .)
+    D               reduce using rule 20 (expression -> dval ATHOU af .)
+    E               reduce using rule 20 (expression -> dval ATHOU af .)
+    $end            reduce using rule 20 (expression -> dval ATHOU af .)
+    RPAREN          reduce using rule 20 (expression -> dval ATHOU af .)
+    AHUN            shift and go to state 15
+
+
+state 41
+
+    (18) expression -> dval ATHOU hval .
+
+    PLUS            reduce using rule 18 (expression -> dval ATHOU hval .)
+    MINUS           reduce using rule 18 (expression -> dval ATHOU hval .)
+    TIMES           reduce using rule 18 (expression -> dval ATHOU hval .)
+    DIVIDE          reduce using rule 18 (expression -> dval ATHOU hval .)
+    EXP             reduce using rule 18 (expression -> dval ATHOU hval .)
+    P               reduce using rule 18 (expression -> dval ATHOU hval .)
+    M               reduce using rule 18 (expression -> dval ATHOU hval .)
+    T               reduce using rule 18 (expression -> dval ATHOU hval .)
+    D               reduce using rule 18 (expression -> dval ATHOU hval .)
+    E               reduce using rule 18 (expression -> dval ATHOU hval .)
+    $end            reduce using rule 18 (expression -> dval ATHOU hval .)
+    RPAREN          reduce using rule 18 (expression -> dval ATHOU hval .)
+
+
+state 42
+
+    (1) statement -> NAME EQUALS expression .
     (3) expression -> expression . PLUS expression
     (4) expression -> expression . MINUS expression
     (5) expression -> expression . TIMES expression
@@ -1610,32 +1464,20 @@ state 38
     (11) expression -> expression . D expression
     (12) expression -> expression . E expression
 
-    PLUS            reduce using rule 6 (expression -> expression DIVIDE expression .)
-    MINUS           reduce using rule 6 (expression -> expression DIVIDE expression .)
-    TIMES           reduce using rule 6 (expression -> expression DIVIDE expression .)
-    DIVIDE          reduce using rule 6 (expression -> expression DIVIDE expression .)
-    P               reduce using rule 6 (expression -> expression DIVIDE expression .)
-    M               reduce using rule 6 (expression -> expression DIVIDE expression .)
-    T               reduce using rule 6 (expression -> expression DIVIDE expression .)
-    D               reduce using rule 6 (expression -> expression DIVIDE expression .)
-    $end            reduce using rule 6 (expression -> expression DIVIDE expression .)
-    RPAREN          reduce using rule 6 (expression -> expression DIVIDE expression .)
-    EXP             shift and go to state 19
-    E               shift and go to state 18
-
-  ! EXP             [ reduce using rule 6 (expression -> expression DIVIDE expression .) ]
-  ! E               [ reduce using rule 6 (expression -> expression DIVIDE expression .) ]
-  ! PLUS            [ shift and go to state 20 ]
-  ! MINUS           [ shift and go to state 16 ]
-  ! TIMES           [ shift and go to state 15 ]
-  ! DIVIDE          [ shift and go to state 17 ]
-  ! P               [ shift and go to state 21 ]
-  ! M               [ shift and go to state 23 ]
-  ! T               [ shift and go to state 22 ]
-  ! D               [ shift and go to state 24 ]
+    $end            reduce using rule 1 (statement -> NAME EQUALS expression .)
+    PLUS            shift and go to state 28
+    MINUS           shift and go to state 31
+    TIMES           shift and go to state 26
+    DIVIDE          shift and go to state 24
+    EXP             shift and go to state 30
+    P               shift and go to state 27
+    M               shift and go to state 25
+    T               shift and go to state 29
+    D               shift and go to state 32
+    E               shift and go to state 23
 
 
-state 39
+state 43
 
     (12) expression -> expression E expression .
     (3) expression -> expression . PLUS expression
@@ -1662,19 +1504,253 @@ state 39
     $end            reduce using rule 12 (expression -> expression E expression .)
     RPAREN          reduce using rule 12 (expression -> expression E expression .)
 
-  ! PLUS            [ shift and go to state 20 ]
-  ! MINUS           [ shift and go to state 16 ]
-  ! TIMES           [ shift and go to state 15 ]
-  ! DIVIDE          [ shift and go to state 17 ]
-  ! EXP             [ shift and go to state 19 ]
-  ! P               [ shift and go to state 21 ]
-  ! M               [ shift and go to state 23 ]
-  ! T               [ shift and go to state 22 ]
-  ! D               [ shift and go to state 24 ]
-  ! E               [ shift and go to state 18 ]
+  ! PLUS            [ shift and go to state 28 ]
+  ! MINUS           [ shift and go to state 31 ]
+  ! TIMES           [ shift and go to state 26 ]
+  ! DIVIDE          [ shift and go to state 24 ]
+  ! EXP             [ shift and go to state 30 ]
+  ! P               [ shift and go to state 27 ]
+  ! M               [ shift and go to state 25 ]
+  ! T               [ shift and go to state 29 ]
+  ! D               [ shift and go to state 32 ]
+  ! E               [ shift and go to state 23 ]
 
 
-state 40
+state 44
+
+    (6) expression -> expression DIVIDE expression .
+    (3) expression -> expression . PLUS expression
+    (4) expression -> expression . MINUS expression
+    (5) expression -> expression . TIMES expression
+    (6) expression -> expression . DIVIDE expression
+    (7) expression -> expression . EXP expression
+    (8) expression -> expression . P expression
+    (9) expression -> expression . M expression
+    (10) expression -> expression . T expression
+    (11) expression -> expression . D expression
+    (12) expression -> expression . E expression
+
+    PLUS            reduce using rule 6 (expression -> expression DIVIDE expression .)
+    MINUS           reduce using rule 6 (expression -> expression DIVIDE expression .)
+    TIMES           reduce using rule 6 (expression -> expression DIVIDE expression .)
+    DIVIDE          reduce using rule 6 (expression -> expression DIVIDE expression .)
+    P               reduce using rule 6 (expression -> expression DIVIDE expression .)
+    M               reduce using rule 6 (expression -> expression DIVIDE expression .)
+    T               reduce using rule 6 (expression -> expression DIVIDE expression .)
+    D               reduce using rule 6 (expression -> expression DIVIDE expression .)
+    $end            reduce using rule 6 (expression -> expression DIVIDE expression .)
+    RPAREN          reduce using rule 6 (expression -> expression DIVIDE expression .)
+    EXP             shift and go to state 30
+    E               shift and go to state 23
+
+  ! EXP             [ reduce using rule 6 (expression -> expression DIVIDE expression .) ]
+  ! E               [ reduce using rule 6 (expression -> expression DIVIDE expression .) ]
+  ! PLUS            [ shift and go to state 28 ]
+  ! MINUS           [ shift and go to state 31 ]
+  ! TIMES           [ shift and go to state 26 ]
+  ! DIVIDE          [ shift and go to state 24 ]
+  ! P               [ shift and go to state 27 ]
+  ! M               [ shift and go to state 25 ]
+  ! T               [ shift and go to state 29 ]
+  ! D               [ shift and go to state 32 ]
+
+
+state 45
+
+    (9) expression -> expression M expression .
+    (3) expression -> expression . PLUS expression
+    (4) expression -> expression . MINUS expression
+    (5) expression -> expression . TIMES expression
+    (6) expression -> expression . DIVIDE expression
+    (7) expression -> expression . EXP expression
+    (8) expression -> expression . P expression
+    (9) expression -> expression . M expression
+    (10) expression -> expression . T expression
+    (11) expression -> expression . D expression
+    (12) expression -> expression . E expression
+
+    PLUS            reduce using rule 9 (expression -> expression M expression .)
+    MINUS           reduce using rule 9 (expression -> expression M expression .)
+    P               reduce using rule 9 (expression -> expression M expression .)
+    M               reduce using rule 9 (expression -> expression M expression .)
+    $end            reduce using rule 9 (expression -> expression M expression .)
+    RPAREN          reduce using rule 9 (expression -> expression M expression .)
+    TIMES           shift and go to state 26
+    DIVIDE          shift and go to state 24
+    EXP             shift and go to state 30
+    T               shift and go to state 29
+    D               shift and go to state 32
+    E               shift and go to state 23
+
+  ! TIMES           [ reduce using rule 9 (expression -> expression M expression .) ]
+  ! DIVIDE          [ reduce using rule 9 (expression -> expression M expression .) ]
+  ! EXP             [ reduce using rule 9 (expression -> expression M expression .) ]
+  ! T               [ reduce using rule 9 (expression -> expression M expression .) ]
+  ! D               [ reduce using rule 9 (expression -> expression M expression .) ]
+  ! E               [ reduce using rule 9 (expression -> expression M expression .) ]
+  ! PLUS            [ shift and go to state 28 ]
+  ! MINUS           [ shift and go to state 31 ]
+  ! P               [ shift and go to state 27 ]
+  ! M               [ shift and go to state 25 ]
+
+
+state 46
+
+    (5) expression -> expression TIMES expression .
+    (3) expression -> expression . PLUS expression
+    (4) expression -> expression . MINUS expression
+    (5) expression -> expression . TIMES expression
+    (6) expression -> expression . DIVIDE expression
+    (7) expression -> expression . EXP expression
+    (8) expression -> expression . P expression
+    (9) expression -> expression . M expression
+    (10) expression -> expression . T expression
+    (11) expression -> expression . D expression
+    (12) expression -> expression . E expression
+
+    PLUS            reduce using rule 5 (expression -> expression TIMES expression .)
+    MINUS           reduce using rule 5 (expression -> expression TIMES expression .)
+    TIMES           reduce using rule 5 (expression -> expression TIMES expression .)
+    DIVIDE          reduce using rule 5 (expression -> expression TIMES expression .)
+    P               reduce using rule 5 (expression -> expression TIMES expression .)
+    M               reduce using rule 5 (expression -> expression TIMES expression .)
+    T               reduce using rule 5 (expression -> expression TIMES expression .)
+    D               reduce using rule 5 (expression -> expression TIMES expression .)
+    $end            reduce using rule 5 (expression -> expression TIMES expression .)
+    RPAREN          reduce using rule 5 (expression -> expression TIMES expression .)
+    EXP             shift and go to state 30
+    E               shift and go to state 23
+
+  ! EXP             [ reduce using rule 5 (expression -> expression TIMES expression .) ]
+  ! E               [ reduce using rule 5 (expression -> expression TIMES expression .) ]
+  ! PLUS            [ shift and go to state 28 ]
+  ! MINUS           [ shift and go to state 31 ]
+  ! TIMES           [ shift and go to state 26 ]
+  ! DIVIDE          [ shift and go to state 24 ]
+  ! P               [ shift and go to state 27 ]
+  ! M               [ shift and go to state 25 ]
+  ! T               [ shift and go to state 29 ]
+  ! D               [ shift and go to state 32 ]
+
+
+state 47
+
+    (8) expression -> expression P expression .
+    (3) expression -> expression . PLUS expression
+    (4) expression -> expression . MINUS expression
+    (5) expression -> expression . TIMES expression
+    (6) expression -> expression . DIVIDE expression
+    (7) expression -> expression . EXP expression
+    (8) expression -> expression . P expression
+    (9) expression -> expression . M expression
+    (10) expression -> expression . T expression
+    (11) expression -> expression . D expression
+    (12) expression -> expression . E expression
+
+    PLUS            reduce using rule 8 (expression -> expression P expression .)
+    MINUS           reduce using rule 8 (expression -> expression P expression .)
+    P               reduce using rule 8 (expression -> expression P expression .)
+    M               reduce using rule 8 (expression -> expression P expression .)
+    $end            reduce using rule 8 (expression -> expression P expression .)
+    RPAREN          reduce using rule 8 (expression -> expression P expression .)
+    TIMES           shift and go to state 26
+    DIVIDE          shift and go to state 24
+    EXP             shift and go to state 30
+    T               shift and go to state 29
+    D               shift and go to state 32
+    E               shift and go to state 23
+
+  ! TIMES           [ reduce using rule 8 (expression -> expression P expression .) ]
+  ! DIVIDE          [ reduce using rule 8 (expression -> expression P expression .) ]
+  ! EXP             [ reduce using rule 8 (expression -> expression P expression .) ]
+  ! T               [ reduce using rule 8 (expression -> expression P expression .) ]
+  ! D               [ reduce using rule 8 (expression -> expression P expression .) ]
+  ! E               [ reduce using rule 8 (expression -> expression P expression .) ]
+  ! PLUS            [ shift and go to state 28 ]
+  ! MINUS           [ shift and go to state 31 ]
+  ! P               [ shift and go to state 27 ]
+  ! M               [ shift and go to state 25 ]
+
+
+state 48
+
+    (3) expression -> expression PLUS expression .
+    (3) expression -> expression . PLUS expression
+    (4) expression -> expression . MINUS expression
+    (5) expression -> expression . TIMES expression
+    (6) expression -> expression . DIVIDE expression
+    (7) expression -> expression . EXP expression
+    (8) expression -> expression . P expression
+    (9) expression -> expression . M expression
+    (10) expression -> expression . T expression
+    (11) expression -> expression . D expression
+    (12) expression -> expression . E expression
+
+    PLUS            reduce using rule 3 (expression -> expression PLUS expression .)
+    MINUS           reduce using rule 3 (expression -> expression PLUS expression .)
+    P               reduce using rule 3 (expression -> expression PLUS expression .)
+    M               reduce using rule 3 (expression -> expression PLUS expression .)
+    $end            reduce using rule 3 (expression -> expression PLUS expression .)
+    RPAREN          reduce using rule 3 (expression -> expression PLUS expression .)
+    TIMES           shift and go to state 26
+    DIVIDE          shift and go to state 24
+    EXP             shift and go to state 30
+    T               shift and go to state 29
+    D               shift and go to state 32
+    E               shift and go to state 23
+
+  ! TIMES           [ reduce using rule 3 (expression -> expression PLUS expression .) ]
+  ! DIVIDE          [ reduce using rule 3 (expression -> expression PLUS expression .) ]
+  ! EXP             [ reduce using rule 3 (expression -> expression PLUS expression .) ]
+  ! T               [ reduce using rule 3 (expression -> expression PLUS expression .) ]
+  ! D               [ reduce using rule 3 (expression -> expression PLUS expression .) ]
+  ! E               [ reduce using rule 3 (expression -> expression PLUS expression .) ]
+  ! PLUS            [ shift and go to state 28 ]
+  ! MINUS           [ shift and go to state 31 ]
+  ! P               [ shift and go to state 27 ]
+  ! M               [ shift and go to state 25 ]
+
+
+state 49
+
+    (10) expression -> expression T expression .
+    (3) expression -> expression . PLUS expression
+    (4) expression -> expression . MINUS expression
+    (5) expression -> expression . TIMES expression
+    (6) expression -> expression . DIVIDE expression
+    (7) expression -> expression . EXP expression
+    (8) expression -> expression . P expression
+    (9) expression -> expression . M expression
+    (10) expression -> expression . T expression
+    (11) expression -> expression . D expression
+    (12) expression -> expression . E expression
+
+    PLUS            reduce using rule 10 (expression -> expression T expression .)
+    MINUS           reduce using rule 10 (expression -> expression T expression .)
+    TIMES           reduce using rule 10 (expression -> expression T expression .)
+    DIVIDE          reduce using rule 10 (expression -> expression T expression .)
+    P               reduce using rule 10 (expression -> expression T expression .)
+    M               reduce using rule 10 (expression -> expression T expression .)
+    T               reduce using rule 10 (expression -> expression T expression .)
+    D               reduce using rule 10 (expression -> expression T expression .)
+    $end            reduce using rule 10 (expression -> expression T expression .)
+    RPAREN          reduce using rule 10 (expression -> expression T expression .)
+    EXP             shift and go to state 30
+    E               shift and go to state 23
+
+  ! EXP             [ reduce using rule 10 (expression -> expression T expression .) ]
+  ! E               [ reduce using rule 10 (expression -> expression T expression .) ]
+  ! PLUS            [ shift and go to state 28 ]
+  ! MINUS           [ shift and go to state 31 ]
+  ! TIMES           [ shift and go to state 26 ]
+  ! DIVIDE          [ shift and go to state 24 ]
+  ! P               [ shift and go to state 27 ]
+  ! M               [ shift and go to state 25 ]
+  ! T               [ shift and go to state 29 ]
+  ! D               [ shift and go to state 32 ]
+
+
+state 50
 
     (7) expression -> expression EXP expression .
     (3) expression -> expression . PLUS expression
@@ -1701,21 +1777,21 @@ state 40
     $end            reduce using rule 7 (expression -> expression EXP expression .)
     RPAREN          reduce using rule 7 (expression -> expression EXP expression .)
 
-  ! PLUS            [ shift and go to state 20 ]
-  ! MINUS           [ shift and go to state 16 ]
-  ! TIMES           [ shift and go to state 15 ]
-  ! DIVIDE          [ shift and go to state 17 ]
-  ! EXP             [ shift and go to state 19 ]
-  ! P               [ shift and go to state 21 ]
-  ! M               [ shift and go to state 23 ]
-  ! T               [ shift and go to state 22 ]
-  ! D               [ shift and go to state 24 ]
-  ! E               [ shift and go to state 18 ]
+  ! PLUS            [ shift and go to state 28 ]
+  ! MINUS           [ shift and go to state 31 ]
+  ! TIMES           [ shift and go to state 26 ]
+  ! DIVIDE          [ shift and go to state 24 ]
+  ! EXP             [ shift and go to state 30 ]
+  ! P               [ shift and go to state 27 ]
+  ! M               [ shift and go to state 25 ]
+  ! T               [ shift and go to state 29 ]
+  ! D               [ shift and go to state 32 ]
+  ! E               [ shift and go to state 23 ]
 
 
-state 41
+state 51
 
-    (3) expression -> expression PLUS expression .
+    (4) expression -> expression MINUS expression .
     (3) expression -> expression . PLUS expression
     (4) expression -> expression . MINUS expression
     (5) expression -> expression . TIMES expression
@@ -1727,149 +1803,32 @@ state 41
     (11) expression -> expression . D expression
     (12) expression -> expression . E expression
 
-    PLUS            reduce using rule 3 (expression -> expression PLUS expression .)
-    MINUS           reduce using rule 3 (expression -> expression PLUS expression .)
-    P               reduce using rule 3 (expression -> expression PLUS expression .)
-    M               reduce using rule 3 (expression -> expression PLUS expression .)
-    $end            reduce using rule 3 (expression -> expression PLUS expression .)
-    RPAREN          reduce using rule 3 (expression -> expression PLUS expression .)
-    TIMES           shift and go to state 15
-    DIVIDE          shift and go to state 17
-    EXP             shift and go to state 19
-    T               shift and go to state 22
-    D               shift and go to state 24
-    E               shift and go to state 18
+    PLUS            reduce using rule 4 (expression -> expression MINUS expression .)
+    MINUS           reduce using rule 4 (expression -> expression MINUS expression .)
+    P               reduce using rule 4 (expression -> expression MINUS expression .)
+    M               reduce using rule 4 (expression -> expression MINUS expression .)
+    $end            reduce using rule 4 (expression -> expression MINUS expression .)
+    RPAREN          reduce using rule 4 (expression -> expression MINUS expression .)
+    TIMES           shift and go to state 26
+    DIVIDE          shift and go to state 24
+    EXP             shift and go to state 30
+    T               shift and go to state 29
+    D               shift and go to state 32
+    E               shift and go to state 23
 
-  ! TIMES           [ reduce using rule 3 (expression -> expression PLUS expression .) ]
-  ! DIVIDE          [ reduce using rule 3 (expression -> expression PLUS expression .) ]
-  ! EXP             [ reduce using rule 3 (expression -> expression PLUS expression .) ]
-  ! T               [ reduce using rule 3 (expression -> expression PLUS expression .) ]
-  ! D               [ reduce using rule 3 (expression -> expression PLUS expression .) ]
-  ! E               [ reduce using rule 3 (expression -> expression PLUS expression .) ]
-  ! PLUS            [ shift and go to state 20 ]
-  ! MINUS           [ shift and go to state 16 ]
-  ! P               [ shift and go to state 21 ]
-  ! M               [ shift and go to state 23 ]
-
-
-state 42
-
-    (8) expression -> expression P expression .
-    (3) expression -> expression . PLUS expression
-    (4) expression -> expression . MINUS expression
-    (5) expression -> expression . TIMES expression
-    (6) expression -> expression . DIVIDE expression
-    (7) expression -> expression . EXP expression
-    (8) expression -> expression . P expression
-    (9) expression -> expression . M expression
-    (10) expression -> expression . T expression
-    (11) expression -> expression . D expression
-    (12) expression -> expression . E expression
-
-    PLUS            reduce using rule 8 (expression -> expression P expression .)
-    MINUS           reduce using rule 8 (expression -> expression P expression .)
-    P               reduce using rule 8 (expression -> expression P expression .)
-    M               reduce using rule 8 (expression -> expression P expression .)
-    $end            reduce using rule 8 (expression -> expression P expression .)
-    RPAREN          reduce using rule 8 (expression -> expression P expression .)
-    TIMES           shift and go to state 15
-    DIVIDE          shift and go to state 17
-    EXP             shift and go to state 19
-    T               shift and go to state 22
-    D               shift and go to state 24
-    E               shift and go to state 18
-
-  ! TIMES           [ reduce using rule 8 (expression -> expression P expression .) ]
-  ! DIVIDE          [ reduce using rule 8 (expression -> expression P expression .) ]
-  ! EXP             [ reduce using rule 8 (expression -> expression P expression .) ]
-  ! T               [ reduce using rule 8 (expression -> expression P expression .) ]
-  ! D               [ reduce using rule 8 (expression -> expression P expression .) ]
-  ! E               [ reduce using rule 8 (expression -> expression P expression .) ]
-  ! PLUS            [ shift and go to state 20 ]
-  ! MINUS           [ shift and go to state 16 ]
-  ! P               [ shift and go to state 21 ]
-  ! M               [ shift and go to state 23 ]
+  ! TIMES           [ reduce using rule 4 (expression -> expression MINUS expression .) ]
+  ! DIVIDE          [ reduce using rule 4 (expression -> expression MINUS expression .) ]
+  ! EXP             [ reduce using rule 4 (expression -> expression MINUS expression .) ]
+  ! T               [ reduce using rule 4 (expression -> expression MINUS expression .) ]
+  ! D               [ reduce using rule 4 (expression -> expression MINUS expression .) ]
+  ! E               [ reduce using rule 4 (expression -> expression MINUS expression .) ]
+  ! PLUS            [ shift and go to state 28 ]
+  ! MINUS           [ shift and go to state 31 ]
+  ! P               [ shift and go to state 27 ]
+  ! M               [ shift and go to state 25 ]
 
 
-state 43
-
-    (10) expression -> expression T expression .
-    (3) expression -> expression . PLUS expression
-    (4) expression -> expression . MINUS expression
-    (5) expression -> expression . TIMES expression
-    (6) expression -> expression . DIVIDE expression
-    (7) expression -> expression . EXP expression
-    (8) expression -> expression . P expression
-    (9) expression -> expression . M expression
-    (10) expression -> expression . T expression
-    (11) expression -> expression . D expression
-    (12) expression -> expression . E expression
-
-    PLUS            reduce using rule 10 (expression -> expression T expression .)
-    MINUS           reduce using rule 10 (expression -> expression T expression .)
-    TIMES           reduce using rule 10 (expression -> expression T expression .)
-    DIVIDE          reduce using rule 10 (expression -> expression T expression .)
-    P               reduce using rule 10 (expression -> expression T expression .)
-    M               reduce using rule 10 (expression -> expression T expression .)
-    T               reduce using rule 10 (expression -> expression T expression .)
-    D               reduce using rule 10 (expression -> expression T expression .)
-    $end            reduce using rule 10 (expression -> expression T expression .)
-    RPAREN          reduce using rule 10 (expression -> expression T expression .)
-    EXP             shift and go to state 19
-    E               shift and go to state 18
-
-  ! EXP             [ reduce using rule 10 (expression -> expression T expression .) ]
-  ! E               [ reduce using rule 10 (expression -> expression T expression .) ]
-  ! PLUS            [ shift and go to state 20 ]
-  ! MINUS           [ shift and go to state 16 ]
-  ! TIMES           [ shift and go to state 15 ]
-  ! DIVIDE          [ shift and go to state 17 ]
-  ! P               [ shift and go to state 21 ]
-  ! M               [ shift and go to state 23 ]
-  ! T               [ shift and go to state 22 ]
-  ! D               [ shift and go to state 24 ]
-
-
-state 44
-
-    (9) expression -> expression M expression .
-    (3) expression -> expression . PLUS expression
-    (4) expression -> expression . MINUS expression
-    (5) expression -> expression . TIMES expression
-    (6) expression -> expression . DIVIDE expression
-    (7) expression -> expression . EXP expression
-    (8) expression -> expression . P expression
-    (9) expression -> expression . M expression
-    (10) expression -> expression . T expression
-    (11) expression -> expression . D expression
-    (12) expression -> expression . E expression
-
-    PLUS            reduce using rule 9 (expression -> expression M expression .)
-    MINUS           reduce using rule 9 (expression -> expression M expression .)
-    P               reduce using rule 9 (expression -> expression M expression .)
-    M               reduce using rule 9 (expression -> expression M expression .)
-    $end            reduce using rule 9 (expression -> expression M expression .)
-    RPAREN          reduce using rule 9 (expression -> expression M expression .)
-    TIMES           shift and go to state 15
-    DIVIDE          shift and go to state 17
-    EXP             shift and go to state 19
-    T               shift and go to state 22
-    D               shift and go to state 24
-    E               shift and go to state 18
-
-  ! TIMES           [ reduce using rule 9 (expression -> expression M expression .) ]
-  ! DIVIDE          [ reduce using rule 9 (expression -> expression M expression .) ]
-  ! EXP             [ reduce using rule 9 (expression -> expression M expression .) ]
-  ! T               [ reduce using rule 9 (expression -> expression M expression .) ]
-  ! D               [ reduce using rule 9 (expression -> expression M expression .) ]
-  ! E               [ reduce using rule 9 (expression -> expression M expression .) ]
-  ! PLUS            [ shift and go to state 20 ]
-  ! MINUS           [ shift and go to state 16 ]
-  ! P               [ shift and go to state 21 ]
-  ! M               [ shift and go to state 23 ]
-
-
-state 45
+state 52
 
     (11) expression -> expression D expression .
     (3) expression -> expression . PLUS expression
@@ -1893,310 +1852,17 @@ state 45
     D               reduce using rule 11 (expression -> expression D expression .)
     $end            reduce using rule 11 (expression -> expression D expression .)
     RPAREN          reduce using rule 11 (expression -> expression D expression .)
-    EXP             shift and go to state 19
-    E               shift and go to state 18
+    EXP             shift and go to state 30
+    E               shift and go to state 23
 
   ! EXP             [ reduce using rule 11 (expression -> expression D expression .) ]
   ! E               [ reduce using rule 11 (expression -> expression D expression .) ]
-  ! PLUS            [ shift and go to state 20 ]
-  ! MINUS           [ shift and go to state 16 ]
-  ! TIMES           [ shift and go to state 15 ]
-  ! DIVIDE          [ shift and go to state 17 ]
-  ! P               [ shift and go to state 21 ]
-  ! M               [ shift and go to state 23 ]
-  ! T               [ shift and go to state 22 ]
-  ! D               [ shift and go to state 24 ]
-
-
-state 46
-
-    (20) expression -> hval ATHOU af .
-    (37) hval -> af . AHUN dval
-    (38) hval -> af . AHUN af
-    (39) hval -> af . AHUN
-
-    PLUS            reduce using rule 20 (expression -> hval ATHOU af .)
-    MINUS           reduce using rule 20 (expression -> hval ATHOU af .)
-    TIMES           reduce using rule 20 (expression -> hval ATHOU af .)
-    DIVIDE          reduce using rule 20 (expression -> hval ATHOU af .)
-    EXP             reduce using rule 20 (expression -> hval ATHOU af .)
-    P               reduce using rule 20 (expression -> hval ATHOU af .)
-    M               reduce using rule 20 (expression -> hval ATHOU af .)
-    T               reduce using rule 20 (expression -> hval ATHOU af .)
-    D               reduce using rule 20 (expression -> hval ATHOU af .)
-    E               reduce using rule 20 (expression -> hval ATHOU af .)
-    $end            reduce using rule 20 (expression -> hval ATHOU af .)
-    RPAREN          reduce using rule 20 (expression -> hval ATHOU af .)
-    AHUN            shift and go to state 33
-
-
-state 47
-
-    (19) expression -> hval ATHOU dval .
-
-    PLUS            reduce using rule 19 (expression -> hval ATHOU dval .)
-    MINUS           reduce using rule 19 (expression -> hval ATHOU dval .)
-    TIMES           reduce using rule 19 (expression -> hval ATHOU dval .)
-    DIVIDE          reduce using rule 19 (expression -> hval ATHOU dval .)
-    EXP             reduce using rule 19 (expression -> hval ATHOU dval .)
-    P               reduce using rule 19 (expression -> hval ATHOU dval .)
-    M               reduce using rule 19 (expression -> hval ATHOU dval .)
-    T               reduce using rule 19 (expression -> hval ATHOU dval .)
-    D               reduce using rule 19 (expression -> hval ATHOU dval .)
-    E               reduce using rule 19 (expression -> hval ATHOU dval .)
-    $end            reduce using rule 19 (expression -> hval ATHOU dval .)
-    RPAREN          reduce using rule 19 (expression -> hval ATHOU dval .)
-
-
-state 48
-
-    (18) expression -> hval ATHOU hval .
-
-    PLUS            reduce using rule 18 (expression -> hval ATHOU hval .)
-    MINUS           reduce using rule 18 (expression -> hval ATHOU hval .)
-    TIMES           reduce using rule 18 (expression -> hval ATHOU hval .)
-    DIVIDE          reduce using rule 18 (expression -> hval ATHOU hval .)
-    EXP             reduce using rule 18 (expression -> hval ATHOU hval .)
-    P               reduce using rule 18 (expression -> hval ATHOU hval .)
-    M               reduce using rule 18 (expression -> hval ATHOU hval .)
-    T               reduce using rule 18 (expression -> hval ATHOU hval .)
-    D               reduce using rule 18 (expression -> hval ATHOU hval .)
-    E               reduce using rule 18 (expression -> hval ATHOU hval .)
-    $end            reduce using rule 18 (expression -> hval ATHOU hval .)
-    RPAREN          reduce using rule 18 (expression -> hval ATHOU hval .)
-
-
-state 49
-
-    (23) expression -> dval ATHOU af .
-    (37) hval -> af . AHUN dval
-    (38) hval -> af . AHUN af
-    (39) hval -> af . AHUN
-
-    PLUS            reduce using rule 23 (expression -> dval ATHOU af .)
-    MINUS           reduce using rule 23 (expression -> dval ATHOU af .)
-    TIMES           reduce using rule 23 (expression -> dval ATHOU af .)
-    DIVIDE          reduce using rule 23 (expression -> dval ATHOU af .)
-    EXP             reduce using rule 23 (expression -> dval ATHOU af .)
-    P               reduce using rule 23 (expression -> dval ATHOU af .)
-    M               reduce using rule 23 (expression -> dval ATHOU af .)
-    T               reduce using rule 23 (expression -> dval ATHOU af .)
-    D               reduce using rule 23 (expression -> dval ATHOU af .)
-    E               reduce using rule 23 (expression -> dval ATHOU af .)
-    $end            reduce using rule 23 (expression -> dval ATHOU af .)
-    RPAREN          reduce using rule 23 (expression -> dval ATHOU af .)
-    AHUN            shift and go to state 33
-
-
-state 50
-
-    (22) expression -> dval ATHOU dval .
-
-    PLUS            reduce using rule 22 (expression -> dval ATHOU dval .)
-    MINUS           reduce using rule 22 (expression -> dval ATHOU dval .)
-    TIMES           reduce using rule 22 (expression -> dval ATHOU dval .)
-    DIVIDE          reduce using rule 22 (expression -> dval ATHOU dval .)
-    EXP             reduce using rule 22 (expression -> dval ATHOU dval .)
-    P               reduce using rule 22 (expression -> dval ATHOU dval .)
-    M               reduce using rule 22 (expression -> dval ATHOU dval .)
-    T               reduce using rule 22 (expression -> dval ATHOU dval .)
-    D               reduce using rule 22 (expression -> dval ATHOU dval .)
-    E               reduce using rule 22 (expression -> dval ATHOU dval .)
-    $end            reduce using rule 22 (expression -> dval ATHOU dval .)
-    RPAREN          reduce using rule 22 (expression -> dval ATHOU dval .)
-
-
-state 51
-
-    (21) expression -> dval ATHOU hval .
-
-    PLUS            reduce using rule 21 (expression -> dval ATHOU hval .)
-    MINUS           reduce using rule 21 (expression -> dval ATHOU hval .)
-    TIMES           reduce using rule 21 (expression -> dval ATHOU hval .)
-    DIVIDE          reduce using rule 21 (expression -> dval ATHOU hval .)
-    EXP             reduce using rule 21 (expression -> dval ATHOU hval .)
-    P               reduce using rule 21 (expression -> dval ATHOU hval .)
-    M               reduce using rule 21 (expression -> dval ATHOU hval .)
-    T               reduce using rule 21 (expression -> dval ATHOU hval .)
-    D               reduce using rule 21 (expression -> dval ATHOU hval .)
-    E               reduce using rule 21 (expression -> dval ATHOU hval .)
-    $end            reduce using rule 21 (expression -> dval ATHOU hval .)
-    RPAREN          reduce using rule 21 (expression -> dval ATHOU hval .)
-
-
-state 52
-
-    (35) hhval -> dval AHUN af .
-
-    PLUS            reduce using rule 35 (hhval -> dval AHUN af .)
-    MINUS           reduce using rule 35 (hhval -> dval AHUN af .)
-    TIMES           reduce using rule 35 (hhval -> dval AHUN af .)
-    DIVIDE          reduce using rule 35 (hhval -> dval AHUN af .)
-    EXP             reduce using rule 35 (hhval -> dval AHUN af .)
-    P               reduce using rule 35 (hhval -> dval AHUN af .)
-    M               reduce using rule 35 (hhval -> dval AHUN af .)
-    T               reduce using rule 35 (hhval -> dval AHUN af .)
-    D               reduce using rule 35 (hhval -> dval AHUN af .)
-    E               reduce using rule 35 (hhval -> dval AHUN af .)
-    $end            reduce using rule 35 (hhval -> dval AHUN af .)
-    RPAREN          reduce using rule 35 (hhval -> dval AHUN af .)
-
-
-state 53
-
-    (34) hhval -> dval AHUN dval .
-
-    PLUS            reduce using rule 34 (hhval -> dval AHUN dval .)
-    MINUS           reduce using rule 34 (hhval -> dval AHUN dval .)
-    TIMES           reduce using rule 34 (hhval -> dval AHUN dval .)
-    DIVIDE          reduce using rule 34 (hhval -> dval AHUN dval .)
-    EXP             reduce using rule 34 (hhval -> dval AHUN dval .)
-    P               reduce using rule 34 (hhval -> dval AHUN dval .)
-    M               reduce using rule 34 (hhval -> dval AHUN dval .)
-    T               reduce using rule 34 (hhval -> dval AHUN dval .)
-    D               reduce using rule 34 (hhval -> dval AHUN dval .)
-    E               reduce using rule 34 (hhval -> dval AHUN dval .)
-    $end            reduce using rule 34 (hhval -> dval AHUN dval .)
-    RPAREN          reduce using rule 34 (hhval -> dval AHUN dval .)
-
-
-state 54
-
-    (15) expression -> LPAREN expression RPAREN .
-
-    PLUS            reduce using rule 15 (expression -> LPAREN expression RPAREN .)
-    MINUS           reduce using rule 15 (expression -> LPAREN expression RPAREN .)
-    TIMES           reduce using rule 15 (expression -> LPAREN expression RPAREN .)
-    DIVIDE          reduce using rule 15 (expression -> LPAREN expression RPAREN .)
-    EXP             reduce using rule 15 (expression -> LPAREN expression RPAREN .)
-    P               reduce using rule 15 (expression -> LPAREN expression RPAREN .)
-    M               reduce using rule 15 (expression -> LPAREN expression RPAREN .)
-    T               reduce using rule 15 (expression -> LPAREN expression RPAREN .)
-    D               reduce using rule 15 (expression -> LPAREN expression RPAREN .)
-    E               reduce using rule 15 (expression -> LPAREN expression RPAREN .)
-    $end            reduce using rule 15 (expression -> LPAREN expression RPAREN .)
-    RPAREN          reduce using rule 15 (expression -> LPAREN expression RPAREN .)
-
-
-state 55
-
-    (26) expression -> af ATHOU af .
-    (37) hval -> af . AHUN dval
-    (38) hval -> af . AHUN af
-    (39) hval -> af . AHUN
-
-    PLUS            reduce using rule 26 (expression -> af ATHOU af .)
-    MINUS           reduce using rule 26 (expression -> af ATHOU af .)
-    TIMES           reduce using rule 26 (expression -> af ATHOU af .)
-    DIVIDE          reduce using rule 26 (expression -> af ATHOU af .)
-    EXP             reduce using rule 26 (expression -> af ATHOU af .)
-    P               reduce using rule 26 (expression -> af ATHOU af .)
-    M               reduce using rule 26 (expression -> af ATHOU af .)
-    T               reduce using rule 26 (expression -> af ATHOU af .)
-    D               reduce using rule 26 (expression -> af ATHOU af .)
-    E               reduce using rule 26 (expression -> af ATHOU af .)
-    $end            reduce using rule 26 (expression -> af ATHOU af .)
-    RPAREN          reduce using rule 26 (expression -> af ATHOU af .)
-    AHUN            shift and go to state 33
-
-
-state 56
-
-    (25) expression -> af ATHOU dval .
-
-    PLUS            reduce using rule 25 (expression -> af ATHOU dval .)
-    MINUS           reduce using rule 25 (expression -> af ATHOU dval .)
-    TIMES           reduce using rule 25 (expression -> af ATHOU dval .)
-    DIVIDE          reduce using rule 25 (expression -> af ATHOU dval .)
-    EXP             reduce using rule 25 (expression -> af ATHOU dval .)
-    P               reduce using rule 25 (expression -> af ATHOU dval .)
-    M               reduce using rule 25 (expression -> af ATHOU dval .)
-    T               reduce using rule 25 (expression -> af ATHOU dval .)
-    D               reduce using rule 25 (expression -> af ATHOU dval .)
-    E               reduce using rule 25 (expression -> af ATHOU dval .)
-    $end            reduce using rule 25 (expression -> af ATHOU dval .)
-    RPAREN          reduce using rule 25 (expression -> af ATHOU dval .)
-
-
-state 57
-
-    (24) expression -> af ATHOU hval .
-
-    PLUS            reduce using rule 24 (expression -> af ATHOU hval .)
-    MINUS           reduce using rule 24 (expression -> af ATHOU hval .)
-    TIMES           reduce using rule 24 (expression -> af ATHOU hval .)
-    DIVIDE          reduce using rule 24 (expression -> af ATHOU hval .)
-    EXP             reduce using rule 24 (expression -> af ATHOU hval .)
-    P               reduce using rule 24 (expression -> af ATHOU hval .)
-    M               reduce using rule 24 (expression -> af ATHOU hval .)
-    T               reduce using rule 24 (expression -> af ATHOU hval .)
-    D               reduce using rule 24 (expression -> af ATHOU hval .)
-    E               reduce using rule 24 (expression -> af ATHOU hval .)
-    $end            reduce using rule 24 (expression -> af ATHOU hval .)
-    RPAREN          reduce using rule 24 (expression -> af ATHOU hval .)
-
-
-state 58
-
-    (38) hval -> af AHUN af .
-
-    ATHOU           reduce using rule 38 (hval -> af AHUN af .)
-    PLUS            reduce using rule 38 (hval -> af AHUN af .)
-    MINUS           reduce using rule 38 (hval -> af AHUN af .)
-    TIMES           reduce using rule 38 (hval -> af AHUN af .)
-    DIVIDE          reduce using rule 38 (hval -> af AHUN af .)
-    EXP             reduce using rule 38 (hval -> af AHUN af .)
-    P               reduce using rule 38 (hval -> af AHUN af .)
-    M               reduce using rule 38 (hval -> af AHUN af .)
-    T               reduce using rule 38 (hval -> af AHUN af .)
-    D               reduce using rule 38 (hval -> af AHUN af .)
-    E               reduce using rule 38 (hval -> af AHUN af .)
-    $end            reduce using rule 38 (hval -> af AHUN af .)
-    RPAREN          reduce using rule 38 (hval -> af AHUN af .)
-
-
-state 59
-
-    (37) hval -> af AHUN dval .
-
-    ATHOU           reduce using rule 37 (hval -> af AHUN dval .)
-    PLUS            reduce using rule 37 (hval -> af AHUN dval .)
-    MINUS           reduce using rule 37 (hval -> af AHUN dval .)
-    TIMES           reduce using rule 37 (hval -> af AHUN dval .)
-    DIVIDE          reduce using rule 37 (hval -> af AHUN dval .)
-    EXP             reduce using rule 37 (hval -> af AHUN dval .)
-    P               reduce using rule 37 (hval -> af AHUN dval .)
-    M               reduce using rule 37 (hval -> af AHUN dval .)
-    T               reduce using rule 37 (hval -> af AHUN dval .)
-    D               reduce using rule 37 (hval -> af AHUN dval .)
-    E               reduce using rule 37 (hval -> af AHUN dval .)
-    $end            reduce using rule 37 (hval -> af AHUN dval .)
-    RPAREN          reduce using rule 37 (hval -> af AHUN dval .)
-
-
-state 60
-
-    (1) statement -> NAME EQUALS expression .
-    (3) expression -> expression . PLUS expression
-    (4) expression -> expression . MINUS expression
-    (5) expression -> expression . TIMES expression
-    (6) expression -> expression . DIVIDE expression
-    (7) expression -> expression . EXP expression
-    (8) expression -> expression . P expression
-    (9) expression -> expression . M expression
-    (10) expression -> expression . T expression
-    (11) expression -> expression . D expression
-    (12) expression -> expression . E expression
-
-    $end            reduce using rule 1 (statement -> NAME EQUALS expression .)
-    PLUS            shift and go to state 20
-    MINUS           shift and go to state 16
-    TIMES           shift and go to state 15
-    DIVIDE          shift and go to state 17
-    EXP             shift and go to state 19
-    P               shift and go to state 21
-    M               shift and go to state 23
-    T               shift and go to state 22
-    D               shift and go to state 24
-    E               shift and go to state 18
+  ! PLUS            [ shift and go to state 28 ]
+  ! MINUS           [ shift and go to state 31 ]
+  ! TIMES           [ shift and go to state 26 ]
+  ! DIVIDE          [ shift and go to state 24 ]
+  ! P               [ shift and go to state 27 ]
+  ! M               [ shift and go to state 25 ]
+  ! T               [ shift and go to state 29 ]
+  ! D               [ shift and go to state 32 ]
 

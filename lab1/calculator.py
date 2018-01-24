@@ -21,7 +21,7 @@ tokens = (
 r_values = {
 	'twenty'	: 20,
 	'thirty'	: 30,
-	'fourty'	: 40,
+	'forty'		: 40,
 	'fifty'		: 50,
 	'sixty'		: 60,
 	'seventy'	: 70,
@@ -67,7 +67,39 @@ t_DIVIDE = r'/'
 t_EQUALS = r'='
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
-t_NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
+# t_NAME = r'[a-zA-Z_][a-zA-Z0-9_]*'
+
+def t_NAME(t):
+	r'[a-zA-Z_][a-zA-Z0-9_]*'
+	s = t.value.lower()
+	if s == "hundred":
+		t.type = "AHUN"
+	if s == "thousand":
+		t.type = "ATHOU"
+	if r_values.get(s):
+		t.type = "ARVAL"
+	if face_values.get(s):
+		t.type = "AFACE"
+	if two_digit_vals.get(s):
+		t.type = "ATWO"
+	if s == "plus":
+		t.type = "P"
+		t.value = "+"
+	if s == "minus":
+		t.type = "M"
+		t.value = "-"
+	if s == "times":
+		t.type = "T"
+		t.value = "*"
+	if s == "divide":
+		t.type = "D"
+		t.value = "/"
+	if s == "power":
+		t.type = "E"
+		t.value = "**"
+
+	return t
+
 
 def t_AHUN(t):
   r'(?i)hundred(^|\s)'
@@ -182,11 +214,7 @@ def p_expression_name(p):
 
 def p_thou_group(p):
   '''
-    expression : hval ATHOU hval 
-            | hval ATHOU dval
-            | hval ATHOU af
-
-            | dval ATHOU hval
+    expression :  dval ATHOU hval
             | dval ATHOU dval
 			| dval ATHOU af
 
@@ -194,12 +222,10 @@ def p_thou_group(p):
             | af ATHOU dval
 			| af ATHOU af
 
-            | hval ATHOU 
             | dval ATHOU
             | af ATHOU
 
             | hval
-            | hhval
             | dval
             | af
   '''
@@ -211,20 +237,18 @@ def p_thou_group(p):
   else:
       p[0] = p[1]
 
-
-def p_hhval_group(p):
-  ''' hhval : dval AHUN dval
-  			| dval AHUN af
-            | dval AHUN
-  '''
-  if p[1] == 10:
-  	raise Exception("ten hundred isn't valid.")
-  # print [repr(p[i]) for i in xrange(len(p))]
-  if len(p) == 4:
-    p[0] = p[1]*100 + p[3]
-  elif len(p) == 3:
-    p[0] = p[1]*100
-
+# def p_hhval_group(p):
+#   ''' hhval : dval AHUN dval
+#   			| dval AHUN af
+#             | dval AHUN
+#   '''
+#   if p[1] == 10:
+#   	raise Exception("ten hundred isn't valid.")
+#   # print [repr(p[i]) for i in range(len(p))]
+#   if len(p) == 4:
+#     p[0] = p[1]*100 + p[3]
+#   elif len(p) == 3:
+#     p[0] = p[1]*100
 
 def p_hval_group(p):
 	''' hval : af AHUN dval
@@ -243,7 +267,7 @@ def p_dval_group(p):
             | ARVAL
             | ATWO
   '''
-  # print [repr(p[i]) for i in xrange(len(p))]
+  # print [repr(p[i]) for i in range(len(p))]
   p[1] = p[1].strip(" ").strip("\n")
   if len(p) == 3:
     p[0] = r_values[p[1]] + p[2]
@@ -262,10 +286,17 @@ def p_error(p):
 	if p:
 		print("syntax error at {0}".format(p.value))
 	else:
-		print("syntax error at EOF")		
+		print("syntax error at EOF")
+	sys.exit(0)
 
 def process(data):
 	lex.lex()
+	# lex.input(data)
+	# while True:
+	# 	tok = lex.token()
+	# 	if not tok:
+	# 		break
+	# 	print(tok)
 	yacc.yacc()
 	yacc.parse(data)
 
