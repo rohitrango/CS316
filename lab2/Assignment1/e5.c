@@ -3,6 +3,7 @@ void main ()
 	int a, b, c, d, e, f, g;
 	int *p, *q, *r, *s, *t, *u, *v; 
      
+    *p = *q, a= &b;
         p=&a, q=&b, r=&c, s=&d, t=&e, u=&f, v=&g;
 	*p = 13;
 	*q = *p;
