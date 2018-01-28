@@ -4,62 +4,62 @@ Grammar
 
 Rule 0     S' -> prog
 Rule 1     prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL
-Rule 2     body -> stmt body
-Rule 3     body -> stmt
-Rule 4     stmt -> expr1 SEMICOLON
-Rule 5     stmt -> expr2 SEMICOLON
-Rule 6     expr2 -> expr2 COMMA equality
-Rule 7     expr2 -> equality
-Rule 8     equality -> equality1
-Rule 9     equality -> equality2
-Rule 10    expr1 -> INT subexpr1
-Rule 11    subexpr1 -> subexpr1 COMMA ID
-Rule 12    subexpr1 -> subexpr1 COMMA ptr
-Rule 13    subexpr1 -> subexpr1 COMMA equality1
-Rule 14    subexpr1 -> ID
-Rule 15    subexpr1 -> ptr
-Rule 16    subexpr1 -> equality1
-Rule 17    equality1 -> ptr EQUALS ptrexpr
-Rule 18    equality2 -> ID EQUALS addr
-Rule 19    ptrexpr -> ptr EQUALS ptrexpr
-Rule 20    ptrexpr -> NUM
-Rule 21    ptrexpr -> ptr
-Rule 22    ptrexpr -> addr
+Rule 2     prog -> VOID MAIN LPAREN RPAREN LCURL RCURL
+Rule 3     body -> stmt body
+Rule 4     body -> stmt
+Rule 5     stmt -> expr1 SEMICOLON
+Rule 6     stmt -> expr2 SEMICOLON
+Rule 7     expr2 -> expr2 COMMA equality
+Rule 8     expr2 -> equality
+Rule 9     equality -> equality1
+Rule 10    equality -> equality2
+Rule 11    expr1 -> INT subexpr1
+Rule 12    subexpr1 -> subexpr1 COMMA ID
+Rule 13    subexpr1 -> subexpr1 COMMA ptr
+Rule 14    subexpr1 -> subexpr1 COMMA equality1
+Rule 15    subexpr1 -> ID
+Rule 16    subexpr1 -> ptr
+Rule 17    subexpr1 -> equality1
+Rule 18    equality1 -> ptr EQUALS ptrexpr
+Rule 19    equality2 -> ID EQUALS addr
+Rule 20    ptrexpr -> ptr EQUALS ptrexpr
+Rule 21    ptrexpr -> NUM
+Rule 22    ptrexpr -> ptr
 Rule 23    ptr -> STAR ID
 Rule 24    addr -> AND ID
 
 Terminals, with rules where they appear
 
 AND                  : 24
-COMMA                : 6 11 12 13
-EQUALS               : 17 18 19
-ID                   : 11 14 18 23 24
-INT                  : 10
-LCURL                : 1
-LPAREN               : 1
-MAIN                 : 1
-NUM                  : 20
-RCURL                : 1
-RPAREN               : 1
-SEMICOLON            : 4 5
+COMMA                : 7 12 13 14
+EQUALS               : 18 19 20
+ID                   : 12 15 19 23 24
+INT                  : 11
+LCURL                : 1 2
+LPAREN               : 1 2
+MAIN                 : 1 2
+NUM                  : 21
+RCURL                : 1 2
+RPAREN               : 1 2
+SEMICOLON            : 5 6
 STAR                 : 23
-VOID                 : 1
+VOID                 : 1 2
 error                : 
 
 Nonterminals, with rules where they appear
 
-addr                 : 18 22
-body                 : 1 2
-equality             : 6 7
-equality1            : 8 13 16
-equality2            : 9
-expr1                : 4
-expr2                : 5 6
+addr                 : 19
+body                 : 1 3
+equality             : 7 8
+equality1            : 9 14 17
+equality2            : 10
+expr1                : 5
+expr2                : 6 7
 prog                 : 0
-ptr                  : 12 15 17 19 21
-ptrexpr              : 17 19
-stmt                 : 2 3
-subexpr1             : 10 11 12 13
+ptr                  : 13 16 18 20 22
+ptrexpr              : 18 20
+stmt                 : 3 4
+subexpr1             : 11 12 13 14
 
 Parsing method: LALR
 
@@ -67,6 +67,7 @@ state 0
 
     (0) S' -> . prog
     (1) prog -> . VOID MAIN LPAREN RPAREN LCURL body RCURL
+    (2) prog -> . VOID MAIN LPAREN RPAREN LCURL RCURL
 
     VOID            shift and go to state 1
 
@@ -75,6 +76,7 @@ state 0
 state 1
 
     (1) prog -> VOID . MAIN LPAREN RPAREN LCURL body RCURL
+    (2) prog -> VOID . MAIN LPAREN RPAREN LCURL RCURL
 
     MAIN            shift and go to state 3
 
@@ -88,6 +90,7 @@ state 2
 state 3
 
     (1) prog -> VOID MAIN . LPAREN RPAREN LCURL body RCURL
+    (2) prog -> VOID MAIN . LPAREN RPAREN LCURL RCURL
 
     LPAREN          shift and go to state 4
 
@@ -95,6 +98,7 @@ state 3
 state 4
 
     (1) prog -> VOID MAIN LPAREN . RPAREN LCURL body RCURL
+    (2) prog -> VOID MAIN LPAREN . RPAREN LCURL RCURL
 
     RPAREN          shift and go to state 5
 
@@ -102,6 +106,7 @@ state 4
 state 5
 
     (1) prog -> VOID MAIN LPAREN RPAREN . LCURL body RCURL
+    (2) prog -> VOID MAIN LPAREN RPAREN . LCURL RCURL
 
     LCURL           shift and go to state 6
 
@@ -109,338 +114,335 @@ state 5
 state 6
 
     (1) prog -> VOID MAIN LPAREN RPAREN LCURL . body RCURL
-    (2) body -> . stmt body
-    (3) body -> . stmt
-    (4) stmt -> . expr1 SEMICOLON
-    (5) stmt -> . expr2 SEMICOLON
-    (10) expr1 -> . INT subexpr1
-    (6) expr2 -> . expr2 COMMA equality
-    (7) expr2 -> . equality
-    (8) equality -> . equality1
-    (9) equality -> . equality2
-    (17) equality1 -> . ptr EQUALS ptrexpr
-    (18) equality2 -> . ID EQUALS addr
+    (2) prog -> VOID MAIN LPAREN RPAREN LCURL . RCURL
+    (3) body -> . stmt body
+    (4) body -> . stmt
+    (5) stmt -> . expr1 SEMICOLON
+    (6) stmt -> . expr2 SEMICOLON
+    (11) expr1 -> . INT subexpr1
+    (7) expr2 -> . expr2 COMMA equality
+    (8) expr2 -> . equality
+    (9) equality -> . equality1
+    (10) equality -> . equality2
+    (18) equality1 -> . ptr EQUALS ptrexpr
+    (19) equality2 -> . ID EQUALS addr
     (23) ptr -> . STAR ID
 
-    INT             shift and go to state 15
-    ID              shift and go to state 13
+    RCURL           shift and go to state 9
+    INT             shift and go to state 16
+    ID              shift and go to state 14
     STAR            shift and go to state 7
 
-    body                           shift and go to state 11
-    equality                       shift and go to state 14
-    stmt                           shift and go to state 12
-    expr2                          shift and go to state 9
-    expr1                          shift and go to state 10
-    equality1                      shift and go to state 16
+    body                           shift and go to state 12
+    equality                       shift and go to state 15
+    stmt                           shift and go to state 13
+    expr2                          shift and go to state 10
+    expr1                          shift and go to state 11
+    equality1                      shift and go to state 17
     ptr                            shift and go to state 8
-    equality2                      shift and go to state 17
+    equality2                      shift and go to state 18
 
 state 7
 
     (23) ptr -> STAR . ID
 
-    ID              shift and go to state 18
+    ID              shift and go to state 19
 
 
 state 8
 
-    (17) equality1 -> ptr . EQUALS ptrexpr
+    (18) equality1 -> ptr . EQUALS ptrexpr
 
-    EQUALS          shift and go to state 19
+    EQUALS          shift and go to state 20
 
 
 state 9
 
-    (5) stmt -> expr2 . SEMICOLON
-    (6) expr2 -> expr2 . COMMA equality
+    (2) prog -> VOID MAIN LPAREN RPAREN LCURL RCURL .
 
-    SEMICOLON       shift and go to state 21
-    COMMA           shift and go to state 20
+    $end            reduce using rule 2 (prog -> VOID MAIN LPAREN RPAREN LCURL RCURL .)
 
 
 state 10
 
-    (4) stmt -> expr1 . SEMICOLON
+    (6) stmt -> expr2 . SEMICOLON
+    (7) expr2 -> expr2 . COMMA equality
 
     SEMICOLON       shift and go to state 22
+    COMMA           shift and go to state 21
 
 
 state 11
 
-    (1) prog -> VOID MAIN LPAREN RPAREN LCURL body . RCURL
+    (5) stmt -> expr1 . SEMICOLON
 
-    RCURL           shift and go to state 23
+    SEMICOLON       shift and go to state 23
 
 
 state 12
 
-    (2) body -> stmt . body
-    (3) body -> stmt .
-    (2) body -> . stmt body
-    (3) body -> . stmt
-    (4) stmt -> . expr1 SEMICOLON
-    (5) stmt -> . expr2 SEMICOLON
-    (10) expr1 -> . INT subexpr1
-    (6) expr2 -> . expr2 COMMA equality
-    (7) expr2 -> . equality
-    (8) equality -> . equality1
-    (9) equality -> . equality2
-    (17) equality1 -> . ptr EQUALS ptrexpr
-    (18) equality2 -> . ID EQUALS addr
-    (23) ptr -> . STAR ID
+    (1) prog -> VOID MAIN LPAREN RPAREN LCURL body . RCURL
 
-    RCURL           reduce using rule 3 (body -> stmt .)
-    INT             shift and go to state 15
-    ID              shift and go to state 13
-    STAR            shift and go to state 7
+    RCURL           shift and go to state 24
 
-    body                           shift and go to state 24
-    equality                       shift and go to state 14
-    stmt                           shift and go to state 12
-    expr2                          shift and go to state 9
-    expr1                          shift and go to state 10
-    equality1                      shift and go to state 16
-    ptr                            shift and go to state 8
-    equality2                      shift and go to state 17
 
 state 13
 
-    (18) equality2 -> ID . EQUALS addr
+    (3) body -> stmt . body
+    (4) body -> stmt .
+    (3) body -> . stmt body
+    (4) body -> . stmt
+    (5) stmt -> . expr1 SEMICOLON
+    (6) stmt -> . expr2 SEMICOLON
+    (11) expr1 -> . INT subexpr1
+    (7) expr2 -> . expr2 COMMA equality
+    (8) expr2 -> . equality
+    (9) equality -> . equality1
+    (10) equality -> . equality2
+    (18) equality1 -> . ptr EQUALS ptrexpr
+    (19) equality2 -> . ID EQUALS addr
+    (23) ptr -> . STAR ID
 
-    EQUALS          shift and go to state 25
+    RCURL           reduce using rule 4 (body -> stmt .)
+    INT             shift and go to state 16
+    ID              shift and go to state 14
+    STAR            shift and go to state 7
 
+    body                           shift and go to state 25
+    equality                       shift and go to state 15
+    stmt                           shift and go to state 13
+    expr2                          shift and go to state 10
+    expr1                          shift and go to state 11
+    equality1                      shift and go to state 17
+    ptr                            shift and go to state 8
+    equality2                      shift and go to state 18
 
 state 14
 
-    (7) expr2 -> equality .
+    (19) equality2 -> ID . EQUALS addr
 
-    SEMICOLON       reduce using rule 7 (expr2 -> equality .)
-    COMMA           reduce using rule 7 (expr2 -> equality .)
+    EQUALS          shift and go to state 26
 
 
 state 15
 
-    (10) expr1 -> INT . subexpr1
-    (11) subexpr1 -> . subexpr1 COMMA ID
-    (12) subexpr1 -> . subexpr1 COMMA ptr
-    (13) subexpr1 -> . subexpr1 COMMA equality1
-    (14) subexpr1 -> . ID
-    (15) subexpr1 -> . ptr
-    (16) subexpr1 -> . equality1
-    (23) ptr -> . STAR ID
-    (17) equality1 -> . ptr EQUALS ptrexpr
+    (8) expr2 -> equality .
 
-    ID              shift and go to state 29
-    STAR            shift and go to state 7
+    SEMICOLON       reduce using rule 8 (expr2 -> equality .)
+    COMMA           reduce using rule 8 (expr2 -> equality .)
 
-    equality1                      shift and go to state 28
-    subexpr1                       shift and go to state 26
-    ptr                            shift and go to state 27
 
 state 16
 
-    (8) equality -> equality1 .
+    (11) expr1 -> INT . subexpr1
+    (12) subexpr1 -> . subexpr1 COMMA ID
+    (13) subexpr1 -> . subexpr1 COMMA ptr
+    (14) subexpr1 -> . subexpr1 COMMA equality1
+    (15) subexpr1 -> . ID
+    (16) subexpr1 -> . ptr
+    (17) subexpr1 -> . equality1
+    (23) ptr -> . STAR ID
+    (18) equality1 -> . ptr EQUALS ptrexpr
 
-    SEMICOLON       reduce using rule 8 (equality -> equality1 .)
-    COMMA           reduce using rule 8 (equality -> equality1 .)
+    ID              shift and go to state 30
+    STAR            shift and go to state 7
 
+    equality1                      shift and go to state 29
+    subexpr1                       shift and go to state 27
+    ptr                            shift and go to state 28
 
 state 17
 
-    (9) equality -> equality2 .
+    (9) equality -> equality1 .
 
-    SEMICOLON       reduce using rule 9 (equality -> equality2 .)
-    COMMA           reduce using rule 9 (equality -> equality2 .)
+    SEMICOLON       reduce using rule 9 (equality -> equality1 .)
+    COMMA           reduce using rule 9 (equality -> equality1 .)
 
 
 state 18
 
-    (23) ptr -> STAR ID .
+    (10) equality -> equality2 .
 
-    EQUALS          reduce using rule 23 (ptr -> STAR ID .)
-    COMMA           reduce using rule 23 (ptr -> STAR ID .)
-    SEMICOLON       reduce using rule 23 (ptr -> STAR ID .)
+    SEMICOLON       reduce using rule 10 (equality -> equality2 .)
+    COMMA           reduce using rule 10 (equality -> equality2 .)
 
 
 state 19
 
-    (17) equality1 -> ptr EQUALS . ptrexpr
-    (19) ptrexpr -> . ptr EQUALS ptrexpr
-    (20) ptrexpr -> . NUM
-    (21) ptrexpr -> . ptr
-    (22) ptrexpr -> . addr
-    (23) ptr -> . STAR ID
-    (24) addr -> . AND ID
+    (23) ptr -> STAR ID .
 
-    NUM             shift and go to state 33
-    STAR            shift and go to state 7
-    AND             shift and go to state 30
+    EQUALS          reduce using rule 23 (ptr -> STAR ID .)
+    SEMICOLON       reduce using rule 23 (ptr -> STAR ID .)
+    COMMA           reduce using rule 23 (ptr -> STAR ID .)
 
-    ptrexpr                        shift and go to state 32
-    ptr                            shift and go to state 34
-    addr                           shift and go to state 31
 
 state 20
 
-    (6) expr2 -> expr2 COMMA . equality
-    (8) equality -> . equality1
-    (9) equality -> . equality2
-    (17) equality1 -> . ptr EQUALS ptrexpr
-    (18) equality2 -> . ID EQUALS addr
+    (18) equality1 -> ptr EQUALS . ptrexpr
+    (20) ptrexpr -> . ptr EQUALS ptrexpr
+    (21) ptrexpr -> . NUM
+    (22) ptrexpr -> . ptr
     (23) ptr -> . STAR ID
 
-    ID              shift and go to state 13
+    NUM             shift and go to state 33
     STAR            shift and go to state 7
 
-    equality                       shift and go to state 35
-    equality1                      shift and go to state 16
-    ptr                            shift and go to state 8
-    equality2                      shift and go to state 17
+    ptrexpr                        shift and go to state 31
+    ptr                            shift and go to state 32
 
 state 21
 
-    (5) stmt -> expr2 SEMICOLON .
+    (7) expr2 -> expr2 COMMA . equality
+    (9) equality -> . equality1
+    (10) equality -> . equality2
+    (18) equality1 -> . ptr EQUALS ptrexpr
+    (19) equality2 -> . ID EQUALS addr
+    (23) ptr -> . STAR ID
 
-    INT             reduce using rule 5 (stmt -> expr2 SEMICOLON .)
-    ID              reduce using rule 5 (stmt -> expr2 SEMICOLON .)
-    STAR            reduce using rule 5 (stmt -> expr2 SEMICOLON .)
-    RCURL           reduce using rule 5 (stmt -> expr2 SEMICOLON .)
+    ID              shift and go to state 14
+    STAR            shift and go to state 7
 
+    equality                       shift and go to state 34
+    equality1                      shift and go to state 17
+    ptr                            shift and go to state 8
+    equality2                      shift and go to state 18
 
 state 22
 
-    (4) stmt -> expr1 SEMICOLON .
+    (6) stmt -> expr2 SEMICOLON .
 
-    INT             reduce using rule 4 (stmt -> expr1 SEMICOLON .)
-    ID              reduce using rule 4 (stmt -> expr1 SEMICOLON .)
-    STAR            reduce using rule 4 (stmt -> expr1 SEMICOLON .)
-    RCURL           reduce using rule 4 (stmt -> expr1 SEMICOLON .)
+    INT             reduce using rule 6 (stmt -> expr2 SEMICOLON .)
+    ID              reduce using rule 6 (stmt -> expr2 SEMICOLON .)
+    STAR            reduce using rule 6 (stmt -> expr2 SEMICOLON .)
+    RCURL           reduce using rule 6 (stmt -> expr2 SEMICOLON .)
 
 
 state 23
+
+    (5) stmt -> expr1 SEMICOLON .
+
+    INT             reduce using rule 5 (stmt -> expr1 SEMICOLON .)
+    ID              reduce using rule 5 (stmt -> expr1 SEMICOLON .)
+    STAR            reduce using rule 5 (stmt -> expr1 SEMICOLON .)
+    RCURL           reduce using rule 5 (stmt -> expr1 SEMICOLON .)
+
+
+state 24
 
     (1) prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL .
 
     $end            reduce using rule 1 (prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL .)
 
 
-state 24
-
-    (2) body -> stmt body .
-
-    RCURL           reduce using rule 2 (body -> stmt body .)
-
-
 state 25
 
-    (18) equality2 -> ID EQUALS . addr
-    (24) addr -> . AND ID
+    (3) body -> stmt body .
 
-    AND             shift and go to state 30
+    RCURL           reduce using rule 3 (body -> stmt body .)
 
-    addr                           shift and go to state 36
 
 state 26
 
-    (10) expr1 -> INT subexpr1 .
-    (11) subexpr1 -> subexpr1 . COMMA ID
-    (12) subexpr1 -> subexpr1 . COMMA ptr
-    (13) subexpr1 -> subexpr1 . COMMA equality1
+    (19) equality2 -> ID EQUALS . addr
+    (24) addr -> . AND ID
 
-    SEMICOLON       reduce using rule 10 (expr1 -> INT subexpr1 .)
-    COMMA           shift and go to state 37
+    AND             shift and go to state 35
 
+    addr                           shift and go to state 36
 
 state 27
 
-    (15) subexpr1 -> ptr .
-    (17) equality1 -> ptr . EQUALS ptrexpr
+    (11) expr1 -> INT subexpr1 .
+    (12) subexpr1 -> subexpr1 . COMMA ID
+    (13) subexpr1 -> subexpr1 . COMMA ptr
+    (14) subexpr1 -> subexpr1 . COMMA equality1
 
-    COMMA           reduce using rule 15 (subexpr1 -> ptr .)
-    SEMICOLON       reduce using rule 15 (subexpr1 -> ptr .)
-    EQUALS          shift and go to state 19
+    SEMICOLON       reduce using rule 11 (expr1 -> INT subexpr1 .)
+    COMMA           shift and go to state 37
 
 
 state 28
 
-    (16) subexpr1 -> equality1 .
+    (16) subexpr1 -> ptr .
+    (18) equality1 -> ptr . EQUALS ptrexpr
 
-    COMMA           reduce using rule 16 (subexpr1 -> equality1 .)
-    SEMICOLON       reduce using rule 16 (subexpr1 -> equality1 .)
+    COMMA           reduce using rule 16 (subexpr1 -> ptr .)
+    SEMICOLON       reduce using rule 16 (subexpr1 -> ptr .)
+    EQUALS          shift and go to state 20
 
 
 state 29
 
-    (14) subexpr1 -> ID .
+    (17) subexpr1 -> equality1 .
 
-    COMMA           reduce using rule 14 (subexpr1 -> ID .)
-    SEMICOLON       reduce using rule 14 (subexpr1 -> ID .)
+    COMMA           reduce using rule 17 (subexpr1 -> equality1 .)
+    SEMICOLON       reduce using rule 17 (subexpr1 -> equality1 .)
 
 
 state 30
 
-    (24) addr -> AND . ID
+    (15) subexpr1 -> ID .
 
-    ID              shift and go to state 38
+    COMMA           reduce using rule 15 (subexpr1 -> ID .)
+    SEMICOLON       reduce using rule 15 (subexpr1 -> ID .)
 
 
 state 31
 
-    (22) ptrexpr -> addr .
+    (18) equality1 -> ptr EQUALS ptrexpr .
 
-    SEMICOLON       reduce using rule 22 (ptrexpr -> addr .)
-    COMMA           reduce using rule 22 (ptrexpr -> addr .)
+    SEMICOLON       reduce using rule 18 (equality1 -> ptr EQUALS ptrexpr .)
+    COMMA           reduce using rule 18 (equality1 -> ptr EQUALS ptrexpr .)
 
 
 state 32
 
-    (17) equality1 -> ptr EQUALS ptrexpr .
+    (20) ptrexpr -> ptr . EQUALS ptrexpr
+    (22) ptrexpr -> ptr .
 
-    COMMA           reduce using rule 17 (equality1 -> ptr EQUALS ptrexpr .)
-    SEMICOLON       reduce using rule 17 (equality1 -> ptr EQUALS ptrexpr .)
+    EQUALS          shift and go to state 38
+    SEMICOLON       reduce using rule 22 (ptrexpr -> ptr .)
+    COMMA           reduce using rule 22 (ptrexpr -> ptr .)
 
 
 state 33
 
-    (20) ptrexpr -> NUM .
+    (21) ptrexpr -> NUM .
 
-    SEMICOLON       reduce using rule 20 (ptrexpr -> NUM .)
-    COMMA           reduce using rule 20 (ptrexpr -> NUM .)
+    SEMICOLON       reduce using rule 21 (ptrexpr -> NUM .)
+    COMMA           reduce using rule 21 (ptrexpr -> NUM .)
 
 
 state 34
 
-    (19) ptrexpr -> ptr . EQUALS ptrexpr
-    (21) ptrexpr -> ptr .
+    (7) expr2 -> expr2 COMMA equality .
 
-    EQUALS          shift and go to state 39
-    SEMICOLON       reduce using rule 21 (ptrexpr -> ptr .)
-    COMMA           reduce using rule 21 (ptrexpr -> ptr .)
+    SEMICOLON       reduce using rule 7 (expr2 -> expr2 COMMA equality .)
+    COMMA           reduce using rule 7 (expr2 -> expr2 COMMA equality .)
 
 
 state 35
 
-    (6) expr2 -> expr2 COMMA equality .
+    (24) addr -> AND . ID
 
-    SEMICOLON       reduce using rule 6 (expr2 -> expr2 COMMA equality .)
-    COMMA           reduce using rule 6 (expr2 -> expr2 COMMA equality .)
+    ID              shift and go to state 39
 
 
 state 36
 
-    (18) equality2 -> ID EQUALS addr .
+    (19) equality2 -> ID EQUALS addr .
 
-    SEMICOLON       reduce using rule 18 (equality2 -> ID EQUALS addr .)
-    COMMA           reduce using rule 18 (equality2 -> ID EQUALS addr .)
+    SEMICOLON       reduce using rule 19 (equality2 -> ID EQUALS addr .)
+    COMMA           reduce using rule 19 (equality2 -> ID EQUALS addr .)
 
 
 state 37
 
-    (11) subexpr1 -> subexpr1 COMMA . ID
-    (12) subexpr1 -> subexpr1 COMMA . ptr
-    (13) subexpr1 -> subexpr1 COMMA . equality1
+    (12) subexpr1 -> subexpr1 COMMA . ID
+    (13) subexpr1 -> subexpr1 COMMA . ptr
+    (14) subexpr1 -> subexpr1 COMMA . equality1
     (23) ptr -> . STAR ID
-    (17) equality1 -> . ptr EQUALS ptrexpr
+    (18) equality1 -> . ptr EQUALS ptrexpr
 
     ID              shift and go to state 42
     STAR            shift and go to state 7
@@ -450,60 +452,56 @@ state 37
 
 state 38
 
+    (20) ptrexpr -> ptr EQUALS . ptrexpr
+    (20) ptrexpr -> . ptr EQUALS ptrexpr
+    (21) ptrexpr -> . NUM
+    (22) ptrexpr -> . ptr
+    (23) ptr -> . STAR ID
+
+    NUM             shift and go to state 33
+    STAR            shift and go to state 7
+
+    ptrexpr                        shift and go to state 43
+    ptr                            shift and go to state 32
+
+state 39
+
     (24) addr -> AND ID .
 
     SEMICOLON       reduce using rule 24 (addr -> AND ID .)
     COMMA           reduce using rule 24 (addr -> AND ID .)
 
 
-state 39
-
-    (19) ptrexpr -> ptr EQUALS . ptrexpr
-    (19) ptrexpr -> . ptr EQUALS ptrexpr
-    (20) ptrexpr -> . NUM
-    (21) ptrexpr -> . ptr
-    (22) ptrexpr -> . addr
-    (23) ptr -> . STAR ID
-    (24) addr -> . AND ID
-
-    NUM             shift and go to state 33
-    STAR            shift and go to state 7
-    AND             shift and go to state 30
-
-    ptrexpr                        shift and go to state 43
-    ptr                            shift and go to state 34
-    addr                           shift and go to state 31
-
 state 40
 
-    (12) subexpr1 -> subexpr1 COMMA ptr .
-    (17) equality1 -> ptr . EQUALS ptrexpr
+    (13) subexpr1 -> subexpr1 COMMA ptr .
+    (18) equality1 -> ptr . EQUALS ptrexpr
 
-    COMMA           reduce using rule 12 (subexpr1 -> subexpr1 COMMA ptr .)
-    SEMICOLON       reduce using rule 12 (subexpr1 -> subexpr1 COMMA ptr .)
-    EQUALS          shift and go to state 19
+    COMMA           reduce using rule 13 (subexpr1 -> subexpr1 COMMA ptr .)
+    SEMICOLON       reduce using rule 13 (subexpr1 -> subexpr1 COMMA ptr .)
+    EQUALS          shift and go to state 20
 
 
 state 41
 
-    (13) subexpr1 -> subexpr1 COMMA equality1 .
+    (14) subexpr1 -> subexpr1 COMMA equality1 .
 
-    COMMA           reduce using rule 13 (subexpr1 -> subexpr1 COMMA equality1 .)
-    SEMICOLON       reduce using rule 13 (subexpr1 -> subexpr1 COMMA equality1 .)
+    COMMA           reduce using rule 14 (subexpr1 -> subexpr1 COMMA equality1 .)
+    SEMICOLON       reduce using rule 14 (subexpr1 -> subexpr1 COMMA equality1 .)
 
 
 state 42
 
-    (11) subexpr1 -> subexpr1 COMMA ID .
+    (12) subexpr1 -> subexpr1 COMMA ID .
 
-    COMMA           reduce using rule 11 (subexpr1 -> subexpr1 COMMA ID .)
-    SEMICOLON       reduce using rule 11 (subexpr1 -> subexpr1 COMMA ID .)
+    COMMA           reduce using rule 12 (subexpr1 -> subexpr1 COMMA ID .)
+    SEMICOLON       reduce using rule 12 (subexpr1 -> subexpr1 COMMA ID .)
 
 
 state 43
 
-    (19) ptrexpr -> ptr EQUALS ptrexpr .
+    (20) ptrexpr -> ptr EQUALS ptrexpr .
 
-    SEMICOLON       reduce using rule 19 (ptrexpr -> ptr EQUALS ptrexpr .)
-    COMMA           reduce using rule 19 (ptrexpr -> ptr EQUALS ptrexpr .)
+    SEMICOLON       reduce using rule 20 (ptrexpr -> ptr EQUALS ptrexpr .)
+    COMMA           reduce using rule 20 (ptrexpr -> ptr EQUALS ptrexpr .)
 

@@ -50,9 +50,17 @@ def t_error(t):
 	print("Illegal character '%s'" % t.value[0])
 	t.lexer.skip(1)
 
+'''
+-----------------------------------------------------------------------
+Parser
+-----------------------------------------------------------------------
+
+'''
+
 # This defines our program
 def p_def_prog(p):
 	''' prog : VOID MAIN LPAREN RPAREN LCURL body RCURL
+			 | VOID MAIN LPAREN RPAREN LCURL RCURL
 	'''
 	# print("Program defined.")
 	p[0] = "".join(map(lambda x: str(x), p[1:]))
@@ -122,7 +130,6 @@ def p_def_ptrexpr(p):
 	''' ptrexpr : ptr EQUALS ptrexpr
 				| NUM
 				| ptr
-				| addr
 	'''
 	global eq_num
 	if len(p) > 2:
@@ -142,6 +149,13 @@ def p_def_addr(p):
 	''' addr : AND ID
 	'''
 	p[0] = p[1] + p[2]
+
+def p_error(p):
+	if p:
+		print("syntax error at {0}, line no. {1}".format(p.value, p.lineno))
+	else:
+		print("syntax error at EOF.")
+	sys.exit(0)
 
 
 if __name__ == "__main__":
