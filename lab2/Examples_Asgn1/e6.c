@@ -1,3 +1,5 @@
 void main() {
- int a;int b;	
+	// Comment a=M
+	a = &M;
+	// *c= *a;
 }

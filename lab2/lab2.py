@@ -42,6 +42,9 @@ def t_newline(t):
 	r'\n+'
 	t.lexer.lineno += len(t.value)
 
+def t_COMMENT(t):
+	r'\/\/.*'
+	pass
 # A string containing ignored characters (spaces and tabs)
 t_ignore  = ' \t'
 
@@ -73,35 +76,35 @@ def p_def_body(p):
 	p[0] = "".join(map(lambda x: str(x), p[1:]))
 
 def p_def_stmt(p):
-	''' stmt : expr1 SEMICOLON 
-			 | expr2 SEMICOLON
+	''' stmt : decl SEMICOLON 
+			 | assgn_list SEMICOLON
 	'''
 	p[0] = "".join(map(lambda x: str(x), p[1:]))
 
-def p_def_expr2(p):
-	''' expr2 : expr2 COMMA equality 
-			  | equality 
+def p_def_assgn_list(p):
+	''' assgn_list : assgn_list COMMA assgn 
+			  | assgn 
 	'''
 	p[0] = "".join(map(lambda x: str(x), p[1:]))
 
-def p_def_equality(p):
-	''' equality : equality1
-	 			 | equality2
+def p_def_assgn(p):
+	''' assgn : ptr_assgn
+	 		  | num_assgn
 	'''
 	p[0] = "".join(map(lambda x: str(x), p[1:]))
 
-def p_def_expr1(p):
-	''' expr1 : INT subexpr1
+def p_def_decl(p):
+	''' decl : INT decl_list
 	'''
 	p[0] = "".join(map(lambda x: str(x), p[1:]))
 
-def p_def_subexpr1(p):
-	''' subexpr1 : subexpr1 COMMA ID
-				 | subexpr1 COMMA ptr
-				 | subexpr1 COMMA equality1
+def p_def_decl_list(p):
+	''' decl_list : decl_list COMMA ID
+				 | decl_list COMMA ptr
+				 | decl_list COMMA ptr_assgn
 				 | ID
 				 | ptr
-				 | equality1
+				 | ptr_assgn
 	'''
 	global stat_num, ptr_num
 	# print([repr(p[i]) for i in range(len(p))])
@@ -113,21 +116,21 @@ def p_def_subexpr1(p):
 		stat_num += 1
 
 
-def p_def_equality1(p):
-	''' equality1 : ptr EQUALS ptrexpr '''
+def p_def_ptr_assgn(p):
+	''' ptr_assgn : ptr EQUALS ptr_expr '''
 	global eq_num
 	eq_num += 1
 	p[0] = "".join(map(lambda x: str(x), p[1:]))
 
 
-def p_def_equality2(p):
-	''' equality2 : ID EQUALS addr '''
+def p_def_num_assgn(p):
+	''' num_assgn : ID EQUALS addr '''
 	global eq_num
 	eq_num += 1
 	p[0] = "".join(map(lambda x: str(x), p[1:]))	
 
-def p_def_ptrexpr(p):
-	''' ptrexpr : ptr EQUALS ptrexpr
+def p_def_ptr_expr(p):
+	''' ptr_expr : ptr EQUALS ptr_expr
 				| NUM
 				| ptr
 	'''
