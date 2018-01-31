@@ -1,3 +1,9 @@
+'''
+Assignment A1
+Team members: 
+1. Rohit Kumar Jena (150050061)
+2. Walter Berggren  (17V051001)
+'''
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
