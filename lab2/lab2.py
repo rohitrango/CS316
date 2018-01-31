@@ -101,10 +101,8 @@ def p_def_decl(p):
 def p_def_decl_list(p):
 	''' decl_list : decl_list COMMA ID
 				 | decl_list COMMA ptr
-				 | decl_list COMMA ptr_assgn
 				 | ID
 				 | ptr
-				 | ptr_assgn
 	'''
 	global stat_num, ptr_num
 	# print([repr(p[i]) for i in range(len(p))])
@@ -124,8 +122,7 @@ def p_def_ptr_assgn(p):
 
 
 def p_def_num_assgn(p):
-	''' num_assgn : ID EQUALS num_assgn
-				  | ID EQUALS addr
+	''' num_assgn : ID EQUALS addr
 				  | ID EQUALS ID
 	'''
 	global eq_num
@@ -133,9 +130,7 @@ def p_def_num_assgn(p):
 	p[0] = "".join(map(lambda x: str(x), p[1:]))	
 
 def p_def_ptr_expr(p):
-	''' ptr_expr : ptr EQUALS ptr_expr
-				| num_assgn
-				| ID
+	''' ptr_expr : ID
 				| NUM
 				| ptr
 				| addr
