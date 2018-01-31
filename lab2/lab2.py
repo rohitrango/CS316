@@ -124,15 +124,21 @@ def p_def_ptr_assgn(p):
 
 
 def p_def_num_assgn(p):
-	''' num_assgn : ID EQUALS addr '''
+	''' num_assgn : ID EQUALS num_assgn
+				  | ID EQUALS addr
+				  | ID EQUALS ID
+	'''
 	global eq_num
 	eq_num += 1
 	p[0] = "".join(map(lambda x: str(x), p[1:]))	
 
 def p_def_ptr_expr(p):
 	''' ptr_expr : ptr EQUALS ptr_expr
+				| num_assgn
+				| ID
 				| NUM
 				| ptr
+				| addr
 	'''
 	global eq_num
 	if len(p) > 2:
@@ -143,13 +149,16 @@ def p_def_ptr_expr(p):
 
 
 def p_def_ptr(p):
-	'''  ptr : STAR ID
+	'''  ptr : STAR ptr 
+			 | STAR ID
+			 | STAR addr
 	'''
 	p[0] = p[1] + p[2]
 
 
 def p_def_addr(p):
 	''' addr : AND ID
+			 | AND ptr
 	'''
 	p[0] = p[1] + p[2]
 

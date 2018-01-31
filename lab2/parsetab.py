@@ -5,9 +5,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'ID STAR AND NUM LPAREN RPAREN COMMA LCURL RCURL SEMICOLON EQUALS INT VOID MAIN prog : VOID MAIN LPAREN RPAREN LCURL body RCURL\n\t\t\t | VOID MAIN LPAREN RPAREN LCURL RCURL\n\t body : stmt body\n\t\t\t | stmt\n\t stmt : decl SEMICOLON \n\t\t\t | assgn_list SEMICOLON\n\t assgn_list : assgn_list COMMA assgn \n\t\t\t  | assgn \n\t assgn : ptr_assgn\n\t \t\t  | num_assgn\n\t decl : INT decl_list\n\t decl_list : decl_list COMMA ID\n\t\t\t\t | decl_list COMMA ptr\n\t\t\t\t | decl_list COMMA ptr_assgn\n\t\t\t\t | ID\n\t\t\t\t | ptr\n\t\t\t\t | ptr_assgn\n\t ptr_assgn : ptr EQUALS ptr_expr  num_assgn : ID EQUALS addr  ptr_expr : ptr EQUALS ptr_expr\n\t\t\t\t| NUM\n\t\t\t\t| ptr\n\t  ptr : STAR ID\n\t addr : AND ID\n\t'
+_lr_signature = 'ID STAR AND NUM LPAREN RPAREN COMMA LCURL RCURL SEMICOLON EQUALS INT VOID MAIN prog : VOID MAIN LPAREN RPAREN LCURL body RCURL\n\t\t\t | VOID MAIN LPAREN RPAREN LCURL RCURL\n\t body : stmt body\n\t\t\t | stmt\n\t stmt : decl SEMICOLON \n\t\t\t | assgn_list SEMICOLON\n\t assgn_list : assgn_list COMMA assgn \n\t\t\t  | assgn \n\t assgn : ptr_assgn\n\t \t\t  | num_assgn\n\t decl : INT decl_list\n\t decl_list : decl_list COMMA ID\n\t\t\t\t | decl_list COMMA ptr\n\t\t\t\t | decl_list COMMA ptr_assgn\n\t\t\t\t | ID\n\t\t\t\t | ptr\n\t\t\t\t | ptr_assgn\n\t ptr_assgn : ptr EQUALS ptr_expr  num_assgn : ID EQUALS num_assgn\n\t\t\t\t  | ID EQUALS addr\n\t\t\t\t  | ID EQUALS ID\n\t ptr_expr : ptr EQUALS ptr_expr\n\t\t\t\t| num_assgn\n\t\t\t\t| ID\n\t\t\t\t| NUM\n\t\t\t\t| ptr\n\t  ptr : STAR ptr \n\t\t\t | STAR ID\n\t\t\t | STAR addr\n\t addr : AND ID\n\t\t\t | AND ptr\n\t'
     
-_lr_action_items = {'COMMA':([7,8,9,15,26,27,28,29,30,31,32,34,35,36,38,40,41,42,43,],[19,-10,-9,-8,-15,-17,-16,37,-23,-7,-19,-18,-21,-22,-24,-12,-13,-14,-20,]),'INT':([6,12,20,24,],[16,16,-6,-5,]),'RCURL':([6,10,12,20,23,24,],[18,21,-4,-6,-3,-5,]),'$end':([1,18,21,],[0,-2,-1,]),'VOID':([0,],[2,]),'ID':([6,12,16,17,19,20,24,33,37,],[11,11,26,30,11,-6,-5,38,40,]),'LCURL':([5,],[6,]),'EQUALS':([11,14,28,30,36,41,],[22,25,25,-23,39,25,]),'NUM':([25,39,],[35,35,]),'MAIN':([2,],[3,]),'STAR':([6,12,16,19,20,24,25,37,39,],[17,17,17,17,-6,-5,17,17,17,]),'RPAREN':([4,],[5,]),'AND':([22,],[33,]),'LPAREN':([3,],[4,]),'SEMICOLON':([7,8,9,13,15,26,27,28,29,30,31,32,34,35,36,38,40,41,42,43,],[20,-10,-9,24,-8,-15,-17,-16,-11,-23,-7,-19,-18,-21,-22,-24,-12,-13,-14,-20,]),}
+_lr_action_items = {'RCURL':([6,14,18,27,31,33,],[12,30,-4,-5,-6,-3,]),'EQUALS':([10,13,21,23,25,26,35,36,39,41,44,47,],[28,29,29,-27,-29,-28,-31,-30,28,49,28,29,]),'LCURL':([5,],[6,]),'NUM':([29,49,],[42,42,]),'AND':([8,28,],[24,24,]),'STAR':([6,7,8,18,24,27,29,31,32,34,49,],[8,8,8,8,8,-5,8,-6,8,8,8,]),'ID':([6,7,8,18,24,27,28,29,31,32,34,49,],[10,22,26,10,36,-5,39,44,-6,10,46,44,]),'COMMA':([11,15,16,17,19,20,21,22,23,25,26,35,36,37,38,39,40,41,42,43,44,45,46,47,48,50,],[-8,-9,32,-10,-17,34,-16,-15,-27,-29,-28,-31,-30,-19,-20,-21,-23,-26,-25,-18,-24,-7,-12,-13,-14,-22,]),'SEMICOLON':([9,11,15,16,17,19,20,21,22,23,25,26,35,36,37,38,39,40,41,42,43,44,45,46,47,48,50,],[27,-8,-9,31,-10,-17,-11,-16,-15,-27,-29,-28,-31,-30,-19,-20,-21,-23,-26,-25,-18,-24,-7,-12,-13,-14,-22,]),'VOID':([0,],[1,]),'$end':([2,12,30,],[0,-2,-1,]),'LPAREN':([3,],[4,]),'MAIN':([1,],[3,]),'RPAREN':([4,],[5,]),'INT':([6,18,27,31,],[7,7,-5,-6,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -16,7 +16,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'assgn_list':([6,12,],[7,7,]),'assgn':([6,12,19,],[15,15,31,]),'prog':([0,],[1,]),'ptr_expr':([25,39,],[34,43,]),'addr':([22,],[32,]),'num_assgn':([6,12,19,],[8,8,8,]),'ptr_assgn':([6,12,16,19,37,],[9,9,27,9,42,]),'decl_list':([16,],[29,]),'body':([6,12,],[10,23,]),'stmt':([6,12,],[12,12,]),'decl':([6,12,],[13,13,]),'ptr':([6,12,16,19,25,37,39,],[14,14,28,14,36,41,36,]),}
+_lr_goto_items = {'decl':([6,18,],[9,9,]),'prog':([0,],[2,]),'body':([6,18,],[14,33,]),'ptr_expr':([29,49,],[43,50,]),'addr':([8,28,],[25,38,]),'ptr_assgn':([6,7,18,32,34,],[15,19,15,15,48,]),'ptr':([6,7,8,18,24,29,32,34,49,],[13,21,23,13,35,41,13,47,41,]),'assgn':([6,18,32,],[11,11,45,]),'decl_list':([7,],[20,]),'assgn_list':([6,18,],[16,16,]),'num_assgn':([6,18,28,29,32,49,],[17,17,37,40,17,40,]),'stmt':([6,18,],[18,18,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -26,28 +26,35 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> prog","S'",1,None,None,None),
-  ('prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL','prog',7,'p_def_prog','lab2.py',62),
-  ('prog -> VOID MAIN LPAREN RPAREN LCURL RCURL','prog',6,'p_def_prog','lab2.py',63),
-  ('body -> stmt body','body',2,'p_def_body','lab2.py',70),
-  ('body -> stmt','body',1,'p_def_body','lab2.py',71),
-  ('stmt -> decl SEMICOLON','stmt',2,'p_def_stmt','lab2.py',76),
-  ('stmt -> assgn_list SEMICOLON','stmt',2,'p_def_stmt','lab2.py',77),
-  ('assgn_list -> assgn_list COMMA assgn','assgn_list',3,'p_def_assgn_list','lab2.py',82),
-  ('assgn_list -> assgn','assgn_list',1,'p_def_assgn_list','lab2.py',83),
-  ('assgn -> ptr_assgn','assgn',1,'p_def_assgn','lab2.py',88),
-  ('assgn -> num_assgn','assgn',1,'p_def_assgn','lab2.py',89),
-  ('decl -> INT decl_list','decl',2,'p_def_decl','lab2.py',94),
-  ('decl_list -> decl_list COMMA ID','decl_list',3,'p_def_decl_list','lab2.py',99),
-  ('decl_list -> decl_list COMMA ptr','decl_list',3,'p_def_decl_list','lab2.py',100),
-  ('decl_list -> decl_list COMMA ptr_assgn','decl_list',3,'p_def_decl_list','lab2.py',101),
-  ('decl_list -> ID','decl_list',1,'p_def_decl_list','lab2.py',102),
-  ('decl_list -> ptr','decl_list',1,'p_def_decl_list','lab2.py',103),
-  ('decl_list -> ptr_assgn','decl_list',1,'p_def_decl_list','lab2.py',104),
-  ('ptr_assgn -> ptr EQUALS ptr_expr','ptr_assgn',3,'p_def_ptr_assgn','lab2.py',117),
-  ('num_assgn -> ID EQUALS addr','num_assgn',3,'p_def_num_assgn','lab2.py',124),
-  ('ptr_expr -> ptr EQUALS ptr_expr','ptr_expr',3,'p_def_ptr_expr','lab2.py',130),
-  ('ptr_expr -> NUM','ptr_expr',1,'p_def_ptr_expr','lab2.py',131),
-  ('ptr_expr -> ptr','ptr_expr',1,'p_def_ptr_expr','lab2.py',132),
-  ('ptr -> STAR ID','ptr',2,'p_def_ptr','lab2.py',143),
-  ('addr -> AND ID','addr',2,'p_def_addr','lab2.py',149),
+  ('prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL','prog',7,'p_def_prog','lab2.py',65),
+  ('prog -> VOID MAIN LPAREN RPAREN LCURL RCURL','prog',6,'p_def_prog','lab2.py',66),
+  ('body -> stmt body','body',2,'p_def_body','lab2.py',73),
+  ('body -> stmt','body',1,'p_def_body','lab2.py',74),
+  ('stmt -> decl SEMICOLON','stmt',2,'p_def_stmt','lab2.py',79),
+  ('stmt -> assgn_list SEMICOLON','stmt',2,'p_def_stmt','lab2.py',80),
+  ('assgn_list -> assgn_list COMMA assgn','assgn_list',3,'p_def_assgn_list','lab2.py',85),
+  ('assgn_list -> assgn','assgn_list',1,'p_def_assgn_list','lab2.py',86),
+  ('assgn -> ptr_assgn','assgn',1,'p_def_assgn','lab2.py',91),
+  ('assgn -> num_assgn','assgn',1,'p_def_assgn','lab2.py',92),
+  ('decl -> INT decl_list','decl',2,'p_def_decl','lab2.py',97),
+  ('decl_list -> decl_list COMMA ID','decl_list',3,'p_def_decl_list','lab2.py',102),
+  ('decl_list -> decl_list COMMA ptr','decl_list',3,'p_def_decl_list','lab2.py',103),
+  ('decl_list -> decl_list COMMA ptr_assgn','decl_list',3,'p_def_decl_list','lab2.py',104),
+  ('decl_list -> ID','decl_list',1,'p_def_decl_list','lab2.py',105),
+  ('decl_list -> ptr','decl_list',1,'p_def_decl_list','lab2.py',106),
+  ('decl_list -> ptr_assgn','decl_list',1,'p_def_decl_list','lab2.py',107),
+  ('ptr_assgn -> ptr EQUALS ptr_expr','ptr_assgn',3,'p_def_ptr_assgn','lab2.py',120),
+  ('num_assgn -> ID EQUALS num_assgn','num_assgn',3,'p_def_num_assgn','lab2.py',127),
+  ('num_assgn -> ID EQUALS addr','num_assgn',3,'p_def_num_assgn','lab2.py',128),
+  ('num_assgn -> ID EQUALS ID','num_assgn',3,'p_def_num_assgn','lab2.py',129),
+  ('ptr_expr -> ptr EQUALS ptr_expr','ptr_expr',3,'p_def_ptr_expr','lab2.py',136),
+  ('ptr_expr -> num_assgn','ptr_expr',1,'p_def_ptr_expr','lab2.py',137),
+  ('ptr_expr -> ID','ptr_expr',1,'p_def_ptr_expr','lab2.py',138),
+  ('ptr_expr -> NUM','ptr_expr',1,'p_def_ptr_expr','lab2.py',139),
+  ('ptr_expr -> ptr','ptr_expr',1,'p_def_ptr_expr','lab2.py',140),
+  ('ptr -> STAR ptr','ptr',2,'p_def_ptr','lab2.py',151),
+  ('ptr -> STAR ID','ptr',2,'p_def_ptr','lab2.py',152),
+  ('ptr -> STAR addr','ptr',2,'p_def_ptr','lab2.py',153),
+  ('addr -> AND ID','addr',2,'p_def_addr','lab2.py',159),
+  ('addr -> AND ptr','addr',2,'p_def_addr','lab2.py',160),
 ]
