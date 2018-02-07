@@ -1,0 +1,88 @@
+ASGN
+(
+	DEREF
+	(
+		DEREF
+		(
+			VAR(b)
+		)
+	)
+	,
+	PLUS
+	(
+		MUL
+		(
+			DEREF
+			(
+				VAR(b)
+			)
+			,
+			DEREF
+			(
+				VAR(c)
+			)
+		)
+		,
+		CONST(3)
+	)
+)
+
+ASGN
+(
+	VAR(b)
+	,
+	DEREF
+	(
+		ADDR
+		(
+			VAR(d)
+		)
+	)
+)
+
+ASGN
+(
+	DEREF
+	(
+		VAR(p)
+	)
+	,
+	PLUS
+	(
+		MINUS
+		(
+			VAR(a)
+			,
+			DIV
+			(
+				MUL
+				(
+					VAR(b)
+					,
+					DEREF
+					(
+						VAR(d)
+					)
+				)
+				,
+				VAR(l)
+			)
+		)
+		,
+		CONST(2)
+	)
+)
+
+ASGN
+(
+	DEREF
+	(
+		VAR(p)
+	)
+	,
+	UMINUS
+	(
+		VAR(a)
+	)
+)
+
