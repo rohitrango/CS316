@@ -308,7 +308,7 @@ def p_def_ptr(p):
 	if isinstance(p[2], str):
 		p[2] = AbstractSyntaxTreeNode("VAR", p[2])
 
-	p[0] = AbstractSyntaxTreeNode("ADDR", None, [p[2]])
+	p[0] = AbstractSyntaxTreeNode("DEREF", None, [p[2]])
 
 
 def p_def_addr(p):
