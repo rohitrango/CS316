@@ -30,10 +30,14 @@ t_PLUS = r'\+'
 t_MINUS = r'\-'
 t_SLASH = r'\/'
 
-
+# Variables for A1
 ptr_num = 0
 eq_num = 0
 stat_num = 0
+
+# Variables for A2
+ast_list = []
+
 
 def t_NUM(t):
 	r'(\+|\-)?[0-9]+'
@@ -75,8 +79,40 @@ Data Structure for Abstract Syntax Tree
 -----------------------------------------------------------------------
 '''
 
-# class 
+# Generate Tree in format
+# def generateTreeFormat(node, depth=0):
+	# pass
+	# delim = "\t"*depth
+	# if node.operator in ['VAR', 'CONST']:
+	# 	result = delim + node.operator + "(" + node.name + ")\n"
+	# else:
+	# 	result = delim + node.operator + "\n" + \
+	# 			 delim + "(\n"
+	# 	for n in node.operands[:-1]:
+	# 		result += generateTreeFormat(n, depth+1)
+	# 		result += (delim + "\t,")
+	# 	result += generateTreeFormat(node.operands[-1], depth+1)
+	# 	result += delim + "\t" + ")\n"
+	# return result
 
+
+class AbstractSyntaxTreeNode():
+
+	def __init__(self, operator, name=None, operands=[]):
+		self.operator = operator
+		self.name = name
+		self.operands = operands
+
+	def addChild(self, child):
+		self.operands.append(child)
+
+	def __repr__(self, depth=0):
+		if len(self.operands) == 0:
+			return depth*"\t" + self.operator + "(" + self.name + ")"
+		else:
+			return depth*"\t" + self.operator + "\n" + depth*"\t" + "(\n" \
+					+ ("\n" + (depth+1)*"\t" + ",\n").join(map(lambda x: x.__repr__(depth+1), self.operands)) + "\n" + depth*"\t" + ")" 
+		# return generateTreeFormat(self)
 
 
 
@@ -103,8 +139,7 @@ def p_def_prog(p):
 	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 	# TODO: Remove this later
-	import json
-	print(json.dumps(p[0], indent=4, sort_keys=True))
+	# print(json.dumps(p[0], indent=4, sort_keys=True))
 
 
 def p_def_body(p):
@@ -166,10 +201,13 @@ def p_def_decl_list(p):
 
 def p_def_ptr_assgn(p):
 	''' ptr_assgn : ptr EQUALS ptr_expr '''
-	global eq_num
-	eq_num += 1
+
+	p[0] = AbstractSyntaxTreeNode("ASGN", None, [p[1], p[3]])
+	ast_list.append(p[0])
+	# global eq_num
+	# eq_num += 1
 	# p[0] = "".join(map(lambda x: str(x), p[1:]))
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 
 
 
@@ -177,10 +215,15 @@ def p_def_num_assgn(p):
 	''' num_assgn : ID EQUALS addr
 				  | ID EQUALS ID
 	'''
-	global eq_num
-	eq_num += 1
+	p[1] = AbstractSyntaxTreeNode("VAR", p[1])
+	if isinstance(p[3], str):
+		p[3] = AbstractSyntaxTreeNode("VAR", p[3])
+	p[0] = AbstractSyntaxTreeNode("ASGN", None, [p[1], p[3]])
+	ast_list.append(p[0])
+	# global eq_num
+	# eq_num += 1
 	# p[0] = "".join(map(lambda x: str(x), p[1:]))
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 
 
 
@@ -189,7 +232,16 @@ def p_def_ptr_expr(p):
 				 | ptr_expr MINUS ptr_factor
 				 | ptr_factor
 	'''
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+	if len(p) == 2:
+		p[0] = p[1]
+	else:
+		if p[2] == "+":
+			s = "PLUS"
+		else:
+			s = "MINUS"
+		p[0] = AbstractSyntaxTreeNode(s, None, [p[1], p[3]])
+
+	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 
 
@@ -199,7 +251,16 @@ def p_def_ptr_factor(p):
 				 	| ptr_factor SLASH ptr_term
 				 	| ptr_term
 	"""
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+	if len(p) == 2:
+		p[0] = p[1]
+	else:
+		if p[2] == "*":
+			s = "MUL"
+		else:
+			s = "DIV"
+		p[0] = AbstractSyntaxTreeNode(s, None, [p[1], p[3]])
+
+	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 
 
@@ -207,7 +268,12 @@ def p_def_ptr_term(p):
 	""" ptr_term :  MINUS ptr_term  		%prec UMINUS
 				  | ptr_expr_base
 	"""
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+	if len(p) == 2:
+		p[0] = p[1]
+	else:
+		p[0] = AbstractSyntaxTreeNode("UMINUS", None, [p[2]])
+
+	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 
 
@@ -216,9 +282,14 @@ def p_def_ptr_expr_base(p):
 				| NUM
 				| ptr
 				| addr
-				| LPAREN ptr_expr RPAREN
 	'''
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+	if isinstance(p[1], str):
+		p[1] = AbstractSyntaxTreeNode("VAR", p[1])
+	elif isinstance(p[1], int):
+		p[1] = AbstractSyntaxTreeNode("CONST", str(p[1]))
+
+	p[0] = p[1]
+	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 	# global eq_num
 	# if len(p) > 2:
@@ -233,14 +304,23 @@ def p_def_ptr(p):
 			 | STAR ID
 			 | STAR addr
 	'''
-	p[0] = p[1] + p[2]
+	# p[0] = p[1] + p[2]
+	if isinstance(p[2], str):
+		p[2] = AbstractSyntaxTreeNode("VAR", p[2])
+
+	p[0] = AbstractSyntaxTreeNode("ADDR", None, [p[2]])
 
 
 def p_def_addr(p):
 	''' addr : AND ID
 			 | AND ptr
 	'''
-	p[0] = p[1] + p[2]
+	if isinstance(p[2], str):
+		p[2] = AbstractSyntaxTreeNode("VAR", p[2])
+
+	p[0] = AbstractSyntaxTreeNode("ADDR", None, [p[2]])
+
+
 
 def p_error(p):
 	if p:
@@ -265,6 +345,8 @@ if __name__ == "__main__":
 	# 		break
 	# 	print(repr(tok))
 	yacc.parse(data)
-	print(stat_num)
-	print(ptr_num)
-	print(eq_num)
+	for l in ast_list:
+		print(l)
+	# print(stat_num)
+	# print(ptr_num)
+	# print(eq_num)
