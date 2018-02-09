@@ -209,12 +209,13 @@ def p_def_ptr_assgn(p):
 	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 
-
-
 def p_def_num_assgn(p):
-	''' num_assgn : ID EQUALS addr
-				  | ID EQUALS ID
+	''' num_assgn : ID EQUALS ptr_expr
 	'''
+	# Allow any expression after a num assignment, except assignments directly to constants
+	if p[3].operator == "CONST":
+		print("Syntax error: Static assignments to constants not allowed")
+		raise SyntaxError 
 	p[1] = AbstractSyntaxTreeNode("VAR", p[1])
 	if isinstance(p[3], str):
 		p[3] = AbstractSyntaxTreeNode("VAR", p[3])
