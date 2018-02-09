@@ -114,7 +114,11 @@ class AbstractSyntaxTreeNode():
 					+ ("\n" + (depth+1)*"\t" + ",\n").join(map(lambda x: x.__repr__(depth+1), self.operands)) + "\n" + depth*"\t" + ")" 
 		# return generateTreeFormat(self)
 
-
+	def isConst(self):
+		if len(self.operands) == 0:
+			return self.operator == "CONST"
+		else:
+			return all(x.isConst() for x in self.operands)
 
 '''
 -----------------------------------------------------------------------
@@ -213,9 +217,9 @@ def p_def_num_assgn(p):
 	''' num_assgn : ID EQUALS ptr_expr
 	'''
 	# Allow any expression after a num assignment, except assignments directly to constants
-	if p[3].operator == "CONST":
+	if p[3].isConst():
 		print("Syntax error: Static assignments to constants not allowed")
-		raise SyntaxError 
+		raise SyntaxError
 	p[1] = AbstractSyntaxTreeNode("VAR", p[1])
 	if isinstance(p[3], str):
 		p[3] = AbstractSyntaxTreeNode("VAR", p[3])
@@ -283,6 +287,7 @@ def p_def_ptr_expr_base(p):
 				| NUM
 				| ptr
 				| addr
+				| LPAREN ptr_expr RPAREN
 	'''
 	if isinstance(p[1], str):
 		p[1] = AbstractSyntaxTreeNode("VAR", p[1])

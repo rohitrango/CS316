@@ -5,9 +5,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'leftPLUSMINUSleftSTARSLASHrightUMINUSID STAR AND NUM LPAREN RPAREN COMMA LCURL RCURL SEMICOLON EQUALS INT VOID MAIN PLUS MINUS SLASH prog : VOID MAIN LPAREN RPAREN LCURL body RCURL\n\t\t\t | VOID MAIN LPAREN RPAREN LCURL RCURL\n\t body : stmt body\n\t\t\t | stmt\n\t stmt : decl SEMICOLON \n\t\t\t | assgn_list SEMICOLON\n\t assgn_list : assgn_list COMMA assgn \n\t\t\t  | assgn \n\t assgn : ptr_assgn\n\t \t\t  | num_assgn\n\t decl : INT decl_list\n\t decl_list : decl_list COMMA ID\n\t\t\t\t | decl_list COMMA ptr\n\t\t\t\t | ID\n\t\t\t\t | ptr\n\t ptr_assgn : ptr EQUALS ptr_expr  num_assgn : ID EQUALS addr\n\t\t\t\t  | ID EQUALS ID\n\t\tptr_expr : ptr_expr PLUS ptr_factor \n\t\t\t\t | ptr_expr MINUS ptr_factor\n\t\t\t\t | ptr_factor\n\t\n\t\tptr_factor :  ptr_factor STAR ptr_term\n\t\t\t\t \t| ptr_factor SLASH ptr_term\n\t\t\t\t \t| ptr_term\n\t ptr_term :  MINUS ptr_term  \t\t%prec UMINUS\n\t\t\t\t  | ptr_expr_base\n\t ptr_expr_base : ID\n\t\t\t\t| NUM\n\t\t\t\t| ptr\n\t\t\t\t| addr\n\t  ptr : STAR ptr \n\t\t\t | STAR ID\n\t\t\t | STAR addr\n\t addr : AND ID\n\t\t\t | AND ptr\n\t'
+_lr_signature = 'leftPLUSMINUSleftSTARSLASHrightUMINUSID STAR AND NUM LPAREN RPAREN COMMA LCURL RCURL SEMICOLON EQUALS INT VOID MAIN PLUS MINUS SLASH prog : VOID MAIN LPAREN RPAREN LCURL body RCURL\n\t\t\t | VOID MAIN LPAREN RPAREN LCURL RCURL\n\t body : stmt body\n\t\t\t | stmt\n\t stmt : decl SEMICOLON \n\t\t\t | assgn_list SEMICOLON\n\t assgn_list : assgn_list COMMA assgn \n\t\t\t  | assgn \n\t assgn : ptr_assgn\n\t \t\t  | num_assgn\n\t decl : INT decl_list\n\t decl_list : decl_list COMMA ID\n\t\t\t\t | decl_list COMMA ptr\n\t\t\t\t | ID\n\t\t\t\t | ptr\n\t ptr_assgn : ptr EQUALS ptr_expr  num_assgn : ID EQUALS ptr_expr\n\t\tptr_expr : ptr_expr PLUS ptr_factor \n\t\t\t\t | ptr_expr MINUS ptr_factor\n\t\t\t\t | ptr_factor\n\t\n\t\tptr_factor :  ptr_factor STAR ptr_term\n\t\t\t\t \t| ptr_factor SLASH ptr_term\n\t\t\t\t \t| ptr_term\n\t ptr_term :  MINUS ptr_term  \t\t%prec UMINUS\n\t\t\t\t  | ptr_expr_base\n\t ptr_expr_base : ID\n\t\t\t\t| NUM\n\t\t\t\t| ptr\n\t\t\t\t| addr\n\t\t\t\t| LPAREN ptr_expr RPAREN\n\t  ptr : STAR ptr \n\t\t\t | STAR ID\n\t\t\t | STAR addr\n\t addr : AND ID\n\t\t\t | AND ptr\n\t\t\t | AND addr\n\t'
     
-_lr_action_items = {'STAR':([6,7,14,15,23,24,25,26,27,28,29,31,33,37,38,39,40,41,42,43,45,46,47,50,51,52,53,54,55,56,57,58,],[14,14,14,14,-6,14,14,14,-32,-31,-33,-5,14,-24,50,-29,-28,-27,-26,14,-30,-34,-35,14,14,-25,14,14,-22,-23,50,50,]),'AND':([14,22,25,43,50,51,53,54,],[26,26,26,26,26,26,26,26,]),'LCURL':([5,],[6,]),'VOID':([0,],[1,]),'RCURL':([6,15,17,23,30,31,],[12,-4,32,-6,-3,-5,]),'EQUALS':([10,13,27,28,29,46,47,],[22,25,-32,-31,-33,-34,-35,]),'COMMA':([8,9,11,18,19,20,21,27,28,29,34,35,36,37,38,39,40,41,42,44,45,46,47,48,49,52,55,56,57,58,],[-8,-9,24,-10,-14,33,-15,-32,-31,-33,-18,-17,-7,-24,-21,-29,-28,-27,-26,-16,-30,-34,-35,-12,-13,-25,-22,-23,-20,-19,]),'MAIN':([1,],[3,]),'NUM':([25,43,50,51,53,54,],[40,40,40,40,40,40,]),'ID':([6,7,14,15,22,23,24,25,26,31,33,43,50,51,53,54,],[10,19,27,10,34,-6,10,41,46,-5,48,41,41,41,41,41,]),'MINUS':([25,27,28,29,37,38,39,40,41,42,43,44,45,46,47,50,51,52,53,54,55,56,57,58,],[43,-32,-31,-33,-24,-21,-29,-28,-27,-26,43,53,-30,-34,-35,43,43,-25,43,43,-22,-23,-20,-19,]),'LPAREN':([3,],[4,]),'$end':([2,12,32,],[0,-2,-1,]),'RPAREN':([4,],[5,]),'SLASH':([27,28,29,37,38,39,40,41,42,45,46,47,52,55,56,57,58,],[-32,-31,-33,-24,51,-29,-28,-27,-26,-30,-34,-35,-25,-22,-23,51,51,]),'SEMICOLON':([8,9,11,16,18,19,20,21,27,28,29,34,35,36,37,38,39,40,41,42,44,45,46,47,48,49,52,55,56,57,58,],[-8,-9,23,31,-10,-14,-11,-15,-32,-31,-33,-18,-17,-7,-24,-21,-29,-28,-27,-26,-16,-30,-34,-35,-12,-13,-25,-22,-23,-20,-19,]),'PLUS':([27,28,29,37,38,39,40,41,42,44,45,46,47,52,55,56,57,58,],[-32,-31,-33,-24,-21,-29,-28,-27,-26,54,-30,-34,-35,-25,-22,-23,-20,-19,]),'INT':([6,15,23,31,],[7,7,-6,-5,]),}
+_lr_action_items = {'VOID':([0,],[2,]),'$end':([1,8,19,],[0,-2,-1,]),'MAIN':([2,],[3,]),'LPAREN':([3,27,28,38,44,51,52,53,54,],[4,44,44,44,44,44,44,44,44,]),'RPAREN':([4,29,30,31,35,37,39,40,41,42,43,46,47,48,55,56,57,58,59,60,61,],[5,-31,-32,-33,-28,-20,-23,-25,-26,-27,-29,-34,-35,-36,-24,61,-18,-19,-21,-22,-30,]),'LCURL':([5,],[6,]),'RCURL':([6,7,9,20,21,22,],[8,19,-4,-3,-5,-6,]),'INT':([6,9,21,22,],[12,12,-5,-6,]),'ID':([6,9,12,18,21,22,23,27,28,32,34,38,44,51,52,53,54,],[17,17,25,30,-5,-6,17,41,41,46,49,41,41,41,41,41,41,]),'STAR':([6,9,12,18,21,22,23,27,28,29,30,31,32,34,35,37,38,39,40,41,42,43,44,46,47,48,51,52,53,54,55,57,58,59,60,61,],[18,18,18,18,-5,-6,18,18,18,-31,-32,-33,18,18,-28,53,18,-23,-25,-26,-27,-29,18,-34,-35,-36,18,18,18,18,-24,53,53,-21,-22,-30,]),'SEMICOLON':([10,11,13,14,15,24,25,26,29,30,31,33,35,36,37,39,40,41,42,43,45,46,47,48,49,50,55,57,58,59,60,61,],[21,22,-8,-9,-10,-11,-14,-15,-31,-32,-33,-7,-28,-16,-20,-23,-25,-26,-27,-29,-17,-34,-35,-36,-12,-13,-24,-18,-19,-21,-22,-30,]),'COMMA':([11,13,14,15,24,25,26,29,30,31,33,35,36,37,39,40,41,42,43,45,46,47,48,49,50,55,57,58,59,60,61,],[23,-8,-9,-10,34,-14,-15,-31,-32,-33,-7,-28,-16,-20,-23,-25,-26,-27,-29,-17,-34,-35,-36,-12,-13,-24,-18,-19,-21,-22,-30,]),'EQUALS':([16,17,29,30,31,46,47,48,],[27,28,-31,-32,-33,-34,-35,-36,]),'AND':([18,27,28,32,38,44,51,52,53,54,],[32,32,32,32,32,32,32,32,32,32,]),'MINUS':([27,28,29,30,31,35,36,37,38,39,40,41,42,43,44,45,46,47,48,51,52,53,54,55,56,57,58,59,60,61,],[38,38,-31,-32,-33,-28,52,-20,38,-23,-25,-26,-27,-29,38,52,-34,-35,-36,38,38,38,38,-24,52,-18,-19,-21,-22,-30,]),'NUM':([27,28,38,44,51,52,53,54,],[42,42,42,42,42,42,42,42,]),'SLASH':([29,30,31,35,37,39,40,41,42,43,46,47,48,55,57,58,59,60,61,],[-31,-32,-33,-28,54,-23,-25,-26,-27,-29,-34,-35,-36,-24,54,54,-21,-22,-30,]),'PLUS':([29,30,31,35,36,37,39,40,41,42,43,45,46,47,48,55,56,57,58,59,60,61,],[-31,-32,-33,-28,51,-20,-23,-25,-26,-27,-29,51,-34,-35,-36,-24,51,-18,-19,-21,-22,-30,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -16,7 +16,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'assgn':([6,15,24,],[8,8,36,]),'ptr_term':([25,43,50,51,53,54,],[37,52,55,56,37,37,]),'stmt':([6,15,],[15,15,]),'decl':([6,15,],[16,16,]),'ptr_factor':([25,53,54,],[38,57,58,]),'ptr_expr':([25,],[44,]),'decl_list':([7,],[20,]),'body':([6,15,],[17,30,]),'num_assgn':([6,15,24,],[18,18,18,]),'ptr_assgn':([6,15,24,],[9,9,9,]),'assgn_list':([6,15,],[11,11,]),'ptr_expr_base':([25,43,50,51,53,54,],[42,42,42,42,42,42,]),'prog':([0,],[2,]),'ptr':([6,7,14,15,24,25,26,33,43,50,51,53,54,],[13,21,28,13,13,39,47,49,39,39,39,39,39,]),'addr':([14,22,25,43,50,51,53,54,],[29,35,45,45,45,45,45,45,]),}
+_lr_goto_items = {'prog':([0,],[1,]),'body':([6,9,],[7,20,]),'stmt':([6,9,],[9,9,]),'decl':([6,9,],[10,10,]),'assgn_list':([6,9,],[11,11,]),'assgn':([6,9,23,],[13,13,33,]),'ptr_assgn':([6,9,23,],[14,14,14,]),'num_assgn':([6,9,23,],[15,15,15,]),'ptr':([6,9,12,18,23,27,28,32,34,38,44,51,52,53,54,],[16,16,26,29,16,35,35,47,50,35,35,35,35,35,35,]),'decl_list':([12,],[24,]),'addr':([18,27,28,32,38,44,51,52,53,54,],[31,43,43,48,43,43,43,43,43,43,]),'ptr_expr':([27,28,44,],[36,45,56,]),'ptr_factor':([27,28,44,51,52,],[37,37,37,57,58,]),'ptr_term':([27,28,38,44,51,52,53,54,],[39,39,55,39,39,39,59,60,]),'ptr_expr_base':([27,28,38,44,51,52,53,54,],[40,40,40,40,40,40,40,40,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -26,39 +26,40 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> prog","S'",1,None,None,None),
-  ('prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL','prog',7,'p_def_prog','150050061_17V051001.py',118),
-  ('prog -> VOID MAIN LPAREN RPAREN LCURL RCURL','prog',6,'p_def_prog','150050061_17V051001.py',119),
-  ('body -> stmt body','body',2,'p_def_body','150050061_17V051001.py',129),
-  ('body -> stmt','body',1,'p_def_body','150050061_17V051001.py',130),
-  ('stmt -> decl SEMICOLON','stmt',2,'p_def_stmt','150050061_17V051001.py',137),
-  ('stmt -> assgn_list SEMICOLON','stmt',2,'p_def_stmt','150050061_17V051001.py',138),
-  ('assgn_list -> assgn_list COMMA assgn','assgn_list',3,'p_def_assgn_list','150050061_17V051001.py',145),
-  ('assgn_list -> assgn','assgn_list',1,'p_def_assgn_list','150050061_17V051001.py',146),
-  ('assgn -> ptr_assgn','assgn',1,'p_def_assgn','150050061_17V051001.py',153),
-  ('assgn -> num_assgn','assgn',1,'p_def_assgn','150050061_17V051001.py',154),
-  ('decl -> INT decl_list','decl',2,'p_def_decl','150050061_17V051001.py',161),
-  ('decl_list -> decl_list COMMA ID','decl_list',3,'p_def_decl_list','150050061_17V051001.py',168),
-  ('decl_list -> decl_list COMMA ptr','decl_list',3,'p_def_decl_list','150050061_17V051001.py',169),
-  ('decl_list -> ID','decl_list',1,'p_def_decl_list','150050061_17V051001.py',170),
-  ('decl_list -> ptr','decl_list',1,'p_def_decl_list','150050061_17V051001.py',171),
-  ('ptr_assgn -> ptr EQUALS ptr_expr','ptr_assgn',3,'p_def_ptr_assgn','150050061_17V051001.py',186),
-  ('num_assgn -> ID EQUALS addr','num_assgn',3,'p_def_num_assgn','150050061_17V051001.py',198),
-  ('num_assgn -> ID EQUALS ID','num_assgn',3,'p_def_num_assgn','150050061_17V051001.py',199),
-  ('ptr_expr -> ptr_expr PLUS ptr_factor','ptr_expr',3,'p_def_ptr_expr','150050061_17V051001.py',214),
-  ('ptr_expr -> ptr_expr MINUS ptr_factor','ptr_expr',3,'p_def_ptr_expr','150050061_17V051001.py',215),
-  ('ptr_expr -> ptr_factor','ptr_expr',1,'p_def_ptr_expr','150050061_17V051001.py',216),
-  ('ptr_factor -> ptr_factor STAR ptr_term','ptr_factor',3,'p_def_ptr_factor','150050061_17V051001.py',233),
-  ('ptr_factor -> ptr_factor SLASH ptr_term','ptr_factor',3,'p_def_ptr_factor','150050061_17V051001.py',234),
-  ('ptr_factor -> ptr_term','ptr_factor',1,'p_def_ptr_factor','150050061_17V051001.py',235),
-  ('ptr_term -> MINUS ptr_term','ptr_term',2,'p_def_ptr_term','150050061_17V051001.py',251),
-  ('ptr_term -> ptr_expr_base','ptr_term',1,'p_def_ptr_term','150050061_17V051001.py',252),
-  ('ptr_expr_base -> ID','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',264),
-  ('ptr_expr_base -> NUM','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',265),
-  ('ptr_expr_base -> ptr','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',266),
-  ('ptr_expr_base -> addr','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',267),
-  ('ptr -> STAR ptr','ptr',2,'p_def_ptr','150050061_17V051001.py',290),
-  ('ptr -> STAR ID','ptr',2,'p_def_ptr','150050061_17V051001.py',291),
-  ('ptr -> STAR addr','ptr',2,'p_def_ptr','150050061_17V051001.py',292),
-  ('addr -> AND ID','addr',2,'p_def_addr','150050061_17V051001.py',302),
-  ('addr -> AND ptr','addr',2,'p_def_addr','150050061_17V051001.py',303),
+  ('prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL','prog',7,'p_def_prog','150050061_17V051001.py',135),
+  ('prog -> VOID MAIN LPAREN RPAREN LCURL RCURL','prog',6,'p_def_prog','150050061_17V051001.py',136),
+  ('body -> stmt body','body',2,'p_def_body','150050061_17V051001.py',146),
+  ('body -> stmt','body',1,'p_def_body','150050061_17V051001.py',147),
+  ('stmt -> decl SEMICOLON','stmt',2,'p_def_stmt','150050061_17V051001.py',154),
+  ('stmt -> assgn_list SEMICOLON','stmt',2,'p_def_stmt','150050061_17V051001.py',155),
+  ('assgn_list -> assgn_list COMMA assgn','assgn_list',3,'p_def_assgn_list','150050061_17V051001.py',162),
+  ('assgn_list -> assgn','assgn_list',1,'p_def_assgn_list','150050061_17V051001.py',163),
+  ('assgn -> ptr_assgn','assgn',1,'p_def_assgn','150050061_17V051001.py',170),
+  ('assgn -> num_assgn','assgn',1,'p_def_assgn','150050061_17V051001.py',171),
+  ('decl -> INT decl_list','decl',2,'p_def_decl','150050061_17V051001.py',178),
+  ('decl_list -> decl_list COMMA ID','decl_list',3,'p_def_decl_list','150050061_17V051001.py',185),
+  ('decl_list -> decl_list COMMA ptr','decl_list',3,'p_def_decl_list','150050061_17V051001.py',186),
+  ('decl_list -> ID','decl_list',1,'p_def_decl_list','150050061_17V051001.py',187),
+  ('decl_list -> ptr','decl_list',1,'p_def_decl_list','150050061_17V051001.py',188),
+  ('ptr_assgn -> ptr EQUALS ptr_expr','ptr_assgn',3,'p_def_ptr_assgn','150050061_17V051001.py',203),
+  ('num_assgn -> ID EQUALS ptr_expr','num_assgn',3,'p_def_num_assgn','150050061_17V051001.py',213),
+  ('ptr_expr -> ptr_expr PLUS ptr_factor','ptr_expr',3,'p_def_ptr_expr','150050061_17V051001.py',232),
+  ('ptr_expr -> ptr_expr MINUS ptr_factor','ptr_expr',3,'p_def_ptr_expr','150050061_17V051001.py',233),
+  ('ptr_expr -> ptr_factor','ptr_expr',1,'p_def_ptr_expr','150050061_17V051001.py',234),
+  ('ptr_factor -> ptr_factor STAR ptr_term','ptr_factor',3,'p_def_ptr_factor','150050061_17V051001.py',251),
+  ('ptr_factor -> ptr_factor SLASH ptr_term','ptr_factor',3,'p_def_ptr_factor','150050061_17V051001.py',252),
+  ('ptr_factor -> ptr_term','ptr_factor',1,'p_def_ptr_factor','150050061_17V051001.py',253),
+  ('ptr_term -> MINUS ptr_term','ptr_term',2,'p_def_ptr_term','150050061_17V051001.py',269),
+  ('ptr_term -> ptr_expr_base','ptr_term',1,'p_def_ptr_term','150050061_17V051001.py',270),
+  ('ptr_expr_base -> ID','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',282),
+  ('ptr_expr_base -> NUM','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',283),
+  ('ptr_expr_base -> ptr','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',284),
+  ('ptr_expr_base -> addr','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',285),
+  ('ptr_expr_base -> LPAREN ptr_expr RPAREN','ptr_expr_base',3,'p_def_ptr_expr_base','150050061_17V051001.py',286),
+  ('ptr -> STAR ptr','ptr',2,'p_def_ptr','150050061_17V051001.py',305),
+  ('ptr -> STAR ID','ptr',2,'p_def_ptr','150050061_17V051001.py',306),
+  ('ptr -> STAR addr','ptr',2,'p_def_ptr','150050061_17V051001.py',307),
+  ('addr -> AND ID','addr',2,'p_def_addr','150050061_17V051001.py',317),
+  ('addr -> AND ptr','addr',2,'p_def_addr','150050061_17V051001.py',318),
+  ('addr -> AND addr','addr',2,'p_def_addr','150050061_17V051001.py',319),
 ]
