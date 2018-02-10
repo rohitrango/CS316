@@ -1,0 +1,17 @@
+ASGN
+(
+	VAR(a)
+	,
+	MUL
+	(
+		CONST(5)
+		,
+		PLUS
+		(
+			CONST(6)
+			,
+			VAR(b)
+		)
+	)
+)
+
