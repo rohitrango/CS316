@@ -11,7 +11,7 @@ void main()
    *d = *a + 2;
    *c = *a + *b;
    *c = *a - *b;
-   *c = *a * --*b;
+   *c = *a * *b;
    *c = *a / *b;
 
 }

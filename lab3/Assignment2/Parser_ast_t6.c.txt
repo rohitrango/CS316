@@ -1,0 +1,10 @@
+ASGN
+(
+	VAR(b)
+	,
+	ADDR
+	(
+		VAR(a)
+	)
+)
+

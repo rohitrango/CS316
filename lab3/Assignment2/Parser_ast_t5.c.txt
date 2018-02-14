@@ -1,0 +1,23 @@
+ASGN
+(
+	VAR(b)
+	,
+	ADDR
+	(
+		VAR(a)
+	)
+)
+
+ASGN
+(
+	DEREF
+	(
+		VAR(b)
+	)
+	,
+	ADDR
+	(
+		VAR(a)
+	)
+)
+

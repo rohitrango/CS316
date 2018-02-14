@@ -40,7 +40,7 @@ ast_list = []
 
 
 def t_NUM(t):
-	r'(\+|\-)?[0-9]+'
+	r'[0-9]+'
 	t.value = int(t.value)
 	return t
 
@@ -79,23 +79,6 @@ Data Structure for Abstract Syntax Tree
 -----------------------------------------------------------------------
 '''
 
-# Generate Tree in format
-# def generateTreeFormat(node, depth=0):
-	# pass
-	# delim = "\t"*depth
-	# if node.operator in ['VAR', 'CONST']:
-	# 	result = delim + node.operator + "(" + node.name + ")\n"
-	# else:
-	# 	result = delim + node.operator + "\n" + \
-	# 			 delim + "(\n"
-	# 	for n in node.operands[:-1]:
-	# 		result += generateTreeFormat(n, depth+1)
-	# 		result += (delim + "\t,")
-	# 	result += generateTreeFormat(node.operands[-1], depth+1)
-	# 	result += delim + "\t" + ")\n"
-	# return result
-
-
 class AbstractSyntaxTreeNode():
 
 	def __init__(self, operator, name=None, operands=[]):
@@ -114,7 +97,11 @@ class AbstractSyntaxTreeNode():
 					+ ("\n" + (depth+1)*"\t" + ",\n").join(map(lambda x: x.__repr__(depth+1), self.operands)) + "\n" + depth*"\t" + ")" 
 		# return generateTreeFormat(self)
 
-
+	def isConst(self):
+		if len(self.operands) == 0:
+			return self.operator == "CONST"
+		else:
+			return all(x.isConst() for x in self.operands)
 
 '''
 -----------------------------------------------------------------------
@@ -135,18 +122,13 @@ def p_def_prog(p):
 	''' prog : VOID MAIN LPAREN RPAREN LCURL body RCURL
 			 | VOID MAIN LPAREN RPAREN LCURL RCURL
 	'''
-	# print("Program defined.")
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
-	# TODO: Remove this later
-	# print(json.dumps(p[0], indent=4, sort_keys=True))
 
 
 def p_def_body(p):
 	''' body : stmt body
 			 | stmt
 	'''
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 
 
@@ -154,7 +136,6 @@ def p_def_stmt(p):
 	''' stmt : decl SEMICOLON 
 			 | assgn_list SEMICOLON
 	'''
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 
 
@@ -162,7 +143,6 @@ def p_def_assgn_list(p):
 	''' assgn_list : assgn_list COMMA assgn 
 			  | assgn 
 	'''
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 
 
@@ -170,14 +150,12 @@ def p_def_assgn(p):
 	''' assgn : ptr_assgn
 	 		  | num_assgn
 	'''
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 
 
 def p_def_decl(p):
 	''' decl : INT decl_list
 	'''
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 
 
@@ -187,43 +165,26 @@ def p_def_decl_list(p):
 				 | ID
 				 | ptr
 	'''
-	global stat_num, ptr_num
-	# print([repr(p[i]) for i in range(len(p))])
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
 	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
-
-	last_token = repr(p[len(p)-1])[1]
-	if last_token == "*":
-		ptr_num += 1
-	else:
-		stat_num += 1
-
 
 def p_def_ptr_assgn(p):
 	''' ptr_assgn : ptr EQUALS ptr_expr '''
 
 	p[0] = AbstractSyntaxTreeNode("ASGN", None, [p[1], p[3]])
 	ast_list.append(p[0])
-	# global eq_num
-	# eq_num += 1
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
-	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
-
-
 
 def p_def_num_assgn(p):
-	''' num_assgn : ID EQUALS addr
-				  | ID EQUALS ID
+	''' num_assgn : ID EQUALS ptr_expr
 	'''
+	# Allow any expression after a num assignment, except assignments directly to constants
+	if p[3].isConst():
+		print("Syntax error: Static assignments to constants not allowed, line no. {0}".format(p.lineno(1)))
+		raise Exception
 	p[1] = AbstractSyntaxTreeNode("VAR", p[1])
-	if isinstance(p[3], str):
-		p[3] = AbstractSyntaxTreeNode("VAR", p[3])
+	# if isinstance(p[3], str):
+	# 	p[3] = AbstractSyntaxTreeNode("VAR", p[3])
 	p[0] = AbstractSyntaxTreeNode("ASGN", None, [p[1], p[3]])
 	ast_list.append(p[0])
-	# global eq_num
-	# eq_num += 1
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
-	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
 
 
 
@@ -241,9 +202,6 @@ def p_def_ptr_expr(p):
 			s = "MINUS"
 		p[0] = AbstractSyntaxTreeNode(s, None, [p[1], p[3]])
 
-	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
-
 
 def p_def_ptr_factor(p):
 	"""
@@ -260,9 +218,6 @@ def p_def_ptr_factor(p):
 			s = "DIV"
 		p[0] = AbstractSyntaxTreeNode(s, None, [p[1], p[3]])
 
-	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
-
 
 def p_def_ptr_term(p):
 	""" ptr_term :  MINUS ptr_term  		%prec UMINUS
@@ -273,30 +228,25 @@ def p_def_ptr_term(p):
 	else:
 		p[0] = AbstractSyntaxTreeNode("UMINUS", None, [p[2]])
 
-	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
-
 
 def p_def_ptr_expr_base(p):
 	''' ptr_expr_base : ID
 				| NUM
 				| ptr
 				| addr
+				| LPAREN ptr_expr RPAREN
 	'''
-	if isinstance(p[1], str):
-		p[1] = AbstractSyntaxTreeNode("VAR", p[1])
-	elif isinstance(p[1], int):
-		p[1] = AbstractSyntaxTreeNode("CONST", str(p[1]))
+	if len(p) == 2:
+		if isinstance(p[1], str):
+			p[1] = AbstractSyntaxTreeNode("VAR", p[1])
+		elif isinstance(p[1], int):
+			p[1] = AbstractSyntaxTreeNode("CONST", str(p[1]))
 
-	p[0] = p[1]
-	# p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
-	# p[0] = "".join(map(lambda x: str(x), p[1:]))
-	# global eq_num
-	# if len(p) > 2:
-	# 	eq_num+=1
-	# 	p[0] = "".join(map(lambda x: str(x), p[1:]))
-	# else:
-	# 	p[0] = str(p[1])
+		p[0] = p[1]
+
+	# Support parenthesis
+	else:
+		p[0] = p[2]
 
 
 def p_def_ptr(p):
@@ -304,7 +254,6 @@ def p_def_ptr(p):
 			 | STAR ID
 			 | STAR addr
 	'''
-	# p[0] = p[1] + p[2]
 	if isinstance(p[2], str):
 		p[2] = AbstractSyntaxTreeNode("VAR", p[2])
 
@@ -314,6 +263,7 @@ def p_def_ptr(p):
 def p_def_addr(p):
 	''' addr : AND ID
 			 | AND ptr
+			 | AND addr
 	'''
 	if isinstance(p[2], str):
 		p[2] = AbstractSyntaxTreeNode("VAR", p[2])
@@ -327,26 +277,31 @@ def p_error(p):
 		print("syntax error at {0}, line no. {1}".format(p.value, p.lineno))
 	else:
 		print("syntax error at EOF.")
-	sys.exit(0)
+	raise Exception
 
 
 if __name__ == "__main__":
 
+
 	lexer = lex.lex()
 	yacc.yacc()
 	filename = sys.argv[1]
+
+	# read input
 	with open(filename, 'r') as f:
 		data = f.read()
-	# print(data)
+
 	lex.input(data)
-	# while True:
-	# 	tok = lexer.token()
-	# 	if not tok:
-	# 		break
-	# 	print(repr(tok))
-	yacc.parse(data)
-	for l in ast_list:
-		print(l)
-	# print(stat_num)
-	# print(ptr_num)
-	# print(eq_num)
+
+	# Catch the syntax error
+	try:
+		yacc.parse(data)
+		print("Successfully Parsed")
+	except Exception:
+		pass
+
+	output_file = 'Parser_ast_' + filename + '.txt'	
+	with open(output_file, 'w+') as file:
+		for l in ast_list:
+			file.write(repr(l) + "\n")
+			file.write("\n")

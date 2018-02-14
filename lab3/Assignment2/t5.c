@@ -4,5 +4,5 @@ void main()
 	int ***b;
 	b = &a;
 	*b = (&a);
-	****ca = &(a);	
+	****ca = &a;	
 }
