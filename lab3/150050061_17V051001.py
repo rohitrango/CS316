@@ -79,23 +79,6 @@ Data Structure for Abstract Syntax Tree
 -----------------------------------------------------------------------
 '''
 
-# Generate Tree in format
-# def generateTreeFormat(node, depth=0):
-	# pass
-	# delim = "\t"*depth
-	# if node.operator in ['VAR', 'CONST']:
-	# 	result = delim + node.operator + "(" + node.name + ")\n"
-	# else:
-	# 	result = delim + node.operator + "\n" + \
-	# 			 delim + "(\n"
-	# 	for n in node.operands[:-1]:
-	# 		result += generateTreeFormat(n, depth+1)
-	# 		result += (delim + "\t,")
-	# 	result += generateTreeFormat(node.operands[-1], depth+1)
-	# 	result += delim + "\t" + ")\n"
-	# return result
-
-
 class AbstractSyntaxTreeNode():
 
 	def __init__(self, operator, name=None, operands=[]):
@@ -195,8 +178,8 @@ def p_def_num_assgn(p):
 	'''
 	# Allow any expression after a num assignment, except assignments directly to constants
 	if p[3].isConst():
-		print("Syntax error: Static assignments to constants not allowed")
-		raise SyntaxError
+		print("Syntax error: Static assignments to constants not allowed, line no. {0}".format(p.lineno(1)))
+		raise Exception
 	p[1] = AbstractSyntaxTreeNode("VAR", p[1])
 	# if isinstance(p[3], str):
 	# 	p[3] = AbstractSyntaxTreeNode("VAR", p[3])
@@ -294,19 +277,31 @@ def p_error(p):
 		print("syntax error at {0}, line no. {1}".format(p.value, p.lineno))
 	else:
 		print("syntax error at EOF.")
-	sys.exit(0)
+	raise Exception
 
 
 if __name__ == "__main__":
 
+
 	lexer = lex.lex()
 	yacc.yacc()
 	filename = sys.argv[1]
+
+	# read input
 	with open(filename, 'r') as f:
 		data = f.read()
 
 	lex.input(data)
-	yacc.parse(data)
-	for l in ast_list:
-		print(l)
-		print("")
+
+	# Catch the syntax error
+	try:
+		yacc.parse(data)
+		print("Successfully Parsed")
+	except Exception:
+		pass
+
+	output_file = 'Parser_ast_' + filename + '.txt'	
+	with open(output_file, 'w+') as file:
+		for l in ast_list:
+			file.write(repr(l) + "\n")
+			file.write("\n")
