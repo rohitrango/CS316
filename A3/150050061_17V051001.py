@@ -9,23 +9,50 @@ import ply.yacc as yacc
 import sys
 
 tokens = ['ID', 'STAR', 'AND', 'NUM', 'LPAREN', 'RPAREN', 'COMMA', 'LCURL', 'RCURL', 'SEMICOLON', 'EQUALS', 
-			'INT', 'VOID', 'MAIN',
 			# Symbols 
 			'PLUS', 'MINUS', 'SLASH',
 			# For A3
-			'IF', 'ELSE', 'WHILE',
+			'LT', 'GT', 'NOT', 'OR',
 		 ]
 
-t_ID = r'[a-zA-Z][a-zA-Z0-9]*'
+reserved = {
+	'if' 	: 'IF',
+	'else'	: 'ELSE',
+	'while' : 'WHILE',
+	'main'  : 'MAIN',
+	'void' 	: 'VOID',
+	'int'	: 'INT',
+}
+
+tokens += list(reserved.values())
+
+def t_NUM(t):
+	r'[0-9]+'
+	t.value = int(t.value)
+	return t
+
+def t_ID(t):
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    t.type = reserved.get(t.value,'ID')    # Check for reserved words
+    return t
+
 t_STAR = r'\*'
-t_AND = r'\&'
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
 t_COMMA = r'\,'
 t_LCURL = r'\{'
 t_RCURL = r'\}'
 t_SEMICOLON = r'\;'
+
+
+# Boolean operators
 t_EQUALS = r'\='
+t_AND = r'\&'
+t_LT = r'\<'
+t_GT = r'\>'
+t_NOT = r'\!'
+t_OR = r'\|'
+
 
 # New tokens for A3
 t_PLUS = r'\+'
@@ -41,39 +68,8 @@ stat_num = 0
 ast_list = []
 cfg_ast = []
 
-
-def t_IF(t):
-	r'if'
-	return t
-
-def t_ELSE(t):
-	r'else'
-	return t
-
-def t_WHILE(t):
-	r'while'
-	return t
-
-def t_NUM(t):
-	r'[0-9]+'
-	t.value = int(t.value)
-	return t
-
-def t_INT(t):
-	r'int'
-	return t
-
-def t_VOID(t):
-	r'void'
-	return t
-
-# careful!
-def t_MAIN(t):
-	r'main'
-	return t
-
 def t_newline(t):
-	r'\n+'
+	r'\n|\r\n'
 	t.lexer.lineno += len(t.value)
 
 def t_COMMENT(t):
@@ -84,6 +80,7 @@ t_ignore  = ' \t'
 
 # Error handling rule
 def t_error(t):
+	print(t)
 	print("Illegal character '%s'" % t.value[0])
 	t.lexer.skip(1)
 
@@ -128,7 +125,6 @@ precedence = (
 	('left', 'PLUS', 'MINUS'),
 	('left', 'STAR', 'SLASH'),
 	('right', 'UMINUS'),
-
 )
 
 
@@ -144,14 +140,14 @@ def p_def_prog(p):
 
 
 def p_def_body(p):
-	''' body : stmt body
+	''' body : body stmt
 			 | stmt
 	'''
 	if len(p) == 2:
 		p[0] = AbstractSyntaxTreeNode("BODY", [p[1]])
 	else:
-		p[0] = p[2]
-		p[0].addChild(p[1])
+		p[0] = p[1]
+		p[0].addChild(p[2])
 
 
 def p_def_stmt(p):
@@ -246,10 +242,63 @@ def p_def_num_assgn(p):
 	ast_list.append(p[0])
 
 
-
 def p_def_ptr_expr(p):
-	'''	ptr_expr : ptr_expr PLUS ptr_factor 
-				 | ptr_expr MINUS ptr_factor
+	'''	ptr_expr : ptr_expr OR ptr_and_expr 
+				 | ptr_and_expr
+	'''
+	if len(p) == 2:
+		p[0] = p[1]
+	else:
+		p[0] = AbstractSyntaxTreeNode("OR", [p[1], p[3]])
+
+
+def p_def_ptr_and_expr(p):
+	'''	ptr_and_expr : ptr_and_expr AND ptr_eq_expr 
+				 | ptr_eq_expr
+	'''
+	if len(p) == 2:
+		p[0] = p[1]
+	else:
+		p[0] = AbstractSyntaxTreeNode("AND", [p[1], p[3]])
+
+def p_def_ptr_eq_expr(p):
+	'''	ptr_eq_expr : ptr_eq_expr EQUALS EQUALS ptr_lt_expr
+				 | ptr_eq_expr NOT EQUALS ptr_lt_expr
+				 | ptr_lt_expr
+	'''
+	if len(p) == 2:
+		p[0] = p[1]
+	else:
+		if p[2] == "!":
+			p[0] = AbstractSyntaxTreeNode("NEQ", [p[1], p[4]])
+		else:
+			p[0] = AbstractSyntaxTreeNode("EQ", [p[1], p[4]])
+
+
+def p_def_ptr_lt_expr(p):
+	'''	ptr_lt_expr : ptr_lt_expr LT ptr_add_expr
+				 | ptr_lt_expr GT ptr_add_expr
+				 | ptr_lt_expr LT EQUALS ptr_add_expr
+				 | ptr_lt_expr GT EQUALS ptr_add_expr
+				 | ptr_add_expr
+	'''
+	if len(p) == 2:
+		p[0] = p[1]
+	
+	# LT or GT
+	elif len(p) == 4:
+		s = "LT" if p[2] == "<" else "GT"
+		p[0] = AbstractSyntaxTreeNode(s, [p[1], p[3]])
+
+	# LTE or GTE
+	else:
+		s = "LTE" if p[2] == "<" else "GTE"
+		p[0] = AbstractSyntaxTreeNode(s, [p[1], p[4]])
+
+
+def p_def_ptr_add_expr(p):
+	'''	ptr_add_expr : ptr_add_expr PLUS ptr_factor 
+				 | ptr_add_expr MINUS ptr_factor
 				 | ptr_factor
 	'''
 	if len(p) == 2:

@@ -5,9 +5,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'leftPLUSMINUSleftSTARSLASHrightUMINUSID STAR AND NUM LPAREN RPAREN COMMA LCURL RCURL SEMICOLON EQUALS INT VOID MAIN PLUS MINUS SLASH IF ELSE WHILE prog : VOID MAIN LPAREN RPAREN LCURL body RCURL\n\t\t\t | VOID MAIN LPAREN RPAREN LCURL RCURL\n\t body : stmt body\n\t\t\t | stmt\n\t stmt : decl SEMICOLON \n\t\t\t | assgn SEMICOLON\n\t\t\t | if_stmt \n\t\t\t | while_stmt\n\t\n\t\tif_stmt : IF LPAREN ptr_expr RPAREN compound_stmt\n\t\t\t\t| IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt\n\t\n\t\twhile_stmt : WHILE LPAREN ptr_expr RPAREN compound_stmt\n\t\n\t\tcompound_stmt : stmt\n\t\t\t\t\t  | LCURL body RCURL\n\t assgn : ptr_assgn\n\t \t\t  | num_assgn\n\t decl : INT decl_list\n\t decl_list : decl_list COMMA ID\n\t\t\t\t | decl_list COMMA ptr\n\t\t\t\t | ID\n\t\t\t\t | ptr\n\t ptr_assgn : ptr EQUALS ptr_expr  num_assgn : ID EQUALS ptr_expr\n\t\tptr_expr : ptr_expr PLUS ptr_factor \n\t\t\t\t | ptr_expr MINUS ptr_factor\n\t\t\t\t | ptr_factor\n\t\n\t\tptr_factor :  ptr_factor STAR ptr_term\n\t\t\t\t \t| ptr_factor SLASH ptr_term\n\t\t\t\t \t| ptr_term\n\t ptr_term :  MINUS ptr_term  \t\t%prec UMINUS\n\t\t\t\t  | ptr_expr_base\n\t ptr_expr_base : ID\n\t\t\t\t| NUM\n\t\t\t\t| ptr\n\t\t\t\t| addr\n\t\t\t\t| LPAREN ptr_expr RPAREN\n\t  ptr : STAR ptr \n\t\t\t | STAR ID\n\t\t\t | STAR addr\n\t addr : AND ID\n\t\t\t | AND ptr\n\t\t\t | AND addr\n\t'
+_lr_signature = 'leftPLUSMINUSleftSTARSLASHrightUMINUSID STAR AND NUM LPAREN RPAREN COMMA LCURL RCURL SEMICOLON EQUALS PLUS MINUS SLASH LT GT NOT OR INT VOID ELSE WHILE MAIN IF prog : VOID MAIN LPAREN RPAREN LCURL body RCURL\n\t\t\t | VOID MAIN LPAREN RPAREN LCURL RCURL\n\t body : body stmt\n\t\t\t | stmt\n\t stmt : decl SEMICOLON \n\t\t\t | assgn SEMICOLON\n\t\t\t | if_stmt \n\t\t\t | while_stmt\n\t\n\t\tif_stmt : IF LPAREN ptr_expr RPAREN compound_stmt\n\t\t\t\t| IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt\n\t\n\t\twhile_stmt : WHILE LPAREN ptr_expr RPAREN compound_stmt\n\t\n\t\tcompound_stmt : stmt\n\t\t\t\t\t  | LCURL body RCURL\n\t assgn : ptr_assgn\n\t \t\t  | num_assgn\n\t decl : INT decl_list\n\t decl_list : decl_list COMMA ID\n\t\t\t\t | decl_list COMMA ptr\n\t\t\t\t | ID\n\t\t\t\t | ptr\n\t ptr_assgn : ptr EQUALS ptr_expr  num_assgn : ID EQUALS ptr_expr\n\t\tptr_expr : ptr_expr OR ptr_and_expr \n\t\t\t\t | ptr_and_expr\n\t\tptr_and_expr : ptr_and_expr AND ptr_eq_expr \n\t\t\t\t | ptr_eq_expr\n\t\tptr_eq_expr : ptr_eq_expr EQUALS EQUALS ptr_lt_expr\n\t\t\t\t | ptr_eq_expr NOT EQUALS ptr_lt_expr\n\t\t\t\t | ptr_lt_expr\n\t\tptr_lt_expr : ptr_lt_expr LT ptr_add_expr\n\t\t\t\t | ptr_lt_expr GT ptr_add_expr\n\t\t\t\t | ptr_lt_expr LT EQUALS ptr_add_expr\n\t\t\t\t | ptr_lt_expr GT EQUALS ptr_add_expr\n\t\t\t\t | ptr_add_expr\n\t\tptr_add_expr : ptr_add_expr PLUS ptr_factor \n\t\t\t\t | ptr_add_expr MINUS ptr_factor\n\t\t\t\t | ptr_factor\n\t\n\t\tptr_factor :  ptr_factor STAR ptr_term\n\t\t\t\t \t| ptr_factor SLASH ptr_term\n\t\t\t\t \t| ptr_term\n\t ptr_term :  MINUS ptr_term  \t\t%prec UMINUS\n\t\t\t\t  | ptr_expr_base\n\t ptr_expr_base : ID\n\t\t\t\t| NUM\n\t\t\t\t| ptr\n\t\t\t\t| addr\n\t\t\t\t| LPAREN ptr_expr RPAREN\n\t  ptr : STAR ptr \n\t\t\t | STAR ID\n\t\t\t | STAR addr\n\t addr : AND ID\n\t\t\t | AND ptr\n\t\t\t | AND addr\n\t'
     
-_lr_action_items = {'AND':([8,23,27,28,32,33,41,44,56,57,59,60,],[23,23,23,23,23,23,23,23,23,23,23,23,]),'EQUALS':([10,16,24,25,26,37,38,39,],[28,32,-38,-36,-37,-41,-39,-40,]),'RPAREN':([4,24,25,26,37,38,39,40,42,43,45,46,47,48,49,52,54,55,64,65,66,70,71,],[5,-38,-36,-37,-41,-39,-40,-33,-30,-32,-25,-28,58,-31,-34,61,-29,64,-35,-26,-27,-24,-23,]),'SLASH':([24,25,26,37,38,39,40,42,43,45,46,48,49,54,64,65,66,70,71,],[-38,-36,-37,-41,-39,-40,-33,-30,-32,57,-28,-31,-34,-29,-35,-26,-27,57,57,]),'SEMICOLON':([7,11,14,20,24,25,26,34,35,36,37,38,39,40,42,43,45,46,48,49,50,51,54,62,63,64,65,66,70,71,],[22,29,-15,-14,-38,-36,-37,-16,-20,-19,-41,-39,-40,-33,-30,-32,-25,-28,-31,-34,-21,-22,-29,-18,-17,-35,-26,-27,-24,-23,]),'IF':([6,15,18,21,22,29,58,61,67,68,69,72,74,75,76,],[17,17,-7,-8,-5,-6,17,17,17,-11,-12,-9,17,-13,-10,]),'INT':([6,15,18,21,22,29,58,61,67,68,69,72,74,75,76,],[19,19,-7,-8,-5,-6,19,19,19,-11,-12,-9,19,-13,-10,]),'VOID':([0,],[1,]),'RCURL':([6,13,15,18,21,22,29,31,68,69,72,73,75,76,],[12,30,-4,-7,-8,-5,-6,-3,-11,-12,-9,75,-13,-10,]),'ELSE':([18,21,22,29,68,69,72,75,76,],[-7,-8,-5,-6,-11,-12,74,-13,-10,]),'ID':([6,8,15,18,19,21,22,23,27,28,29,32,33,41,44,53,56,57,58,59,60,61,67,68,69,72,74,75,76,],[16,26,16,-7,36,-8,-5,38,48,48,-6,48,48,48,48,63,48,48,16,48,48,16,16,-11,-12,-9,16,-13,-10,]),'WHILE':([6,15,18,21,22,29,58,61,67,68,69,72,74,75,76,],[9,9,-7,-8,-5,-6,9,9,9,-11,-12,-9,9,-13,-10,]),'NUM':([27,28,32,33,41,44,56,57,59,60,],[43,43,43,43,43,43,43,43,43,43,]),'PLUS':([24,25,26,37,38,39,40,42,43,45,46,47,48,49,50,51,52,54,55,64,65,66,70,71,],[-38,-36,-37,-41,-39,-40,-33,-30,-32,-25,-28,60,-31,-34,60,60,60,-29,60,-35,-26,-27,-24,-23,]),'LPAREN':([3,9,17,27,28,32,33,41,44,56,57,59,60,],[4,27,33,44,44,44,44,44,44,44,44,44,44,]),'STAR':([6,8,15,18,19,21,22,23,24,25,26,27,28,29,32,33,37,38,39,40,41,42,43,44,45,46,48,49,53,54,56,57,58,59,60,61,64,65,66,67,68,69,70,71,72,74,75,76,],[8,8,8,-7,8,-8,-5,8,-38,-36,-37,8,8,-6,8,8,-41,-39,-40,-33,8,-30,-32,8,56,-28,-31,-34,8,-29,8,8,8,8,8,8,-35,-26,-27,8,-11,-12,56,56,-9,8,-13,-10,]),'MAIN':([1,],[3,]),'MINUS':([24,25,26,27,28,32,33,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,54,55,56,57,59,60,64,65,66,70,71,],[-38,-36,-37,41,41,41,41,-41,-39,-40,-33,41,-30,-32,41,-25,-28,59,-31,-34,59,59,59,-29,59,41,41,41,41,-35,-26,-27,-24,-23,]),'$end':([2,12,30,],[0,-2,-1,]),'COMMA':([24,25,26,34,35,36,37,38,39,62,63,],[-38,-36,-37,53,-20,-19,-41,-39,-40,-18,-17,]),'LCURL':([5,58,61,74,],[6,67,67,67,]),}
+_lr_action_items = {'STAR':([6,8,13,15,18,19,21,22,23,24,25,26,27,28,29,31,32,33,37,38,39,41,42,43,44,45,48,49,50,53,57,61,62,63,64,65,66,67,68,69,70,71,74,75,76,77,78,81,83,84,85,86,87,88,90,95,96,97,98,],[8,8,8,-4,-7,8,-8,-5,8,-50,-48,-49,8,8,-6,-3,8,8,-53,-51,-52,8,-40,61,8,-46,-45,-42,-44,-43,8,8,8,-41,8,8,8,8,8,8,8,8,8,8,-47,-38,-39,8,8,61,61,8,-11,-12,-9,8,8,-13,-10,]),'LPAREN':([3,9,17,27,28,32,33,41,44,61,62,64,65,66,67,68,70,74,75,81,83,],[4,27,33,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,41,]),'VOID':([0,],[1,]),'WHILE':([6,13,15,18,21,22,29,31,69,71,86,87,88,90,95,96,97,98,],[9,9,-4,-7,-8,-5,-6,-3,9,9,9,-11,-12,-9,9,9,-13,-10,]),'MINUS':([24,25,26,27,28,32,33,37,38,39,41,42,43,44,45,48,49,50,51,53,61,62,63,64,65,66,67,68,70,74,75,76,77,78,80,81,82,83,84,85,93,94,],[-50,-48,-49,44,44,44,44,-53,-51,-52,44,-40,-37,44,-46,-45,-42,-44,68,-43,44,44,-41,44,44,44,44,44,44,44,44,-47,-38,-39,68,44,68,44,-35,-36,68,68,]),'LCURL':([5,69,71,96,],[6,86,86,86,]),'RPAREN':([4,24,25,26,37,38,39,40,42,43,45,46,47,48,49,50,51,52,53,56,60,63,76,77,78,79,80,82,84,85,89,91,92,93,94,],[5,-50,-48,-49,-53,-51,-52,-26,-40,-37,-46,-24,-29,-45,-42,-44,-34,69,-43,71,76,-41,-47,-38,-39,-25,-30,-31,-35,-36,-23,-28,-27,-32,-33,]),'SEMICOLON':([7,11,14,20,24,25,26,34,35,36,37,38,39,40,42,43,45,46,47,48,49,50,51,53,54,55,63,72,73,76,77,78,79,80,82,84,85,89,91,92,93,94,],[22,29,-15,-14,-50,-48,-49,-16,-20,-19,-53,-51,-52,-26,-40,-37,-46,-24,-29,-45,-42,-44,-34,-43,-21,-22,-41,-18,-17,-47,-38,-39,-25,-30,-31,-35,-36,-23,-28,-27,-32,-33,]),'RCURL':([6,13,15,18,21,22,29,31,87,88,90,95,97,98,],[12,30,-4,-7,-8,-5,-6,-3,-11,-12,-9,97,-13,-10,]),'LT':([24,25,26,37,38,39,42,43,45,47,48,49,50,51,53,63,76,77,78,80,82,84,85,91,92,93,94,],[-50,-48,-49,-53,-51,-52,-40,-37,-46,65,-45,-42,-44,-34,-43,-41,-47,-38,-39,-30,-31,-35,-36,65,65,-32,-33,]),'NUM':([27,28,32,33,41,44,61,62,64,65,66,67,68,70,74,75,81,83,],[50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,50,]),'PLUS':([24,25,26,37,38,39,42,43,45,48,49,50,51,53,63,76,77,78,80,82,84,85,93,94,],[-50,-48,-49,-53,-51,-52,-40,-37,-46,-45,-42,-44,67,-43,-41,-47,-38,-39,67,67,-35,-36,67,67,]),'COMMA':([24,25,26,34,35,36,37,38,39,72,73,],[-50,-48,-49,57,-20,-19,-53,-51,-52,-18,-17,]),'$end':([2,12,30,],[0,-2,-1,]),'GT':([24,25,26,37,38,39,42,43,45,47,48,49,50,51,53,63,76,77,78,80,82,84,85,91,92,93,94,],[-50,-48,-49,-53,-51,-52,-40,-37,-46,66,-45,-42,-44,-34,-43,-41,-47,-38,-39,-30,-31,-35,-36,66,66,-32,-33,]),'EQUALS':([10,16,24,25,26,37,38,39,40,42,43,45,47,48,49,50,51,53,58,59,63,65,66,76,77,78,79,80,82,84,85,91,92,93,94,],[28,32,-50,-48,-49,-53,-51,-52,59,-40,-37,-46,-29,-45,-42,-44,-34,-43,74,75,-41,81,83,-47,-38,-39,59,-30,-31,-35,-36,-28,-27,-32,-33,]),'ELSE':([18,21,22,29,87,88,90,97,98,],[-7,-8,-5,-6,-11,-12,96,-13,-10,]),'SLASH':([24,25,26,37,38,39,42,43,45,48,49,50,53,63,76,77,78,84,85,],[-50,-48,-49,-53,-51,-52,-40,62,-46,-45,-42,-44,-43,-41,-47,-38,-39,62,62,]),'ID':([6,8,13,15,18,19,21,22,23,27,28,29,31,32,33,41,44,57,61,62,64,65,66,67,68,69,70,71,74,75,81,83,86,87,88,90,95,96,97,98,],[16,26,16,-4,-7,36,-8,-5,38,53,53,-6,-3,53,53,53,53,73,53,53,53,53,53,53,53,16,53,16,53,53,53,53,16,-11,-12,-9,16,16,-13,-10,]),'IF':([6,13,15,18,21,22,29,31,69,71,86,87,88,90,95,96,97,98,],[17,17,-4,-7,-8,-5,-6,-3,17,17,17,-11,-12,-9,17,17,-13,-10,]),'AND':([8,23,24,25,26,27,28,32,33,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,53,61,62,63,64,65,66,67,68,70,74,75,76,77,78,79,80,81,82,83,84,85,89,91,92,93,94,],[23,23,-50,-48,-49,23,23,23,23,-53,-51,-52,-26,23,-40,-37,23,-46,64,-29,-45,-42,-44,-34,-43,23,23,-41,23,23,23,23,23,23,23,23,-47,-38,-39,-25,-30,23,-31,23,-35,-36,64,-28,-27,-32,-33,]),'INT':([6,13,15,18,21,22,29,31,69,71,86,87,88,90,95,96,97,98,],[19,19,-4,-7,-8,-5,-6,-3,19,19,19,-11,-12,-9,19,19,-13,-10,]),'NOT':([24,25,26,37,38,39,40,42,43,45,47,48,49,50,51,53,63,76,77,78,79,80,82,84,85,91,92,93,94,],[-50,-48,-49,-53,-51,-52,58,-40,-37,-46,-29,-45,-42,-44,-34,-43,-41,-47,-38,-39,58,-30,-31,-35,-36,-28,-27,-32,-33,]),'MAIN':([1,],[3,]),'OR':([24,25,26,37,38,39,40,42,43,45,46,47,48,49,50,51,52,53,54,55,56,60,63,76,77,78,79,80,82,84,85,89,91,92,93,94,],[-50,-48,-49,-53,-51,-52,-26,-40,-37,-46,-24,-29,-45,-42,-44,-34,70,-43,70,70,70,70,-41,-47,-38,-39,-25,-30,-31,-35,-36,-23,-28,-27,-32,-33,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -16,7 +16,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'body':([6,15,67,],[13,31,73,]),'decl':([6,15,58,61,67,74,],[7,7,7,7,7,7,]),'if_stmt':([6,15,58,61,67,74,],[18,18,18,18,18,18,]),'assgn':([6,15,58,61,67,74,],[11,11,11,11,11,11,]),'num_assgn':([6,15,58,61,67,74,],[14,14,14,14,14,14,]),'ptr_assgn':([6,15,58,61,67,74,],[20,20,20,20,20,20,]),'stmt':([6,15,58,61,67,74,],[15,15,69,69,15,69,]),'ptr_term':([27,28,32,33,41,44,56,57,59,60,],[46,46,46,46,54,46,65,66,46,46,]),'ptr_expr_base':([27,28,32,33,41,44,56,57,59,60,],[42,42,42,42,42,42,42,42,42,42,]),'while_stmt':([6,15,58,61,67,74,],[21,21,21,21,21,21,]),'decl_list':([19,],[34,]),'compound_stmt':([58,61,74,],[68,72,76,]),'prog':([0,],[2,]),'ptr_factor':([27,28,32,33,44,59,60,],[45,45,45,45,45,70,71,]),'ptr_expr':([27,28,32,33,44,],[47,50,51,52,55,]),'ptr':([6,8,15,19,23,27,28,32,33,41,44,53,56,57,58,59,60,61,67,74,],[10,25,10,35,39,40,40,40,40,40,40,62,40,40,10,40,40,10,10,10,]),'addr':([8,23,27,28,32,33,41,44,56,57,59,60,],[24,37,49,49,49,49,49,49,49,49,49,49,]),}
+_lr_goto_items = {'body':([6,86,],[13,95,]),'decl':([6,13,69,71,86,95,96,],[7,7,7,7,7,7,7,]),'ptr_eq_expr':([27,28,32,33,41,64,70,],[40,40,40,40,40,79,40,]),'if_stmt':([6,13,69,71,86,95,96,],[18,18,18,18,18,18,18,]),'ptr_and_expr':([27,28,32,33,41,70,],[46,46,46,46,46,89,]),'assgn':([6,13,69,71,86,95,96,],[11,11,11,11,11,11,11,]),'num_assgn':([6,13,69,71,86,95,96,],[14,14,14,14,14,14,14,]),'ptr_assgn':([6,13,69,71,86,95,96,],[20,20,20,20,20,20,20,]),'ptr_expr_base':([27,28,32,33,41,44,61,62,64,65,66,67,68,70,74,75,81,83,],[49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,49,]),'stmt':([6,13,69,71,86,95,96,],[15,31,88,88,15,31,88,]),'ptr_term':([27,28,32,33,41,44,61,62,64,65,66,67,68,70,74,75,81,83,],[42,42,42,42,42,63,77,78,42,42,42,42,42,42,42,42,42,42,]),'ptr_add_expr':([27,28,32,33,41,64,65,66,70,74,75,81,83,],[51,51,51,51,51,51,80,82,51,51,51,93,94,]),'while_stmt':([6,13,69,71,86,95,96,],[21,21,21,21,21,21,21,]),'decl_list':([19,],[34,]),'compound_stmt':([69,71,96,],[87,90,98,]),'prog':([0,],[2,]),'ptr_factor':([27,28,32,33,41,64,65,66,67,68,70,74,75,81,83,],[43,43,43,43,43,43,43,43,84,85,43,43,43,43,43,]),'ptr_lt_expr':([27,28,32,33,41,64,70,74,75,],[47,47,47,47,47,47,47,91,92,]),'ptr_expr':([27,28,32,33,41,],[52,54,55,56,60,]),'ptr':([6,8,13,19,23,27,28,32,33,41,44,57,61,62,64,65,66,67,68,69,70,71,74,75,81,83,86,95,96,],[10,25,10,35,39,48,48,48,48,48,48,72,48,48,48,48,48,48,48,10,48,10,48,48,48,48,10,10,10,]),'addr':([8,23,27,28,32,33,41,44,61,62,64,65,66,67,68,70,74,75,81,83,],[24,37,45,45,45,45,45,45,45,45,45,45,45,45,45,45,45,45,45,45,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -26,45 +26,57 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> prog","S'",1,None,None,None),
-  ('prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL','prog',7,'p_def_prog','150050061_17V051001.py',137),
-  ('prog -> VOID MAIN LPAREN RPAREN LCURL RCURL','prog',6,'p_def_prog','150050061_17V051001.py',138),
-  ('body -> stmt body','body',2,'p_def_body','150050061_17V051001.py',147),
-  ('body -> stmt','body',1,'p_def_body','150050061_17V051001.py',148),
-  ('stmt -> decl SEMICOLON','stmt',2,'p_def_stmt','150050061_17V051001.py',154),
-  ('stmt -> assgn SEMICOLON','stmt',2,'p_def_stmt','150050061_17V051001.py',155),
-  ('stmt -> if_stmt','stmt',1,'p_def_stmt','150050061_17V051001.py',156),
-  ('stmt -> while_stmt','stmt',1,'p_def_stmt','150050061_17V051001.py',157),
-  ('if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt','if_stmt',5,'p_def_if_stmt','150050061_17V051001.py',167),
-  ('if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt','if_stmt',7,'p_def_if_stmt','150050061_17V051001.py',168),
-  ('while_stmt -> WHILE LPAREN ptr_expr RPAREN compound_stmt','while_stmt',5,'p_def_while_stmt','150050061_17V051001.py',180),
-  ('compound_stmt -> stmt','compound_stmt',1,'p_def_compound_stmt','150050061_17V051001.py',187),
-  ('compound_stmt -> LCURL body RCURL','compound_stmt',3,'p_def_compound_stmt','150050061_17V051001.py',188),
-  ('assgn -> ptr_assgn','assgn',1,'p_def_assgn','150050061_17V051001.py',199),
-  ('assgn -> num_assgn','assgn',1,'p_def_assgn','150050061_17V051001.py',200),
-  ('decl -> INT decl_list','decl',2,'p_def_decl','150050061_17V051001.py',206),
-  ('decl_list -> decl_list COMMA ID','decl_list',3,'p_def_decl_list','150050061_17V051001.py',213),
-  ('decl_list -> decl_list COMMA ptr','decl_list',3,'p_def_decl_list','150050061_17V051001.py',214),
-  ('decl_list -> ID','decl_list',1,'p_def_decl_list','150050061_17V051001.py',215),
-  ('decl_list -> ptr','decl_list',1,'p_def_decl_list','150050061_17V051001.py',216),
-  ('ptr_assgn -> ptr EQUALS ptr_expr','ptr_assgn',3,'p_def_ptr_assgn','150050061_17V051001.py',226),
-  ('num_assgn -> ID EQUALS ptr_expr','num_assgn',3,'p_def_num_assgn','150050061_17V051001.py',232),
-  ('ptr_expr -> ptr_expr PLUS ptr_factor','ptr_expr',3,'p_def_ptr_expr','150050061_17V051001.py',247),
-  ('ptr_expr -> ptr_expr MINUS ptr_factor','ptr_expr',3,'p_def_ptr_expr','150050061_17V051001.py',248),
-  ('ptr_expr -> ptr_factor','ptr_expr',1,'p_def_ptr_expr','150050061_17V051001.py',249),
-  ('ptr_factor -> ptr_factor STAR ptr_term','ptr_factor',3,'p_def_ptr_factor','150050061_17V051001.py',263),
-  ('ptr_factor -> ptr_factor SLASH ptr_term','ptr_factor',3,'p_def_ptr_factor','150050061_17V051001.py',264),
-  ('ptr_factor -> ptr_term','ptr_factor',1,'p_def_ptr_factor','150050061_17V051001.py',265),
-  ('ptr_term -> MINUS ptr_term','ptr_term',2,'p_def_ptr_term','150050061_17V051001.py',278),
-  ('ptr_term -> ptr_expr_base','ptr_term',1,'p_def_ptr_term','150050061_17V051001.py',279),
-  ('ptr_expr_base -> ID','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',288),
-  ('ptr_expr_base -> NUM','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',289),
-  ('ptr_expr_base -> ptr','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',290),
-  ('ptr_expr_base -> addr','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',291),
-  ('ptr_expr_base -> LPAREN ptr_expr RPAREN','ptr_expr_base',3,'p_def_ptr_expr_base','150050061_17V051001.py',292),
-  ('ptr -> STAR ptr','ptr',2,'p_def_ptr','150050061_17V051001.py',308),
-  ('ptr -> STAR ID','ptr',2,'p_def_ptr','150050061_17V051001.py',309),
-  ('ptr -> STAR addr','ptr',2,'p_def_ptr','150050061_17V051001.py',310),
-  ('addr -> AND ID','addr',2,'p_def_addr','150050061_17V051001.py',319),
-  ('addr -> AND ptr','addr',2,'p_def_addr','150050061_17V051001.py',320),
-  ('addr -> AND addr','addr',2,'p_def_addr','150050061_17V051001.py',321),
+  ('prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL','prog',7,'p_def_prog','150050061_17V051001.py',127),
+  ('prog -> VOID MAIN LPAREN RPAREN LCURL RCURL','prog',6,'p_def_prog','150050061_17V051001.py',128),
+  ('body -> body stmt','body',2,'p_def_body','150050061_17V051001.py',137),
+  ('body -> stmt','body',1,'p_def_body','150050061_17V051001.py',138),
+  ('stmt -> decl SEMICOLON','stmt',2,'p_def_stmt','150050061_17V051001.py',148),
+  ('stmt -> assgn SEMICOLON','stmt',2,'p_def_stmt','150050061_17V051001.py',149),
+  ('stmt -> if_stmt','stmt',1,'p_def_stmt','150050061_17V051001.py',150),
+  ('stmt -> while_stmt','stmt',1,'p_def_stmt','150050061_17V051001.py',151),
+  ('if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt','if_stmt',5,'p_def_if_stmt','150050061_17V051001.py',161),
+  ('if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt','if_stmt',7,'p_def_if_stmt','150050061_17V051001.py',162),
+  ('while_stmt -> WHILE LPAREN ptr_expr RPAREN compound_stmt','while_stmt',5,'p_def_while_stmt','150050061_17V051001.py',174),
+  ('compound_stmt -> stmt','compound_stmt',1,'p_def_compound_stmt','150050061_17V051001.py',181),
+  ('compound_stmt -> LCURL body RCURL','compound_stmt',3,'p_def_compound_stmt','150050061_17V051001.py',182),
+  ('assgn -> ptr_assgn','assgn',1,'p_def_assgn','150050061_17V051001.py',193),
+  ('assgn -> num_assgn','assgn',1,'p_def_assgn','150050061_17V051001.py',194),
+  ('decl -> INT decl_list','decl',2,'p_def_decl','150050061_17V051001.py',200),
+  ('decl_list -> decl_list COMMA ID','decl_list',3,'p_def_decl_list','150050061_17V051001.py',207),
+  ('decl_list -> decl_list COMMA ptr','decl_list',3,'p_def_decl_list','150050061_17V051001.py',208),
+  ('decl_list -> ID','decl_list',1,'p_def_decl_list','150050061_17V051001.py',209),
+  ('decl_list -> ptr','decl_list',1,'p_def_decl_list','150050061_17V051001.py',210),
+  ('ptr_assgn -> ptr EQUALS ptr_expr','ptr_assgn',3,'p_def_ptr_assgn','150050061_17V051001.py',220),
+  ('num_assgn -> ID EQUALS ptr_expr','num_assgn',3,'p_def_num_assgn','150050061_17V051001.py',226),
+  ('ptr_expr -> ptr_expr OR ptr_and_expr','ptr_expr',3,'p_def_ptr_expr','150050061_17V051001.py',240),
+  ('ptr_expr -> ptr_and_expr','ptr_expr',1,'p_def_ptr_expr','150050061_17V051001.py',241),
+  ('ptr_and_expr -> ptr_and_expr AND ptr_eq_expr','ptr_and_expr',3,'p_def_ptr_and_expr','150050061_17V051001.py',250),
+  ('ptr_and_expr -> ptr_eq_expr','ptr_and_expr',1,'p_def_ptr_and_expr','150050061_17V051001.py',251),
+  ('ptr_eq_expr -> ptr_eq_expr EQUALS EQUALS ptr_lt_expr','ptr_eq_expr',4,'p_def_ptr_eq_expr','150050061_17V051001.py',259),
+  ('ptr_eq_expr -> ptr_eq_expr NOT EQUALS ptr_lt_expr','ptr_eq_expr',4,'p_def_ptr_eq_expr','150050061_17V051001.py',260),
+  ('ptr_eq_expr -> ptr_lt_expr','ptr_eq_expr',1,'p_def_ptr_eq_expr','150050061_17V051001.py',261),
+  ('ptr_lt_expr -> ptr_lt_expr LT ptr_add_expr','ptr_lt_expr',3,'p_def_ptr_lt_expr','150050061_17V051001.py',273),
+  ('ptr_lt_expr -> ptr_lt_expr GT ptr_add_expr','ptr_lt_expr',3,'p_def_ptr_lt_expr','150050061_17V051001.py',274),
+  ('ptr_lt_expr -> ptr_lt_expr LT EQUALS ptr_add_expr','ptr_lt_expr',4,'p_def_ptr_lt_expr','150050061_17V051001.py',275),
+  ('ptr_lt_expr -> ptr_lt_expr GT EQUALS ptr_add_expr','ptr_lt_expr',4,'p_def_ptr_lt_expr','150050061_17V051001.py',276),
+  ('ptr_lt_expr -> ptr_add_expr','ptr_lt_expr',1,'p_def_ptr_lt_expr','150050061_17V051001.py',277),
+  ('ptr_add_expr -> ptr_add_expr PLUS ptr_factor','ptr_add_expr',3,'p_def_ptr_add_expr','150050061_17V051001.py',294),
+  ('ptr_add_expr -> ptr_add_expr MINUS ptr_factor','ptr_add_expr',3,'p_def_ptr_add_expr','150050061_17V051001.py',295),
+  ('ptr_add_expr -> ptr_factor','ptr_add_expr',1,'p_def_ptr_add_expr','150050061_17V051001.py',296),
+  ('ptr_factor -> ptr_factor STAR ptr_term','ptr_factor',3,'p_def_ptr_factor','150050061_17V051001.py',310),
+  ('ptr_factor -> ptr_factor SLASH ptr_term','ptr_factor',3,'p_def_ptr_factor','150050061_17V051001.py',311),
+  ('ptr_factor -> ptr_term','ptr_factor',1,'p_def_ptr_factor','150050061_17V051001.py',312),
+  ('ptr_term -> MINUS ptr_term','ptr_term',2,'p_def_ptr_term','150050061_17V051001.py',325),
+  ('ptr_term -> ptr_expr_base','ptr_term',1,'p_def_ptr_term','150050061_17V051001.py',326),
+  ('ptr_expr_base -> ID','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',335),
+  ('ptr_expr_base -> NUM','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',336),
+  ('ptr_expr_base -> ptr','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',337),
+  ('ptr_expr_base -> addr','ptr_expr_base',1,'p_def_ptr_expr_base','150050061_17V051001.py',338),
+  ('ptr_expr_base -> LPAREN ptr_expr RPAREN','ptr_expr_base',3,'p_def_ptr_expr_base','150050061_17V051001.py',339),
+  ('ptr -> STAR ptr','ptr',2,'p_def_ptr','150050061_17V051001.py',355),
+  ('ptr -> STAR ID','ptr',2,'p_def_ptr','150050061_17V051001.py',356),
+  ('ptr -> STAR addr','ptr',2,'p_def_ptr','150050061_17V051001.py',357),
+  ('addr -> AND ID','addr',2,'p_def_addr','150050061_17V051001.py',366),
+  ('addr -> AND ptr','addr',2,'p_def_addr','150050061_17V051001.py',367),
+  ('addr -> AND addr','addr',2,'p_def_addr','150050061_17V051001.py',368),
 ]

@@ -5,7 +5,7 @@ Grammar
 Rule 0     S' -> prog
 Rule 1     prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL
 Rule 2     prog -> VOID MAIN LPAREN RPAREN LCURL RCURL
-Rule 3     body -> stmt body
+Rule 3     body -> body stmt
 Rule 4     body -> stmt
 Rule 5     stmt -> decl SEMICOLON
 Rule 6     stmt -> assgn SEMICOLON
@@ -25,53 +25,69 @@ Rule 19    decl_list -> ID
 Rule 20    decl_list -> ptr
 Rule 21    ptr_assgn -> ptr EQUALS ptr_expr
 Rule 22    num_assgn -> ID EQUALS ptr_expr
-Rule 23    ptr_expr -> ptr_expr PLUS ptr_factor
-Rule 24    ptr_expr -> ptr_expr MINUS ptr_factor
-Rule 25    ptr_expr -> ptr_factor
-Rule 26    ptr_factor -> ptr_factor STAR ptr_term
-Rule 27    ptr_factor -> ptr_factor SLASH ptr_term
-Rule 28    ptr_factor -> ptr_term
-Rule 29    ptr_term -> MINUS ptr_term
-Rule 30    ptr_term -> ptr_expr_base
-Rule 31    ptr_expr_base -> ID
-Rule 32    ptr_expr_base -> NUM
-Rule 33    ptr_expr_base -> ptr
-Rule 34    ptr_expr_base -> addr
-Rule 35    ptr_expr_base -> LPAREN ptr_expr RPAREN
-Rule 36    ptr -> STAR ptr
-Rule 37    ptr -> STAR ID
-Rule 38    ptr -> STAR addr
-Rule 39    addr -> AND ID
-Rule 40    addr -> AND ptr
-Rule 41    addr -> AND addr
+Rule 23    ptr_expr -> ptr_expr OR ptr_and_expr
+Rule 24    ptr_expr -> ptr_and_expr
+Rule 25    ptr_and_expr -> ptr_and_expr AND ptr_eq_expr
+Rule 26    ptr_and_expr -> ptr_eq_expr
+Rule 27    ptr_eq_expr -> ptr_eq_expr EQUALS EQUALS ptr_lt_expr
+Rule 28    ptr_eq_expr -> ptr_eq_expr NOT EQUALS ptr_lt_expr
+Rule 29    ptr_eq_expr -> ptr_lt_expr
+Rule 30    ptr_lt_expr -> ptr_lt_expr LT ptr_add_expr
+Rule 31    ptr_lt_expr -> ptr_lt_expr GT ptr_add_expr
+Rule 32    ptr_lt_expr -> ptr_lt_expr LT EQUALS ptr_add_expr
+Rule 33    ptr_lt_expr -> ptr_lt_expr GT EQUALS ptr_add_expr
+Rule 34    ptr_lt_expr -> ptr_add_expr
+Rule 35    ptr_add_expr -> ptr_add_expr PLUS ptr_factor
+Rule 36    ptr_add_expr -> ptr_add_expr MINUS ptr_factor
+Rule 37    ptr_add_expr -> ptr_factor
+Rule 38    ptr_factor -> ptr_factor STAR ptr_term
+Rule 39    ptr_factor -> ptr_factor SLASH ptr_term
+Rule 40    ptr_factor -> ptr_term
+Rule 41    ptr_term -> MINUS ptr_term
+Rule 42    ptr_term -> ptr_expr_base
+Rule 43    ptr_expr_base -> ID
+Rule 44    ptr_expr_base -> NUM
+Rule 45    ptr_expr_base -> ptr
+Rule 46    ptr_expr_base -> addr
+Rule 47    ptr_expr_base -> LPAREN ptr_expr RPAREN
+Rule 48    ptr -> STAR ptr
+Rule 49    ptr -> STAR ID
+Rule 50    ptr -> STAR addr
+Rule 51    addr -> AND ID
+Rule 52    addr -> AND ptr
+Rule 53    addr -> AND addr
 
 Terminals, with rules where they appear
 
-AND                  : 39 40 41
+AND                  : 25 51 52 53
 COMMA                : 17 18
 ELSE                 : 10
-EQUALS               : 21 22
-ID                   : 17 19 22 31 37 39
+EQUALS               : 21 22 27 27 28 32 33
+GT                   : 31 33
+ID                   : 17 19 22 43 49 51
 IF                   : 9 10
 INT                  : 16
 LCURL                : 1 2 13
-LPAREN               : 1 2 9 10 11 35
+LPAREN               : 1 2 9 10 11 47
+LT                   : 30 32
 MAIN                 : 1 2
-MINUS                : 24 29
-NUM                  : 32
-PLUS                 : 23
+MINUS                : 36 41
+NOT                  : 28
+NUM                  : 44
+OR                   : 23
+PLUS                 : 35
 RCURL                : 1 2 13
-RPAREN               : 1 2 9 10 11 35
+RPAREN               : 1 2 9 10 11 47
 SEMICOLON            : 5 6
-SLASH                : 27
-STAR                 : 26 36 37 38
+SLASH                : 39
+STAR                 : 38 48 49 50
 VOID                 : 1 2
 WHILE                : 11
 error                : 
 
 Nonterminals, with rules where they appear
 
-addr                 : 34 38 41
+addr                 : 46 50 53
 assgn                : 6
 body                 : 1 3 13
 compound_stmt        : 9 10 10 11
@@ -80,12 +96,16 @@ decl_list            : 16 17 18
 if_stmt              : 7
 num_assgn            : 15
 prog                 : 0
-ptr                  : 18 20 21 33 36 40
+ptr                  : 18 20 21 45 48 52
+ptr_add_expr         : 30 31 32 33 34 35 36
+ptr_and_expr         : 23 24 25
 ptr_assgn            : 14
-ptr_expr             : 9 10 11 21 22 23 24 35
-ptr_expr_base        : 30
-ptr_factor           : 23 24 25 26 27
-ptr_term             : 26 27 28 29
+ptr_eq_expr          : 25 26 27 28
+ptr_expr             : 9 10 11 21 22 23 47
+ptr_expr_base        : 42
+ptr_factor           : 35 36 37 38 39
+ptr_lt_expr          : 27 28 29 30 31 32 33
+ptr_term             : 38 39 40 41
 stmt                 : 3 4 12
 while_stmt           : 8
 
@@ -143,7 +163,7 @@ state 6
 
     (1) prog -> VOID MAIN LPAREN RPAREN LCURL . body RCURL
     (2) prog -> VOID MAIN LPAREN RPAREN LCURL . RCURL
-    (3) body -> . stmt body
+    (3) body -> . body stmt
     (4) body -> . stmt
     (5) stmt -> . decl SEMICOLON
     (6) stmt -> . assgn SEMICOLON
@@ -157,9 +177,9 @@ state 6
     (11) while_stmt -> . WHILE LPAREN ptr_expr RPAREN compound_stmt
     (21) ptr_assgn -> . ptr EQUALS ptr_expr
     (22) num_assgn -> . ID EQUALS ptr_expr
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
 
     RCURL           shift and go to state 12
     INT             shift and go to state 19
@@ -187,15 +207,15 @@ state 7
 
 state 8
 
-    (36) ptr -> STAR . ptr
-    (37) ptr -> STAR . ID
-    (38) ptr -> STAR . addr
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
-    (39) addr -> . AND ID
-    (40) addr -> . AND ptr
-    (41) addr -> . AND addr
+    (48) ptr -> STAR . ptr
+    (49) ptr -> STAR . ID
+    (50) ptr -> STAR . addr
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
 
     ID              shift and go to state 26
     STAR            shift and go to state 8
@@ -235,23 +255,7 @@ state 12
 state 13
 
     (1) prog -> VOID MAIN LPAREN RPAREN LCURL body . RCURL
-
-    RCURL           shift and go to state 30
-
-
-state 14
-
-    (15) assgn -> num_assgn .
-
-    SEMICOLON       reduce using rule 15 (assgn -> num_assgn .)
-
-
-state 15
-
-    (3) body -> stmt . body
-    (4) body -> stmt .
-    (3) body -> . stmt body
-    (4) body -> . stmt
+    (3) body -> body . stmt
     (5) stmt -> . decl SEMICOLON
     (6) stmt -> . assgn SEMICOLON
     (7) stmt -> . if_stmt
@@ -264,26 +268,44 @@ state 15
     (11) while_stmt -> . WHILE LPAREN ptr_expr RPAREN compound_stmt
     (21) ptr_assgn -> . ptr EQUALS ptr_expr
     (22) num_assgn -> . ID EQUALS ptr_expr
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
 
-    RCURL           reduce using rule 4 (body -> stmt .)
+    RCURL           shift and go to state 30
     INT             shift and go to state 19
     IF              shift and go to state 17
     WHILE           shift and go to state 9
     ID              shift and go to state 16
     STAR            shift and go to state 8
 
-    body                           shift and go to state 31
     decl                           shift and go to state 7
     if_stmt                        shift and go to state 18
     assgn                          shift and go to state 11
     num_assgn                      shift and go to state 14
     ptr_assgn                      shift and go to state 20
-    stmt                           shift and go to state 15
+    stmt                           shift and go to state 31
     ptr                            shift and go to state 10
     while_stmt                     shift and go to state 21
+
+state 14
+
+    (15) assgn -> num_assgn .
+
+    SEMICOLON       reduce using rule 15 (assgn -> num_assgn .)
+
+
+state 15
+
+    (4) body -> stmt .
+
+    RCURL           reduce using rule 4 (body -> stmt .)
+    INT             reduce using rule 4 (body -> stmt .)
+    IF              reduce using rule 4 (body -> stmt .)
+    WHILE           reduce using rule 4 (body -> stmt .)
+    ID              reduce using rule 4 (body -> stmt .)
+    STAR            reduce using rule 4 (body -> stmt .)
+
 
 state 16
 
@@ -304,12 +326,12 @@ state 18
 
     (7) stmt -> if_stmt .
 
+    RCURL           reduce using rule 7 (stmt -> if_stmt .)
     INT             reduce using rule 7 (stmt -> if_stmt .)
     IF              reduce using rule 7 (stmt -> if_stmt .)
     WHILE           reduce using rule 7 (stmt -> if_stmt .)
     ID              reduce using rule 7 (stmt -> if_stmt .)
     STAR            reduce using rule 7 (stmt -> if_stmt .)
-    RCURL           reduce using rule 7 (stmt -> if_stmt .)
     ELSE            reduce using rule 7 (stmt -> if_stmt .)
 
 
@@ -320,9 +342,9 @@ state 19
     (18) decl_list -> . decl_list COMMA ptr
     (19) decl_list -> . ID
     (20) decl_list -> . ptr
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
 
     ID              shift and go to state 36
     STAR            shift and go to state 8
@@ -341,12 +363,12 @@ state 21
 
     (8) stmt -> while_stmt .
 
+    RCURL           reduce using rule 8 (stmt -> while_stmt .)
     INT             reduce using rule 8 (stmt -> while_stmt .)
     IF              reduce using rule 8 (stmt -> while_stmt .)
     WHILE           reduce using rule 8 (stmt -> while_stmt .)
     ID              reduce using rule 8 (stmt -> while_stmt .)
     STAR            reduce using rule 8 (stmt -> while_stmt .)
-    RCURL           reduce using rule 8 (stmt -> while_stmt .)
     ELSE            reduce using rule 8 (stmt -> while_stmt .)
 
 
@@ -354,26 +376,26 @@ state 22
 
     (5) stmt -> decl SEMICOLON .
 
+    RCURL           reduce using rule 5 (stmt -> decl SEMICOLON .)
     INT             reduce using rule 5 (stmt -> decl SEMICOLON .)
     IF              reduce using rule 5 (stmt -> decl SEMICOLON .)
     WHILE           reduce using rule 5 (stmt -> decl SEMICOLON .)
     ID              reduce using rule 5 (stmt -> decl SEMICOLON .)
     STAR            reduce using rule 5 (stmt -> decl SEMICOLON .)
-    RCURL           reduce using rule 5 (stmt -> decl SEMICOLON .)
     ELSE            reduce using rule 5 (stmt -> decl SEMICOLON .)
 
 
 state 23
 
-    (39) addr -> AND . ID
-    (40) addr -> AND . ptr
-    (41) addr -> AND . addr
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
-    (39) addr -> . AND ID
-    (40) addr -> . AND ptr
-    (41) addr -> . AND addr
+    (51) addr -> AND . ID
+    (52) addr -> AND . ptr
+    (53) addr -> AND . addr
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
 
     ID              shift and go to state 38
     STAR            shift and go to state 8
@@ -384,130 +406,177 @@ state 23
 
 state 24
 
-    (38) ptr -> STAR addr .
+    (50) ptr -> STAR addr .
 
-    EQUALS          reduce using rule 38 (ptr -> STAR addr .)
-    COMMA           reduce using rule 38 (ptr -> STAR addr .)
-    SEMICOLON       reduce using rule 38 (ptr -> STAR addr .)
-    STAR            reduce using rule 38 (ptr -> STAR addr .)
-    SLASH           reduce using rule 38 (ptr -> STAR addr .)
-    RPAREN          reduce using rule 38 (ptr -> STAR addr .)
-    PLUS            reduce using rule 38 (ptr -> STAR addr .)
-    MINUS           reduce using rule 38 (ptr -> STAR addr .)
+    STAR            reduce using rule 50 (ptr -> STAR addr .)
+    SLASH           reduce using rule 50 (ptr -> STAR addr .)
+    PLUS            reduce using rule 50 (ptr -> STAR addr .)
+    MINUS           reduce using rule 50 (ptr -> STAR addr .)
+    LT              reduce using rule 50 (ptr -> STAR addr .)
+    GT              reduce using rule 50 (ptr -> STAR addr .)
+    EQUALS          reduce using rule 50 (ptr -> STAR addr .)
+    NOT             reduce using rule 50 (ptr -> STAR addr .)
+    AND             reduce using rule 50 (ptr -> STAR addr .)
+    RPAREN          reduce using rule 50 (ptr -> STAR addr .)
+    OR              reduce using rule 50 (ptr -> STAR addr .)
+    SEMICOLON       reduce using rule 50 (ptr -> STAR addr .)
+    COMMA           reduce using rule 50 (ptr -> STAR addr .)
 
 
 state 25
 
-    (36) ptr -> STAR ptr .
+    (48) ptr -> STAR ptr .
 
-    EQUALS          reduce using rule 36 (ptr -> STAR ptr .)
-    COMMA           reduce using rule 36 (ptr -> STAR ptr .)
-    SEMICOLON       reduce using rule 36 (ptr -> STAR ptr .)
-    STAR            reduce using rule 36 (ptr -> STAR ptr .)
-    SLASH           reduce using rule 36 (ptr -> STAR ptr .)
-    RPAREN          reduce using rule 36 (ptr -> STAR ptr .)
-    PLUS            reduce using rule 36 (ptr -> STAR ptr .)
-    MINUS           reduce using rule 36 (ptr -> STAR ptr .)
+    STAR            reduce using rule 48 (ptr -> STAR ptr .)
+    SLASH           reduce using rule 48 (ptr -> STAR ptr .)
+    PLUS            reduce using rule 48 (ptr -> STAR ptr .)
+    MINUS           reduce using rule 48 (ptr -> STAR ptr .)
+    LT              reduce using rule 48 (ptr -> STAR ptr .)
+    GT              reduce using rule 48 (ptr -> STAR ptr .)
+    EQUALS          reduce using rule 48 (ptr -> STAR ptr .)
+    NOT             reduce using rule 48 (ptr -> STAR ptr .)
+    AND             reduce using rule 48 (ptr -> STAR ptr .)
+    RPAREN          reduce using rule 48 (ptr -> STAR ptr .)
+    OR              reduce using rule 48 (ptr -> STAR ptr .)
+    SEMICOLON       reduce using rule 48 (ptr -> STAR ptr .)
+    COMMA           reduce using rule 48 (ptr -> STAR ptr .)
 
 
 state 26
 
-    (37) ptr -> STAR ID .
+    (49) ptr -> STAR ID .
 
-    EQUALS          reduce using rule 37 (ptr -> STAR ID .)
-    COMMA           reduce using rule 37 (ptr -> STAR ID .)
-    SEMICOLON       reduce using rule 37 (ptr -> STAR ID .)
-    STAR            reduce using rule 37 (ptr -> STAR ID .)
-    SLASH           reduce using rule 37 (ptr -> STAR ID .)
-    RPAREN          reduce using rule 37 (ptr -> STAR ID .)
-    PLUS            reduce using rule 37 (ptr -> STAR ID .)
-    MINUS           reduce using rule 37 (ptr -> STAR ID .)
+    STAR            reduce using rule 49 (ptr -> STAR ID .)
+    SLASH           reduce using rule 49 (ptr -> STAR ID .)
+    PLUS            reduce using rule 49 (ptr -> STAR ID .)
+    MINUS           reduce using rule 49 (ptr -> STAR ID .)
+    LT              reduce using rule 49 (ptr -> STAR ID .)
+    GT              reduce using rule 49 (ptr -> STAR ID .)
+    EQUALS          reduce using rule 49 (ptr -> STAR ID .)
+    NOT             reduce using rule 49 (ptr -> STAR ID .)
+    AND             reduce using rule 49 (ptr -> STAR ID .)
+    RPAREN          reduce using rule 49 (ptr -> STAR ID .)
+    OR              reduce using rule 49 (ptr -> STAR ID .)
+    SEMICOLON       reduce using rule 49 (ptr -> STAR ID .)
+    COMMA           reduce using rule 49 (ptr -> STAR ID .)
 
 
 state 27
 
     (11) while_stmt -> WHILE LPAREN . ptr_expr RPAREN compound_stmt
-    (23) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (24) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (25) ptr_expr -> . ptr_factor
-    (26) ptr_factor -> . ptr_factor STAR ptr_term
-    (27) ptr_factor -> . ptr_factor SLASH ptr_term
-    (28) ptr_factor -> . ptr_term
-    (29) ptr_term -> . MINUS ptr_term
-    (30) ptr_term -> . ptr_expr_base
-    (31) ptr_expr_base -> . ID
-    (32) ptr_expr_base -> . NUM
-    (33) ptr_expr_base -> . ptr
-    (34) ptr_expr_base -> . addr
-    (35) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
-    (39) addr -> . AND ID
-    (40) addr -> . AND ptr
-    (41) addr -> . AND addr
+    (23) ptr_expr -> . ptr_expr OR ptr_and_expr
+    (24) ptr_expr -> . ptr_and_expr
+    (25) ptr_and_expr -> . ptr_and_expr AND ptr_eq_expr
+    (26) ptr_and_expr -> . ptr_eq_expr
+    (27) ptr_eq_expr -> . ptr_eq_expr EQUALS EQUALS ptr_lt_expr
+    (28) ptr_eq_expr -> . ptr_eq_expr NOT EQUALS ptr_lt_expr
+    (29) ptr_eq_expr -> . ptr_lt_expr
+    (30) ptr_lt_expr -> . ptr_lt_expr LT ptr_add_expr
+    (31) ptr_lt_expr -> . ptr_lt_expr GT ptr_add_expr
+    (32) ptr_lt_expr -> . ptr_lt_expr LT EQUALS ptr_add_expr
+    (33) ptr_lt_expr -> . ptr_lt_expr GT EQUALS ptr_add_expr
+    (34) ptr_lt_expr -> . ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
 
-    MINUS           shift and go to state 41
-    ID              shift and go to state 48
-    NUM             shift and go to state 43
-    LPAREN          shift and go to state 44
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
     STAR            shift and go to state 8
     AND             shift and go to state 23
 
-    addr                           shift and go to state 49
-    ptr_expr_base                  shift and go to state 42
-    ptr_factor                     shift and go to state 45
-    ptr_term                       shift and go to state 46
-    ptr_expr                       shift and go to state 47
-    ptr                            shift and go to state 40
+    ptr_eq_expr                    shift and go to state 40
+    addr                           shift and go to state 45
+    ptr_and_expr                   shift and go to state 46
+    ptr_add_expr                   shift and go to state 51
+    ptr                            shift and go to state 48
+    ptr_lt_expr                    shift and go to state 47
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr_expr                       shift and go to state 52
 
 state 28
 
     (21) ptr_assgn -> ptr EQUALS . ptr_expr
-    (23) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (24) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (25) ptr_expr -> . ptr_factor
-    (26) ptr_factor -> . ptr_factor STAR ptr_term
-    (27) ptr_factor -> . ptr_factor SLASH ptr_term
-    (28) ptr_factor -> . ptr_term
-    (29) ptr_term -> . MINUS ptr_term
-    (30) ptr_term -> . ptr_expr_base
-    (31) ptr_expr_base -> . ID
-    (32) ptr_expr_base -> . NUM
-    (33) ptr_expr_base -> . ptr
-    (34) ptr_expr_base -> . addr
-    (35) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
-    (39) addr -> . AND ID
-    (40) addr -> . AND ptr
-    (41) addr -> . AND addr
+    (23) ptr_expr -> . ptr_expr OR ptr_and_expr
+    (24) ptr_expr -> . ptr_and_expr
+    (25) ptr_and_expr -> . ptr_and_expr AND ptr_eq_expr
+    (26) ptr_and_expr -> . ptr_eq_expr
+    (27) ptr_eq_expr -> . ptr_eq_expr EQUALS EQUALS ptr_lt_expr
+    (28) ptr_eq_expr -> . ptr_eq_expr NOT EQUALS ptr_lt_expr
+    (29) ptr_eq_expr -> . ptr_lt_expr
+    (30) ptr_lt_expr -> . ptr_lt_expr LT ptr_add_expr
+    (31) ptr_lt_expr -> . ptr_lt_expr GT ptr_add_expr
+    (32) ptr_lt_expr -> . ptr_lt_expr LT EQUALS ptr_add_expr
+    (33) ptr_lt_expr -> . ptr_lt_expr GT EQUALS ptr_add_expr
+    (34) ptr_lt_expr -> . ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
 
-    MINUS           shift and go to state 41
-    ID              shift and go to state 48
-    NUM             shift and go to state 43
-    LPAREN          shift and go to state 44
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
     STAR            shift and go to state 8
     AND             shift and go to state 23
 
-    addr                           shift and go to state 49
-    ptr_term                       shift and go to state 46
-    ptr_expr_base                  shift and go to state 42
-    ptr_factor                     shift and go to state 45
-    ptr_expr                       shift and go to state 50
-    ptr                            shift and go to state 40
+    ptr_eq_expr                    shift and go to state 40
+    addr                           shift and go to state 45
+    ptr_and_expr                   shift and go to state 46
+    ptr_add_expr                   shift and go to state 51
+    ptr_lt_expr                    shift and go to state 47
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr_expr                       shift and go to state 54
+    ptr                            shift and go to state 48
 
 state 29
 
     (6) stmt -> assgn SEMICOLON .
 
+    RCURL           reduce using rule 6 (stmt -> assgn SEMICOLON .)
     INT             reduce using rule 6 (stmt -> assgn SEMICOLON .)
     IF              reduce using rule 6 (stmt -> assgn SEMICOLON .)
     WHILE           reduce using rule 6 (stmt -> assgn SEMICOLON .)
     ID              reduce using rule 6 (stmt -> assgn SEMICOLON .)
     STAR            reduce using rule 6 (stmt -> assgn SEMICOLON .)
-    RCURL           reduce using rule 6 (stmt -> assgn SEMICOLON .)
     ELSE            reduce using rule 6 (stmt -> assgn SEMICOLON .)
 
 
@@ -520,85 +589,122 @@ state 30
 
 state 31
 
-    (3) body -> stmt body .
+    (3) body -> body stmt .
 
-    RCURL           reduce using rule 3 (body -> stmt body .)
+    RCURL           reduce using rule 3 (body -> body stmt .)
+    INT             reduce using rule 3 (body -> body stmt .)
+    IF              reduce using rule 3 (body -> body stmt .)
+    WHILE           reduce using rule 3 (body -> body stmt .)
+    ID              reduce using rule 3 (body -> body stmt .)
+    STAR            reduce using rule 3 (body -> body stmt .)
 
 
 state 32
 
     (22) num_assgn -> ID EQUALS . ptr_expr
-    (23) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (24) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (25) ptr_expr -> . ptr_factor
-    (26) ptr_factor -> . ptr_factor STAR ptr_term
-    (27) ptr_factor -> . ptr_factor SLASH ptr_term
-    (28) ptr_factor -> . ptr_term
-    (29) ptr_term -> . MINUS ptr_term
-    (30) ptr_term -> . ptr_expr_base
-    (31) ptr_expr_base -> . ID
-    (32) ptr_expr_base -> . NUM
-    (33) ptr_expr_base -> . ptr
-    (34) ptr_expr_base -> . addr
-    (35) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
-    (39) addr -> . AND ID
-    (40) addr -> . AND ptr
-    (41) addr -> . AND addr
+    (23) ptr_expr -> . ptr_expr OR ptr_and_expr
+    (24) ptr_expr -> . ptr_and_expr
+    (25) ptr_and_expr -> . ptr_and_expr AND ptr_eq_expr
+    (26) ptr_and_expr -> . ptr_eq_expr
+    (27) ptr_eq_expr -> . ptr_eq_expr EQUALS EQUALS ptr_lt_expr
+    (28) ptr_eq_expr -> . ptr_eq_expr NOT EQUALS ptr_lt_expr
+    (29) ptr_eq_expr -> . ptr_lt_expr
+    (30) ptr_lt_expr -> . ptr_lt_expr LT ptr_add_expr
+    (31) ptr_lt_expr -> . ptr_lt_expr GT ptr_add_expr
+    (32) ptr_lt_expr -> . ptr_lt_expr LT EQUALS ptr_add_expr
+    (33) ptr_lt_expr -> . ptr_lt_expr GT EQUALS ptr_add_expr
+    (34) ptr_lt_expr -> . ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
 
-    MINUS           shift and go to state 41
-    ID              shift and go to state 48
-    NUM             shift and go to state 43
-    LPAREN          shift and go to state 44
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
     STAR            shift and go to state 8
     AND             shift and go to state 23
 
-    addr                           shift and go to state 49
-    ptr_term                       shift and go to state 46
-    ptr_expr_base                  shift and go to state 42
-    ptr_factor                     shift and go to state 45
-    ptr_expr                       shift and go to state 51
-    ptr                            shift and go to state 40
+    ptr_eq_expr                    shift and go to state 40
+    addr                           shift and go to state 45
+    ptr_and_expr                   shift and go to state 46
+    ptr_add_expr                   shift and go to state 51
+    ptr_lt_expr                    shift and go to state 47
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr_expr                       shift and go to state 55
+    ptr                            shift and go to state 48
 
 state 33
 
     (9) if_stmt -> IF LPAREN . ptr_expr RPAREN compound_stmt
     (10) if_stmt -> IF LPAREN . ptr_expr RPAREN compound_stmt ELSE compound_stmt
-    (23) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (24) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (25) ptr_expr -> . ptr_factor
-    (26) ptr_factor -> . ptr_factor STAR ptr_term
-    (27) ptr_factor -> . ptr_factor SLASH ptr_term
-    (28) ptr_factor -> . ptr_term
-    (29) ptr_term -> . MINUS ptr_term
-    (30) ptr_term -> . ptr_expr_base
-    (31) ptr_expr_base -> . ID
-    (32) ptr_expr_base -> . NUM
-    (33) ptr_expr_base -> . ptr
-    (34) ptr_expr_base -> . addr
-    (35) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
-    (39) addr -> . AND ID
-    (40) addr -> . AND ptr
-    (41) addr -> . AND addr
+    (23) ptr_expr -> . ptr_expr OR ptr_and_expr
+    (24) ptr_expr -> . ptr_and_expr
+    (25) ptr_and_expr -> . ptr_and_expr AND ptr_eq_expr
+    (26) ptr_and_expr -> . ptr_eq_expr
+    (27) ptr_eq_expr -> . ptr_eq_expr EQUALS EQUALS ptr_lt_expr
+    (28) ptr_eq_expr -> . ptr_eq_expr NOT EQUALS ptr_lt_expr
+    (29) ptr_eq_expr -> . ptr_lt_expr
+    (30) ptr_lt_expr -> . ptr_lt_expr LT ptr_add_expr
+    (31) ptr_lt_expr -> . ptr_lt_expr GT ptr_add_expr
+    (32) ptr_lt_expr -> . ptr_lt_expr LT EQUALS ptr_add_expr
+    (33) ptr_lt_expr -> . ptr_lt_expr GT EQUALS ptr_add_expr
+    (34) ptr_lt_expr -> . ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
 
-    MINUS           shift and go to state 41
-    ID              shift and go to state 48
-    NUM             shift and go to state 43
-    LPAREN          shift and go to state 44
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
     STAR            shift and go to state 8
     AND             shift and go to state 23
 
-    addr                           shift and go to state 49
-    ptr_expr_base                  shift and go to state 42
-    ptr_factor                     shift and go to state 45
-    ptr_term                       shift and go to state 46
-    ptr_expr                       shift and go to state 52
-    ptr                            shift and go to state 40
+    ptr_eq_expr                    shift and go to state 40
+    addr                           shift and go to state 45
+    ptr_and_expr                   shift and go to state 46
+    ptr_add_expr                   shift and go to state 51
+    ptr                            shift and go to state 48
+    ptr_lt_expr                    shift and go to state 47
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr_expr                       shift and go to state 56
 
 state 34
 
@@ -607,7 +713,7 @@ state 34
     (18) decl_list -> decl_list . COMMA ptr
 
     SEMICOLON       reduce using rule 16 (decl -> INT decl_list .)
-    COMMA           shift and go to state 53
+    COMMA           shift and go to state 57
 
 
 state 35
@@ -628,338 +734,673 @@ state 36
 
 state 37
 
-    (41) addr -> AND addr .
+    (53) addr -> AND addr .
 
-    STAR            reduce using rule 41 (addr -> AND addr .)
-    SLASH           reduce using rule 41 (addr -> AND addr .)
-    PLUS            reduce using rule 41 (addr -> AND addr .)
-    MINUS           reduce using rule 41 (addr -> AND addr .)
-    SEMICOLON       reduce using rule 41 (addr -> AND addr .)
-    EQUALS          reduce using rule 41 (addr -> AND addr .)
-    COMMA           reduce using rule 41 (addr -> AND addr .)
-    RPAREN          reduce using rule 41 (addr -> AND addr .)
+    STAR            reduce using rule 53 (addr -> AND addr .)
+    SLASH           reduce using rule 53 (addr -> AND addr .)
+    PLUS            reduce using rule 53 (addr -> AND addr .)
+    MINUS           reduce using rule 53 (addr -> AND addr .)
+    LT              reduce using rule 53 (addr -> AND addr .)
+    GT              reduce using rule 53 (addr -> AND addr .)
+    EQUALS          reduce using rule 53 (addr -> AND addr .)
+    NOT             reduce using rule 53 (addr -> AND addr .)
+    AND             reduce using rule 53 (addr -> AND addr .)
+    RPAREN          reduce using rule 53 (addr -> AND addr .)
+    OR              reduce using rule 53 (addr -> AND addr .)
+    SEMICOLON       reduce using rule 53 (addr -> AND addr .)
+    COMMA           reduce using rule 53 (addr -> AND addr .)
 
 
 state 38
 
-    (39) addr -> AND ID .
+    (51) addr -> AND ID .
 
-    STAR            reduce using rule 39 (addr -> AND ID .)
-    SLASH           reduce using rule 39 (addr -> AND ID .)
-    PLUS            reduce using rule 39 (addr -> AND ID .)
-    MINUS           reduce using rule 39 (addr -> AND ID .)
-    SEMICOLON       reduce using rule 39 (addr -> AND ID .)
-    EQUALS          reduce using rule 39 (addr -> AND ID .)
-    COMMA           reduce using rule 39 (addr -> AND ID .)
-    RPAREN          reduce using rule 39 (addr -> AND ID .)
+    STAR            reduce using rule 51 (addr -> AND ID .)
+    SLASH           reduce using rule 51 (addr -> AND ID .)
+    PLUS            reduce using rule 51 (addr -> AND ID .)
+    MINUS           reduce using rule 51 (addr -> AND ID .)
+    LT              reduce using rule 51 (addr -> AND ID .)
+    GT              reduce using rule 51 (addr -> AND ID .)
+    EQUALS          reduce using rule 51 (addr -> AND ID .)
+    NOT             reduce using rule 51 (addr -> AND ID .)
+    AND             reduce using rule 51 (addr -> AND ID .)
+    RPAREN          reduce using rule 51 (addr -> AND ID .)
+    OR              reduce using rule 51 (addr -> AND ID .)
+    SEMICOLON       reduce using rule 51 (addr -> AND ID .)
+    COMMA           reduce using rule 51 (addr -> AND ID .)
 
 
 state 39
 
-    (40) addr -> AND ptr .
+    (52) addr -> AND ptr .
 
-    STAR            reduce using rule 40 (addr -> AND ptr .)
-    SLASH           reduce using rule 40 (addr -> AND ptr .)
-    PLUS            reduce using rule 40 (addr -> AND ptr .)
-    MINUS           reduce using rule 40 (addr -> AND ptr .)
-    SEMICOLON       reduce using rule 40 (addr -> AND ptr .)
-    EQUALS          reduce using rule 40 (addr -> AND ptr .)
-    COMMA           reduce using rule 40 (addr -> AND ptr .)
-    RPAREN          reduce using rule 40 (addr -> AND ptr .)
+    STAR            reduce using rule 52 (addr -> AND ptr .)
+    SLASH           reduce using rule 52 (addr -> AND ptr .)
+    PLUS            reduce using rule 52 (addr -> AND ptr .)
+    MINUS           reduce using rule 52 (addr -> AND ptr .)
+    LT              reduce using rule 52 (addr -> AND ptr .)
+    GT              reduce using rule 52 (addr -> AND ptr .)
+    EQUALS          reduce using rule 52 (addr -> AND ptr .)
+    NOT             reduce using rule 52 (addr -> AND ptr .)
+    AND             reduce using rule 52 (addr -> AND ptr .)
+    RPAREN          reduce using rule 52 (addr -> AND ptr .)
+    OR              reduce using rule 52 (addr -> AND ptr .)
+    SEMICOLON       reduce using rule 52 (addr -> AND ptr .)
+    COMMA           reduce using rule 52 (addr -> AND ptr .)
 
 
 state 40
 
-    (33) ptr_expr_base -> ptr .
+    (26) ptr_and_expr -> ptr_eq_expr .
+    (27) ptr_eq_expr -> ptr_eq_expr . EQUALS EQUALS ptr_lt_expr
+    (28) ptr_eq_expr -> ptr_eq_expr . NOT EQUALS ptr_lt_expr
 
-    STAR            reduce using rule 33 (ptr_expr_base -> ptr .)
-    SLASH           reduce using rule 33 (ptr_expr_base -> ptr .)
-    RPAREN          reduce using rule 33 (ptr_expr_base -> ptr .)
-    PLUS            reduce using rule 33 (ptr_expr_base -> ptr .)
-    MINUS           reduce using rule 33 (ptr_expr_base -> ptr .)
-    SEMICOLON       reduce using rule 33 (ptr_expr_base -> ptr .)
+    AND             reduce using rule 26 (ptr_and_expr -> ptr_eq_expr .)
+    RPAREN          reduce using rule 26 (ptr_and_expr -> ptr_eq_expr .)
+    OR              reduce using rule 26 (ptr_and_expr -> ptr_eq_expr .)
+    SEMICOLON       reduce using rule 26 (ptr_and_expr -> ptr_eq_expr .)
+    EQUALS          shift and go to state 59
+    NOT             shift and go to state 58
 
 
 state 41
 
-    (29) ptr_term -> MINUS . ptr_term
-    (29) ptr_term -> . MINUS ptr_term
-    (30) ptr_term -> . ptr_expr_base
-    (31) ptr_expr_base -> . ID
-    (32) ptr_expr_base -> . NUM
-    (33) ptr_expr_base -> . ptr
-    (34) ptr_expr_base -> . addr
-    (35) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
-    (39) addr -> . AND ID
-    (40) addr -> . AND ptr
-    (41) addr -> . AND addr
+    (47) ptr_expr_base -> LPAREN . ptr_expr RPAREN
+    (23) ptr_expr -> . ptr_expr OR ptr_and_expr
+    (24) ptr_expr -> . ptr_and_expr
+    (25) ptr_and_expr -> . ptr_and_expr AND ptr_eq_expr
+    (26) ptr_and_expr -> . ptr_eq_expr
+    (27) ptr_eq_expr -> . ptr_eq_expr EQUALS EQUALS ptr_lt_expr
+    (28) ptr_eq_expr -> . ptr_eq_expr NOT EQUALS ptr_lt_expr
+    (29) ptr_eq_expr -> . ptr_lt_expr
+    (30) ptr_lt_expr -> . ptr_lt_expr LT ptr_add_expr
+    (31) ptr_lt_expr -> . ptr_lt_expr GT ptr_add_expr
+    (32) ptr_lt_expr -> . ptr_lt_expr LT EQUALS ptr_add_expr
+    (33) ptr_lt_expr -> . ptr_lt_expr GT EQUALS ptr_add_expr
+    (34) ptr_lt_expr -> . ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
 
-    MINUS           shift and go to state 41
-    ID              shift and go to state 48
-    NUM             shift and go to state 43
-    LPAREN          shift and go to state 44
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
     STAR            shift and go to state 8
     AND             shift and go to state 23
 
-    addr                           shift and go to state 49
-    ptr_expr_base                  shift and go to state 42
-    ptr                            shift and go to state 40
-    ptr_term                       shift and go to state 54
+    ptr_eq_expr                    shift and go to state 40
+    addr                           shift and go to state 45
+    ptr_and_expr                   shift and go to state 46
+    ptr_add_expr                   shift and go to state 51
+    ptr_lt_expr                    shift and go to state 47
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr_expr                       shift and go to state 60
+    ptr                            shift and go to state 48
 
 state 42
 
-    (30) ptr_term -> ptr_expr_base .
+    (40) ptr_factor -> ptr_term .
 
-    STAR            reduce using rule 30 (ptr_term -> ptr_expr_base .)
-    SLASH           reduce using rule 30 (ptr_term -> ptr_expr_base .)
-    RPAREN          reduce using rule 30 (ptr_term -> ptr_expr_base .)
-    PLUS            reduce using rule 30 (ptr_term -> ptr_expr_base .)
-    MINUS           reduce using rule 30 (ptr_term -> ptr_expr_base .)
-    SEMICOLON       reduce using rule 30 (ptr_term -> ptr_expr_base .)
+    STAR            reduce using rule 40 (ptr_factor -> ptr_term .)
+    SLASH           reduce using rule 40 (ptr_factor -> ptr_term .)
+    PLUS            reduce using rule 40 (ptr_factor -> ptr_term .)
+    MINUS           reduce using rule 40 (ptr_factor -> ptr_term .)
+    LT              reduce using rule 40 (ptr_factor -> ptr_term .)
+    GT              reduce using rule 40 (ptr_factor -> ptr_term .)
+    EQUALS          reduce using rule 40 (ptr_factor -> ptr_term .)
+    NOT             reduce using rule 40 (ptr_factor -> ptr_term .)
+    AND             reduce using rule 40 (ptr_factor -> ptr_term .)
+    RPAREN          reduce using rule 40 (ptr_factor -> ptr_term .)
+    OR              reduce using rule 40 (ptr_factor -> ptr_term .)
+    SEMICOLON       reduce using rule 40 (ptr_factor -> ptr_term .)
 
 
 state 43
 
-    (32) ptr_expr_base -> NUM .
+    (37) ptr_add_expr -> ptr_factor .
+    (38) ptr_factor -> ptr_factor . STAR ptr_term
+    (39) ptr_factor -> ptr_factor . SLASH ptr_term
 
-    STAR            reduce using rule 32 (ptr_expr_base -> NUM .)
-    SLASH           reduce using rule 32 (ptr_expr_base -> NUM .)
-    RPAREN          reduce using rule 32 (ptr_expr_base -> NUM .)
-    PLUS            reduce using rule 32 (ptr_expr_base -> NUM .)
-    MINUS           reduce using rule 32 (ptr_expr_base -> NUM .)
-    SEMICOLON       reduce using rule 32 (ptr_expr_base -> NUM .)
+    PLUS            reduce using rule 37 (ptr_add_expr -> ptr_factor .)
+    MINUS           reduce using rule 37 (ptr_add_expr -> ptr_factor .)
+    LT              reduce using rule 37 (ptr_add_expr -> ptr_factor .)
+    GT              reduce using rule 37 (ptr_add_expr -> ptr_factor .)
+    EQUALS          reduce using rule 37 (ptr_add_expr -> ptr_factor .)
+    NOT             reduce using rule 37 (ptr_add_expr -> ptr_factor .)
+    AND             reduce using rule 37 (ptr_add_expr -> ptr_factor .)
+    RPAREN          reduce using rule 37 (ptr_add_expr -> ptr_factor .)
+    OR              reduce using rule 37 (ptr_add_expr -> ptr_factor .)
+    SEMICOLON       reduce using rule 37 (ptr_add_expr -> ptr_factor .)
+    STAR            shift and go to state 61
+    SLASH           shift and go to state 62
 
 
 state 44
 
-    (35) ptr_expr_base -> LPAREN . ptr_expr RPAREN
-    (23) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (24) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (25) ptr_expr -> . ptr_factor
-    (26) ptr_factor -> . ptr_factor STAR ptr_term
-    (27) ptr_factor -> . ptr_factor SLASH ptr_term
-    (28) ptr_factor -> . ptr_term
-    (29) ptr_term -> . MINUS ptr_term
-    (30) ptr_term -> . ptr_expr_base
-    (31) ptr_expr_base -> . ID
-    (32) ptr_expr_base -> . NUM
-    (33) ptr_expr_base -> . ptr
-    (34) ptr_expr_base -> . addr
-    (35) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
-    (39) addr -> . AND ID
-    (40) addr -> . AND ptr
-    (41) addr -> . AND addr
+    (41) ptr_term -> MINUS . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
 
-    MINUS           shift and go to state 41
-    ID              shift and go to state 48
-    NUM             shift and go to state 43
-    LPAREN          shift and go to state 44
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
     STAR            shift and go to state 8
     AND             shift and go to state 23
 
-    addr                           shift and go to state 49
-    ptr_term                       shift and go to state 46
-    ptr_expr_base                  shift and go to state 42
-    ptr_factor                     shift and go to state 45
-    ptr_expr                       shift and go to state 55
-    ptr                            shift and go to state 40
+    addr                           shift and go to state 45
+    ptr_expr_base                  shift and go to state 49
+    ptr                            shift and go to state 48
+    ptr_term                       shift and go to state 63
 
 state 45
 
-    (25) ptr_expr -> ptr_factor .
-    (26) ptr_factor -> ptr_factor . STAR ptr_term
-    (27) ptr_factor -> ptr_factor . SLASH ptr_term
+    (46) ptr_expr_base -> addr .
 
-    PLUS            reduce using rule 25 (ptr_expr -> ptr_factor .)
-    MINUS           reduce using rule 25 (ptr_expr -> ptr_factor .)
-    SEMICOLON       reduce using rule 25 (ptr_expr -> ptr_factor .)
-    RPAREN          reduce using rule 25 (ptr_expr -> ptr_factor .)
-    STAR            shift and go to state 56
-    SLASH           shift and go to state 57
+    STAR            reduce using rule 46 (ptr_expr_base -> addr .)
+    SLASH           reduce using rule 46 (ptr_expr_base -> addr .)
+    PLUS            reduce using rule 46 (ptr_expr_base -> addr .)
+    MINUS           reduce using rule 46 (ptr_expr_base -> addr .)
+    LT              reduce using rule 46 (ptr_expr_base -> addr .)
+    GT              reduce using rule 46 (ptr_expr_base -> addr .)
+    EQUALS          reduce using rule 46 (ptr_expr_base -> addr .)
+    NOT             reduce using rule 46 (ptr_expr_base -> addr .)
+    AND             reduce using rule 46 (ptr_expr_base -> addr .)
+    RPAREN          reduce using rule 46 (ptr_expr_base -> addr .)
+    OR              reduce using rule 46 (ptr_expr_base -> addr .)
+    SEMICOLON       reduce using rule 46 (ptr_expr_base -> addr .)
 
 
 state 46
 
-    (28) ptr_factor -> ptr_term .
+    (24) ptr_expr -> ptr_and_expr .
+    (25) ptr_and_expr -> ptr_and_expr . AND ptr_eq_expr
 
-    STAR            reduce using rule 28 (ptr_factor -> ptr_term .)
-    SLASH           reduce using rule 28 (ptr_factor -> ptr_term .)
-    RPAREN          reduce using rule 28 (ptr_factor -> ptr_term .)
-    PLUS            reduce using rule 28 (ptr_factor -> ptr_term .)
-    MINUS           reduce using rule 28 (ptr_factor -> ptr_term .)
-    SEMICOLON       reduce using rule 28 (ptr_factor -> ptr_term .)
+    OR              reduce using rule 24 (ptr_expr -> ptr_and_expr .)
+    SEMICOLON       reduce using rule 24 (ptr_expr -> ptr_and_expr .)
+    RPAREN          reduce using rule 24 (ptr_expr -> ptr_and_expr .)
+    AND             shift and go to state 64
 
 
 state 47
 
-    (11) while_stmt -> WHILE LPAREN ptr_expr . RPAREN compound_stmt
-    (23) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (24) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (29) ptr_eq_expr -> ptr_lt_expr .
+    (30) ptr_lt_expr -> ptr_lt_expr . LT ptr_add_expr
+    (31) ptr_lt_expr -> ptr_lt_expr . GT ptr_add_expr
+    (32) ptr_lt_expr -> ptr_lt_expr . LT EQUALS ptr_add_expr
+    (33) ptr_lt_expr -> ptr_lt_expr . GT EQUALS ptr_add_expr
 
-    RPAREN          shift and go to state 58
-    PLUS            shift and go to state 60
-    MINUS           shift and go to state 59
+    EQUALS          reduce using rule 29 (ptr_eq_expr -> ptr_lt_expr .)
+    NOT             reduce using rule 29 (ptr_eq_expr -> ptr_lt_expr .)
+    AND             reduce using rule 29 (ptr_eq_expr -> ptr_lt_expr .)
+    RPAREN          reduce using rule 29 (ptr_eq_expr -> ptr_lt_expr .)
+    OR              reduce using rule 29 (ptr_eq_expr -> ptr_lt_expr .)
+    SEMICOLON       reduce using rule 29 (ptr_eq_expr -> ptr_lt_expr .)
+    LT              shift and go to state 65
+    GT              shift and go to state 66
 
 
 state 48
 
-    (31) ptr_expr_base -> ID .
+    (45) ptr_expr_base -> ptr .
 
-    STAR            reduce using rule 31 (ptr_expr_base -> ID .)
-    SLASH           reduce using rule 31 (ptr_expr_base -> ID .)
-    RPAREN          reduce using rule 31 (ptr_expr_base -> ID .)
-    PLUS            reduce using rule 31 (ptr_expr_base -> ID .)
-    MINUS           reduce using rule 31 (ptr_expr_base -> ID .)
-    SEMICOLON       reduce using rule 31 (ptr_expr_base -> ID .)
+    STAR            reduce using rule 45 (ptr_expr_base -> ptr .)
+    SLASH           reduce using rule 45 (ptr_expr_base -> ptr .)
+    PLUS            reduce using rule 45 (ptr_expr_base -> ptr .)
+    MINUS           reduce using rule 45 (ptr_expr_base -> ptr .)
+    LT              reduce using rule 45 (ptr_expr_base -> ptr .)
+    GT              reduce using rule 45 (ptr_expr_base -> ptr .)
+    EQUALS          reduce using rule 45 (ptr_expr_base -> ptr .)
+    NOT             reduce using rule 45 (ptr_expr_base -> ptr .)
+    AND             reduce using rule 45 (ptr_expr_base -> ptr .)
+    RPAREN          reduce using rule 45 (ptr_expr_base -> ptr .)
+    OR              reduce using rule 45 (ptr_expr_base -> ptr .)
+    SEMICOLON       reduce using rule 45 (ptr_expr_base -> ptr .)
 
 
 state 49
 
-    (34) ptr_expr_base -> addr .
+    (42) ptr_term -> ptr_expr_base .
 
-    STAR            reduce using rule 34 (ptr_expr_base -> addr .)
-    SLASH           reduce using rule 34 (ptr_expr_base -> addr .)
-    RPAREN          reduce using rule 34 (ptr_expr_base -> addr .)
-    PLUS            reduce using rule 34 (ptr_expr_base -> addr .)
-    MINUS           reduce using rule 34 (ptr_expr_base -> addr .)
-    SEMICOLON       reduce using rule 34 (ptr_expr_base -> addr .)
+    STAR            reduce using rule 42 (ptr_term -> ptr_expr_base .)
+    SLASH           reduce using rule 42 (ptr_term -> ptr_expr_base .)
+    PLUS            reduce using rule 42 (ptr_term -> ptr_expr_base .)
+    MINUS           reduce using rule 42 (ptr_term -> ptr_expr_base .)
+    LT              reduce using rule 42 (ptr_term -> ptr_expr_base .)
+    GT              reduce using rule 42 (ptr_term -> ptr_expr_base .)
+    EQUALS          reduce using rule 42 (ptr_term -> ptr_expr_base .)
+    NOT             reduce using rule 42 (ptr_term -> ptr_expr_base .)
+    AND             reduce using rule 42 (ptr_term -> ptr_expr_base .)
+    RPAREN          reduce using rule 42 (ptr_term -> ptr_expr_base .)
+    OR              reduce using rule 42 (ptr_term -> ptr_expr_base .)
+    SEMICOLON       reduce using rule 42 (ptr_term -> ptr_expr_base .)
 
 
 state 50
 
-    (21) ptr_assgn -> ptr EQUALS ptr_expr .
-    (23) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (24) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (44) ptr_expr_base -> NUM .
 
-    SEMICOLON       reduce using rule 21 (ptr_assgn -> ptr EQUALS ptr_expr .)
-    PLUS            shift and go to state 60
-    MINUS           shift and go to state 59
+    STAR            reduce using rule 44 (ptr_expr_base -> NUM .)
+    SLASH           reduce using rule 44 (ptr_expr_base -> NUM .)
+    PLUS            reduce using rule 44 (ptr_expr_base -> NUM .)
+    MINUS           reduce using rule 44 (ptr_expr_base -> NUM .)
+    LT              reduce using rule 44 (ptr_expr_base -> NUM .)
+    GT              reduce using rule 44 (ptr_expr_base -> NUM .)
+    EQUALS          reduce using rule 44 (ptr_expr_base -> NUM .)
+    NOT             reduce using rule 44 (ptr_expr_base -> NUM .)
+    AND             reduce using rule 44 (ptr_expr_base -> NUM .)
+    RPAREN          reduce using rule 44 (ptr_expr_base -> NUM .)
+    OR              reduce using rule 44 (ptr_expr_base -> NUM .)
+    SEMICOLON       reduce using rule 44 (ptr_expr_base -> NUM .)
 
 
 state 51
 
-    (22) num_assgn -> ID EQUALS ptr_expr .
-    (23) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (24) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (34) ptr_lt_expr -> ptr_add_expr .
+    (35) ptr_add_expr -> ptr_add_expr . PLUS ptr_factor
+    (36) ptr_add_expr -> ptr_add_expr . MINUS ptr_factor
 
-    SEMICOLON       reduce using rule 22 (num_assgn -> ID EQUALS ptr_expr .)
-    PLUS            shift and go to state 60
-    MINUS           shift and go to state 59
+    LT              reduce using rule 34 (ptr_lt_expr -> ptr_add_expr .)
+    GT              reduce using rule 34 (ptr_lt_expr -> ptr_add_expr .)
+    EQUALS          reduce using rule 34 (ptr_lt_expr -> ptr_add_expr .)
+    NOT             reduce using rule 34 (ptr_lt_expr -> ptr_add_expr .)
+    AND             reduce using rule 34 (ptr_lt_expr -> ptr_add_expr .)
+    RPAREN          reduce using rule 34 (ptr_lt_expr -> ptr_add_expr .)
+    OR              reduce using rule 34 (ptr_lt_expr -> ptr_add_expr .)
+    SEMICOLON       reduce using rule 34 (ptr_lt_expr -> ptr_add_expr .)
+    PLUS            shift and go to state 67
+    MINUS           shift and go to state 68
 
 
 state 52
 
-    (9) if_stmt -> IF LPAREN ptr_expr . RPAREN compound_stmt
-    (10) if_stmt -> IF LPAREN ptr_expr . RPAREN compound_stmt ELSE compound_stmt
-    (23) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (24) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (11) while_stmt -> WHILE LPAREN ptr_expr . RPAREN compound_stmt
+    (23) ptr_expr -> ptr_expr . OR ptr_and_expr
 
-    RPAREN          shift and go to state 61
-    PLUS            shift and go to state 60
-    MINUS           shift and go to state 59
+    RPAREN          shift and go to state 69
+    OR              shift and go to state 70
 
 
 state 53
 
-    (17) decl_list -> decl_list COMMA . ID
-    (18) decl_list -> decl_list COMMA . ptr
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
+    (43) ptr_expr_base -> ID .
 
-    ID              shift and go to state 63
-    STAR            shift and go to state 8
+    STAR            reduce using rule 43 (ptr_expr_base -> ID .)
+    SLASH           reduce using rule 43 (ptr_expr_base -> ID .)
+    PLUS            reduce using rule 43 (ptr_expr_base -> ID .)
+    MINUS           reduce using rule 43 (ptr_expr_base -> ID .)
+    LT              reduce using rule 43 (ptr_expr_base -> ID .)
+    GT              reduce using rule 43 (ptr_expr_base -> ID .)
+    EQUALS          reduce using rule 43 (ptr_expr_base -> ID .)
+    NOT             reduce using rule 43 (ptr_expr_base -> ID .)
+    AND             reduce using rule 43 (ptr_expr_base -> ID .)
+    RPAREN          reduce using rule 43 (ptr_expr_base -> ID .)
+    OR              reduce using rule 43 (ptr_expr_base -> ID .)
+    SEMICOLON       reduce using rule 43 (ptr_expr_base -> ID .)
 
-    ptr                            shift and go to state 62
 
 state 54
 
-    (29) ptr_term -> MINUS ptr_term .
+    (21) ptr_assgn -> ptr EQUALS ptr_expr .
+    (23) ptr_expr -> ptr_expr . OR ptr_and_expr
 
-    STAR            reduce using rule 29 (ptr_term -> MINUS ptr_term .)
-    SLASH           reduce using rule 29 (ptr_term -> MINUS ptr_term .)
-    RPAREN          reduce using rule 29 (ptr_term -> MINUS ptr_term .)
-    PLUS            reduce using rule 29 (ptr_term -> MINUS ptr_term .)
-    MINUS           reduce using rule 29 (ptr_term -> MINUS ptr_term .)
-    SEMICOLON       reduce using rule 29 (ptr_term -> MINUS ptr_term .)
+    SEMICOLON       reduce using rule 21 (ptr_assgn -> ptr EQUALS ptr_expr .)
+    OR              shift and go to state 70
 
 
 state 55
 
-    (35) ptr_expr_base -> LPAREN ptr_expr . RPAREN
-    (23) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (24) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (22) num_assgn -> ID EQUALS ptr_expr .
+    (23) ptr_expr -> ptr_expr . OR ptr_and_expr
 
-    RPAREN          shift and go to state 64
-    PLUS            shift and go to state 60
-    MINUS           shift and go to state 59
+    SEMICOLON       reduce using rule 22 (num_assgn -> ID EQUALS ptr_expr .)
+    OR              shift and go to state 70
 
 
 state 56
 
-    (26) ptr_factor -> ptr_factor STAR . ptr_term
-    (29) ptr_term -> . MINUS ptr_term
-    (30) ptr_term -> . ptr_expr_base
-    (31) ptr_expr_base -> . ID
-    (32) ptr_expr_base -> . NUM
-    (33) ptr_expr_base -> . ptr
-    (34) ptr_expr_base -> . addr
-    (35) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
-    (39) addr -> . AND ID
-    (40) addr -> . AND ptr
-    (41) addr -> . AND addr
+    (9) if_stmt -> IF LPAREN ptr_expr . RPAREN compound_stmt
+    (10) if_stmt -> IF LPAREN ptr_expr . RPAREN compound_stmt ELSE compound_stmt
+    (23) ptr_expr -> ptr_expr . OR ptr_and_expr
 
-    MINUS           shift and go to state 41
-    ID              shift and go to state 48
-    NUM             shift and go to state 43
-    LPAREN          shift and go to state 44
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    RPAREN          shift and go to state 71
+    OR              shift and go to state 70
 
-    addr                           shift and go to state 49
-    ptr_term                       shift and go to state 65
-    ptr_expr_base                  shift and go to state 42
-    ptr                            shift and go to state 40
 
 state 57
 
-    (27) ptr_factor -> ptr_factor SLASH . ptr_term
-    (29) ptr_term -> . MINUS ptr_term
-    (30) ptr_term -> . ptr_expr_base
-    (31) ptr_expr_base -> . ID
-    (32) ptr_expr_base -> . NUM
-    (33) ptr_expr_base -> . ptr
-    (34) ptr_expr_base -> . addr
-    (35) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
-    (39) addr -> . AND ID
-    (40) addr -> . AND ptr
-    (41) addr -> . AND addr
+    (17) decl_list -> decl_list COMMA . ID
+    (18) decl_list -> decl_list COMMA . ptr
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
 
-    MINUS           shift and go to state 41
-    ID              shift and go to state 48
-    NUM             shift and go to state 43
-    LPAREN          shift and go to state 44
+    ID              shift and go to state 73
+    STAR            shift and go to state 8
+
+    ptr                            shift and go to state 72
+
+state 58
+
+    (28) ptr_eq_expr -> ptr_eq_expr NOT . EQUALS ptr_lt_expr
+
+    EQUALS          shift and go to state 74
+
+
+state 59
+
+    (27) ptr_eq_expr -> ptr_eq_expr EQUALS . EQUALS ptr_lt_expr
+
+    EQUALS          shift and go to state 75
+
+
+state 60
+
+    (47) ptr_expr_base -> LPAREN ptr_expr . RPAREN
+    (23) ptr_expr -> ptr_expr . OR ptr_and_expr
+
+    RPAREN          shift and go to state 76
+    OR              shift and go to state 70
+
+
+state 61
+
+    (38) ptr_factor -> ptr_factor STAR . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
+
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
     STAR            shift and go to state 8
     AND             shift and go to state 23
 
-    addr                           shift and go to state 49
-    ptr_term                       shift and go to state 66
-    ptr_expr_base                  shift and go to state 42
-    ptr                            shift and go to state 40
+    addr                           shift and go to state 45
+    ptr_term                       shift and go to state 77
+    ptr_expr_base                  shift and go to state 49
+    ptr                            shift and go to state 48
 
-state 58
+state 62
+
+    (39) ptr_factor -> ptr_factor SLASH . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
+
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
+    STAR            shift and go to state 8
+    AND             shift and go to state 23
+
+    addr                           shift and go to state 45
+    ptr_term                       shift and go to state 78
+    ptr_expr_base                  shift and go to state 49
+    ptr                            shift and go to state 48
+
+state 63
+
+    (41) ptr_term -> MINUS ptr_term .
+
+    STAR            reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+    SLASH           reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+    PLUS            reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+    MINUS           reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+    LT              reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+    GT              reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+    EQUALS          reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+    NOT             reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+    AND             reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+    RPAREN          reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+    OR              reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+    SEMICOLON       reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+
+
+state 64
+
+    (25) ptr_and_expr -> ptr_and_expr AND . ptr_eq_expr
+    (27) ptr_eq_expr -> . ptr_eq_expr EQUALS EQUALS ptr_lt_expr
+    (28) ptr_eq_expr -> . ptr_eq_expr NOT EQUALS ptr_lt_expr
+    (29) ptr_eq_expr -> . ptr_lt_expr
+    (30) ptr_lt_expr -> . ptr_lt_expr LT ptr_add_expr
+    (31) ptr_lt_expr -> . ptr_lt_expr GT ptr_add_expr
+    (32) ptr_lt_expr -> . ptr_lt_expr LT EQUALS ptr_add_expr
+    (33) ptr_lt_expr -> . ptr_lt_expr GT EQUALS ptr_add_expr
+    (34) ptr_lt_expr -> . ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
+
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
+    STAR            shift and go to state 8
+    AND             shift and go to state 23
+
+    ptr_eq_expr                    shift and go to state 79
+    addr                           shift and go to state 45
+    ptr_add_expr                   shift and go to state 51
+    ptr_lt_expr                    shift and go to state 47
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr                            shift and go to state 48
+
+state 65
+
+    (30) ptr_lt_expr -> ptr_lt_expr LT . ptr_add_expr
+    (32) ptr_lt_expr -> ptr_lt_expr LT . EQUALS ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
+
+    EQUALS          shift and go to state 81
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
+    STAR            shift and go to state 8
+    AND             shift and go to state 23
+
+    addr                           shift and go to state 45
+    ptr_add_expr                   shift and go to state 80
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr                            shift and go to state 48
+
+state 66
+
+    (31) ptr_lt_expr -> ptr_lt_expr GT . ptr_add_expr
+    (33) ptr_lt_expr -> ptr_lt_expr GT . EQUALS ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
+
+    EQUALS          shift and go to state 83
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
+    STAR            shift and go to state 8
+    AND             shift and go to state 23
+
+    addr                           shift and go to state 45
+    ptr_add_expr                   shift and go to state 82
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr                            shift and go to state 48
+
+state 67
+
+    (35) ptr_add_expr -> ptr_add_expr PLUS . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
+
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
+    STAR            shift and go to state 8
+    AND             shift and go to state 23
+
+    addr                           shift and go to state 45
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 84
+    ptr                            shift and go to state 48
+
+state 68
+
+    (36) ptr_add_expr -> ptr_add_expr MINUS . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
+
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
+    STAR            shift and go to state 8
+    AND             shift and go to state 23
+
+    addr                           shift and go to state 45
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 85
+    ptr                            shift and go to state 48
+
+state 69
 
     (11) while_stmt -> WHILE LPAREN ptr_expr RPAREN . compound_stmt
     (12) compound_stmt -> . stmt
@@ -976,11 +1417,11 @@ state 58
     (11) while_stmt -> . WHILE LPAREN ptr_expr RPAREN compound_stmt
     (21) ptr_assgn -> . ptr EQUALS ptr_expr
     (22) num_assgn -> . ID EQUALS ptr_expr
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
 
-    LCURL           shift and go to state 67
+    LCURL           shift and go to state 86
     INT             shift and go to state 19
     IF              shift and go to state 17
     WHILE           shift and go to state 9
@@ -992,78 +1433,62 @@ state 58
     assgn                          shift and go to state 11
     num_assgn                      shift and go to state 14
     ptr_assgn                      shift and go to state 20
-    stmt                           shift and go to state 69
+    stmt                           shift and go to state 88
     ptr                            shift and go to state 10
     while_stmt                     shift and go to state 21
-    compound_stmt                  shift and go to state 68
+    compound_stmt                  shift and go to state 87
 
-state 59
+state 70
 
-    (24) ptr_expr -> ptr_expr MINUS . ptr_factor
-    (26) ptr_factor -> . ptr_factor STAR ptr_term
-    (27) ptr_factor -> . ptr_factor SLASH ptr_term
-    (28) ptr_factor -> . ptr_term
-    (29) ptr_term -> . MINUS ptr_term
-    (30) ptr_term -> . ptr_expr_base
-    (31) ptr_expr_base -> . ID
-    (32) ptr_expr_base -> . NUM
-    (33) ptr_expr_base -> . ptr
-    (34) ptr_expr_base -> . addr
-    (35) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
-    (39) addr -> . AND ID
-    (40) addr -> . AND ptr
-    (41) addr -> . AND addr
+    (23) ptr_expr -> ptr_expr OR . ptr_and_expr
+    (25) ptr_and_expr -> . ptr_and_expr AND ptr_eq_expr
+    (26) ptr_and_expr -> . ptr_eq_expr
+    (27) ptr_eq_expr -> . ptr_eq_expr EQUALS EQUALS ptr_lt_expr
+    (28) ptr_eq_expr -> . ptr_eq_expr NOT EQUALS ptr_lt_expr
+    (29) ptr_eq_expr -> . ptr_lt_expr
+    (30) ptr_lt_expr -> . ptr_lt_expr LT ptr_add_expr
+    (31) ptr_lt_expr -> . ptr_lt_expr GT ptr_add_expr
+    (32) ptr_lt_expr -> . ptr_lt_expr LT EQUALS ptr_add_expr
+    (33) ptr_lt_expr -> . ptr_lt_expr GT EQUALS ptr_add_expr
+    (34) ptr_lt_expr -> . ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
 
-    MINUS           shift and go to state 41
-    ID              shift and go to state 48
-    NUM             shift and go to state 43
-    LPAREN          shift and go to state 44
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
     STAR            shift and go to state 8
     AND             shift and go to state 23
 
-    addr                           shift and go to state 49
-    ptr_term                       shift and go to state 46
-    ptr_expr_base                  shift and go to state 42
-    ptr_factor                     shift and go to state 70
-    ptr                            shift and go to state 40
+    ptr_eq_expr                    shift and go to state 40
+    addr                           shift and go to state 45
+    ptr_and_expr                   shift and go to state 89
+    ptr_add_expr                   shift and go to state 51
+    ptr_lt_expr                    shift and go to state 47
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr                            shift and go to state 48
 
-state 60
-
-    (23) ptr_expr -> ptr_expr PLUS . ptr_factor
-    (26) ptr_factor -> . ptr_factor STAR ptr_term
-    (27) ptr_factor -> . ptr_factor SLASH ptr_term
-    (28) ptr_factor -> . ptr_term
-    (29) ptr_term -> . MINUS ptr_term
-    (30) ptr_term -> . ptr_expr_base
-    (31) ptr_expr_base -> . ID
-    (32) ptr_expr_base -> . NUM
-    (33) ptr_expr_base -> . ptr
-    (34) ptr_expr_base -> . addr
-    (35) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
-    (39) addr -> . AND ID
-    (40) addr -> . AND ptr
-    (41) addr -> . AND addr
-
-    MINUS           shift and go to state 41
-    ID              shift and go to state 48
-    NUM             shift and go to state 43
-    LPAREN          shift and go to state 44
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
-
-    addr                           shift and go to state 49
-    ptr_term                       shift and go to state 46
-    ptr_expr_base                  shift and go to state 42
-    ptr_factor                     shift and go to state 71
-    ptr                            shift and go to state 40
-
-state 61
+state 71
 
     (9) if_stmt -> IF LPAREN ptr_expr RPAREN . compound_stmt
     (10) if_stmt -> IF LPAREN ptr_expr RPAREN . compound_stmt ELSE compound_stmt
@@ -1081,11 +1506,11 @@ state 61
     (11) while_stmt -> . WHILE LPAREN ptr_expr RPAREN compound_stmt
     (21) ptr_assgn -> . ptr EQUALS ptr_expr
     (22) num_assgn -> . ID EQUALS ptr_expr
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
 
-    LCURL           shift and go to state 67
+    LCURL           shift and go to state 86
     INT             shift and go to state 19
     IF              shift and go to state 17
     WHILE           shift and go to state 9
@@ -1097,12 +1522,12 @@ state 61
     assgn                          shift and go to state 11
     num_assgn                      shift and go to state 14
     ptr_assgn                      shift and go to state 20
-    stmt                           shift and go to state 69
+    stmt                           shift and go to state 88
     ptr                            shift and go to state 10
     while_stmt                     shift and go to state 21
-    compound_stmt                  shift and go to state 72
+    compound_stmt                  shift and go to state 90
 
-state 62
+state 72
 
     (18) decl_list -> decl_list COMMA ptr .
 
@@ -1110,7 +1535,7 @@ state 62
     SEMICOLON       reduce using rule 18 (decl_list -> decl_list COMMA ptr .)
 
 
-state 63
+state 73
 
     (17) decl_list -> decl_list COMMA ID .
 
@@ -1118,46 +1543,314 @@ state 63
     SEMICOLON       reduce using rule 17 (decl_list -> decl_list COMMA ID .)
 
 
-state 64
+state 74
 
-    (35) ptr_expr_base -> LPAREN ptr_expr RPAREN .
+    (28) ptr_eq_expr -> ptr_eq_expr NOT EQUALS . ptr_lt_expr
+    (30) ptr_lt_expr -> . ptr_lt_expr LT ptr_add_expr
+    (31) ptr_lt_expr -> . ptr_lt_expr GT ptr_add_expr
+    (32) ptr_lt_expr -> . ptr_lt_expr LT EQUALS ptr_add_expr
+    (33) ptr_lt_expr -> . ptr_lt_expr GT EQUALS ptr_add_expr
+    (34) ptr_lt_expr -> . ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
 
-    STAR            reduce using rule 35 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    SLASH           reduce using rule 35 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    RPAREN          reduce using rule 35 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    PLUS            reduce using rule 35 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    MINUS           reduce using rule 35 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    SEMICOLON       reduce using rule 35 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
+    STAR            shift and go to state 8
+    AND             shift and go to state 23
+
+    addr                           shift and go to state 45
+    ptr_add_expr                   shift and go to state 51
+    ptr_lt_expr                    shift and go to state 91
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr                            shift and go to state 48
+
+state 75
+
+    (27) ptr_eq_expr -> ptr_eq_expr EQUALS EQUALS . ptr_lt_expr
+    (30) ptr_lt_expr -> . ptr_lt_expr LT ptr_add_expr
+    (31) ptr_lt_expr -> . ptr_lt_expr GT ptr_add_expr
+    (32) ptr_lt_expr -> . ptr_lt_expr LT EQUALS ptr_add_expr
+    (33) ptr_lt_expr -> . ptr_lt_expr GT EQUALS ptr_add_expr
+    (34) ptr_lt_expr -> . ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
+
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
+    STAR            shift and go to state 8
+    AND             shift and go to state 23
+
+    addr                           shift and go to state 45
+    ptr_add_expr                   shift and go to state 51
+    ptr_lt_expr                    shift and go to state 92
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr                            shift and go to state 48
+
+state 76
+
+    (47) ptr_expr_base -> LPAREN ptr_expr RPAREN .
+
+    STAR            reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    SLASH           reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    PLUS            reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    MINUS           reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    LT              reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    GT              reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    EQUALS          reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    NOT             reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    AND             reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    RPAREN          reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    OR              reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    SEMICOLON       reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
 
 
-state 65
+state 77
 
-    (26) ptr_factor -> ptr_factor STAR ptr_term .
+    (38) ptr_factor -> ptr_factor STAR ptr_term .
 
-    STAR            reduce using rule 26 (ptr_factor -> ptr_factor STAR ptr_term .)
-    SLASH           reduce using rule 26 (ptr_factor -> ptr_factor STAR ptr_term .)
-    RPAREN          reduce using rule 26 (ptr_factor -> ptr_factor STAR ptr_term .)
-    PLUS            reduce using rule 26 (ptr_factor -> ptr_factor STAR ptr_term .)
-    MINUS           reduce using rule 26 (ptr_factor -> ptr_factor STAR ptr_term .)
-    SEMICOLON       reduce using rule 26 (ptr_factor -> ptr_factor STAR ptr_term .)
-
-
-state 66
-
-    (27) ptr_factor -> ptr_factor SLASH ptr_term .
-
-    STAR            reduce using rule 27 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    SLASH           reduce using rule 27 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    RPAREN          reduce using rule 27 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    PLUS            reduce using rule 27 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    MINUS           reduce using rule 27 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    SEMICOLON       reduce using rule 27 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    STAR            reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
+    SLASH           reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
+    PLUS            reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
+    MINUS           reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
+    LT              reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
+    GT              reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
+    EQUALS          reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
+    NOT             reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
+    AND             reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
+    RPAREN          reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
+    OR              reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
+    SEMICOLON       reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
 
 
-state 67
+state 78
+
+    (39) ptr_factor -> ptr_factor SLASH ptr_term .
+
+    STAR            reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    SLASH           reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    PLUS            reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    MINUS           reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    LT              reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    GT              reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    EQUALS          reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    NOT             reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    AND             reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    RPAREN          reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    OR              reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    SEMICOLON       reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+
+
+state 79
+
+    (25) ptr_and_expr -> ptr_and_expr AND ptr_eq_expr .
+    (27) ptr_eq_expr -> ptr_eq_expr . EQUALS EQUALS ptr_lt_expr
+    (28) ptr_eq_expr -> ptr_eq_expr . NOT EQUALS ptr_lt_expr
+
+    AND             reduce using rule 25 (ptr_and_expr -> ptr_and_expr AND ptr_eq_expr .)
+    RPAREN          reduce using rule 25 (ptr_and_expr -> ptr_and_expr AND ptr_eq_expr .)
+    OR              reduce using rule 25 (ptr_and_expr -> ptr_and_expr AND ptr_eq_expr .)
+    SEMICOLON       reduce using rule 25 (ptr_and_expr -> ptr_and_expr AND ptr_eq_expr .)
+    EQUALS          shift and go to state 59
+    NOT             shift and go to state 58
+
+
+state 80
+
+    (30) ptr_lt_expr -> ptr_lt_expr LT ptr_add_expr .
+    (35) ptr_add_expr -> ptr_add_expr . PLUS ptr_factor
+    (36) ptr_add_expr -> ptr_add_expr . MINUS ptr_factor
+
+    LT              reduce using rule 30 (ptr_lt_expr -> ptr_lt_expr LT ptr_add_expr .)
+    GT              reduce using rule 30 (ptr_lt_expr -> ptr_lt_expr LT ptr_add_expr .)
+    EQUALS          reduce using rule 30 (ptr_lt_expr -> ptr_lt_expr LT ptr_add_expr .)
+    NOT             reduce using rule 30 (ptr_lt_expr -> ptr_lt_expr LT ptr_add_expr .)
+    AND             reduce using rule 30 (ptr_lt_expr -> ptr_lt_expr LT ptr_add_expr .)
+    RPAREN          reduce using rule 30 (ptr_lt_expr -> ptr_lt_expr LT ptr_add_expr .)
+    OR              reduce using rule 30 (ptr_lt_expr -> ptr_lt_expr LT ptr_add_expr .)
+    SEMICOLON       reduce using rule 30 (ptr_lt_expr -> ptr_lt_expr LT ptr_add_expr .)
+    PLUS            shift and go to state 67
+    MINUS           shift and go to state 68
+
+
+state 81
+
+    (32) ptr_lt_expr -> ptr_lt_expr LT EQUALS . ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
+
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
+    STAR            shift and go to state 8
+    AND             shift and go to state 23
+
+    addr                           shift and go to state 45
+    ptr_add_expr                   shift and go to state 93
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr                            shift and go to state 48
+
+state 82
+
+    (31) ptr_lt_expr -> ptr_lt_expr GT ptr_add_expr .
+    (35) ptr_add_expr -> ptr_add_expr . PLUS ptr_factor
+    (36) ptr_add_expr -> ptr_add_expr . MINUS ptr_factor
+
+    LT              reduce using rule 31 (ptr_lt_expr -> ptr_lt_expr GT ptr_add_expr .)
+    GT              reduce using rule 31 (ptr_lt_expr -> ptr_lt_expr GT ptr_add_expr .)
+    EQUALS          reduce using rule 31 (ptr_lt_expr -> ptr_lt_expr GT ptr_add_expr .)
+    NOT             reduce using rule 31 (ptr_lt_expr -> ptr_lt_expr GT ptr_add_expr .)
+    AND             reduce using rule 31 (ptr_lt_expr -> ptr_lt_expr GT ptr_add_expr .)
+    RPAREN          reduce using rule 31 (ptr_lt_expr -> ptr_lt_expr GT ptr_add_expr .)
+    OR              reduce using rule 31 (ptr_lt_expr -> ptr_lt_expr GT ptr_add_expr .)
+    SEMICOLON       reduce using rule 31 (ptr_lt_expr -> ptr_lt_expr GT ptr_add_expr .)
+    PLUS            shift and go to state 67
+    MINUS           shift and go to state 68
+
+
+state 83
+
+    (33) ptr_lt_expr -> ptr_lt_expr GT EQUALS . ptr_add_expr
+    (35) ptr_add_expr -> . ptr_add_expr PLUS ptr_factor
+    (36) ptr_add_expr -> . ptr_add_expr MINUS ptr_factor
+    (37) ptr_add_expr -> . ptr_factor
+    (38) ptr_factor -> . ptr_factor STAR ptr_term
+    (39) ptr_factor -> . ptr_factor SLASH ptr_term
+    (40) ptr_factor -> . ptr_term
+    (41) ptr_term -> . MINUS ptr_term
+    (42) ptr_term -> . ptr_expr_base
+    (43) ptr_expr_base -> . ID
+    (44) ptr_expr_base -> . NUM
+    (45) ptr_expr_base -> . ptr
+    (46) ptr_expr_base -> . addr
+    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
+    (51) addr -> . AND ID
+    (52) addr -> . AND ptr
+    (53) addr -> . AND addr
+
+    MINUS           shift and go to state 44
+    ID              shift and go to state 53
+    NUM             shift and go to state 50
+    LPAREN          shift and go to state 41
+    STAR            shift and go to state 8
+    AND             shift and go to state 23
+
+    addr                           shift and go to state 45
+    ptr_add_expr                   shift and go to state 94
+    ptr_term                       shift and go to state 42
+    ptr_expr_base                  shift and go to state 49
+    ptr_factor                     shift and go to state 43
+    ptr                            shift and go to state 48
+
+state 84
+
+    (35) ptr_add_expr -> ptr_add_expr PLUS ptr_factor .
+    (38) ptr_factor -> ptr_factor . STAR ptr_term
+    (39) ptr_factor -> ptr_factor . SLASH ptr_term
+
+    PLUS            reduce using rule 35 (ptr_add_expr -> ptr_add_expr PLUS ptr_factor .)
+    MINUS           reduce using rule 35 (ptr_add_expr -> ptr_add_expr PLUS ptr_factor .)
+    LT              reduce using rule 35 (ptr_add_expr -> ptr_add_expr PLUS ptr_factor .)
+    GT              reduce using rule 35 (ptr_add_expr -> ptr_add_expr PLUS ptr_factor .)
+    EQUALS          reduce using rule 35 (ptr_add_expr -> ptr_add_expr PLUS ptr_factor .)
+    NOT             reduce using rule 35 (ptr_add_expr -> ptr_add_expr PLUS ptr_factor .)
+    AND             reduce using rule 35 (ptr_add_expr -> ptr_add_expr PLUS ptr_factor .)
+    RPAREN          reduce using rule 35 (ptr_add_expr -> ptr_add_expr PLUS ptr_factor .)
+    OR              reduce using rule 35 (ptr_add_expr -> ptr_add_expr PLUS ptr_factor .)
+    SEMICOLON       reduce using rule 35 (ptr_add_expr -> ptr_add_expr PLUS ptr_factor .)
+    STAR            shift and go to state 61
+    SLASH           shift and go to state 62
+
+
+state 85
+
+    (36) ptr_add_expr -> ptr_add_expr MINUS ptr_factor .
+    (38) ptr_factor -> ptr_factor . STAR ptr_term
+    (39) ptr_factor -> ptr_factor . SLASH ptr_term
+
+    PLUS            reduce using rule 36 (ptr_add_expr -> ptr_add_expr MINUS ptr_factor .)
+    MINUS           reduce using rule 36 (ptr_add_expr -> ptr_add_expr MINUS ptr_factor .)
+    LT              reduce using rule 36 (ptr_add_expr -> ptr_add_expr MINUS ptr_factor .)
+    GT              reduce using rule 36 (ptr_add_expr -> ptr_add_expr MINUS ptr_factor .)
+    EQUALS          reduce using rule 36 (ptr_add_expr -> ptr_add_expr MINUS ptr_factor .)
+    NOT             reduce using rule 36 (ptr_add_expr -> ptr_add_expr MINUS ptr_factor .)
+    AND             reduce using rule 36 (ptr_add_expr -> ptr_add_expr MINUS ptr_factor .)
+    RPAREN          reduce using rule 36 (ptr_add_expr -> ptr_add_expr MINUS ptr_factor .)
+    OR              reduce using rule 36 (ptr_add_expr -> ptr_add_expr MINUS ptr_factor .)
+    SEMICOLON       reduce using rule 36 (ptr_add_expr -> ptr_add_expr MINUS ptr_factor .)
+    STAR            shift and go to state 61
+    SLASH           shift and go to state 62
+
+
+state 86
 
     (13) compound_stmt -> LCURL . body RCURL
-    (3) body -> . stmt body
+    (3) body -> . body stmt
     (4) body -> . stmt
     (5) stmt -> . decl SEMICOLON
     (6) stmt -> . assgn SEMICOLON
@@ -1171,9 +1864,9 @@ state 67
     (11) while_stmt -> . WHILE LPAREN ptr_expr RPAREN compound_stmt
     (21) ptr_assgn -> . ptr EQUALS ptr_expr
     (22) num_assgn -> . ID EQUALS ptr_expr
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
 
     INT             shift and go to state 19
     IF              shift and go to state 17
@@ -1181,7 +1874,7 @@ state 67
     ID              shift and go to state 16
     STAR            shift and go to state 8
 
-    body                           shift and go to state 73
+    body                           shift and go to state 95
     decl                           shift and go to state 7
     if_stmt                        shift and go to state 18
     assgn                          shift and go to state 11
@@ -1191,85 +1884,169 @@ state 67
     ptr                            shift and go to state 10
     while_stmt                     shift and go to state 21
 
-state 68
+state 87
 
     (11) while_stmt -> WHILE LPAREN ptr_expr RPAREN compound_stmt .
 
+    RCURL           reduce using rule 11 (while_stmt -> WHILE LPAREN ptr_expr RPAREN compound_stmt .)
     INT             reduce using rule 11 (while_stmt -> WHILE LPAREN ptr_expr RPAREN compound_stmt .)
     IF              reduce using rule 11 (while_stmt -> WHILE LPAREN ptr_expr RPAREN compound_stmt .)
     WHILE           reduce using rule 11 (while_stmt -> WHILE LPAREN ptr_expr RPAREN compound_stmt .)
     ID              reduce using rule 11 (while_stmt -> WHILE LPAREN ptr_expr RPAREN compound_stmt .)
     STAR            reduce using rule 11 (while_stmt -> WHILE LPAREN ptr_expr RPAREN compound_stmt .)
-    RCURL           reduce using rule 11 (while_stmt -> WHILE LPAREN ptr_expr RPAREN compound_stmt .)
     ELSE            reduce using rule 11 (while_stmt -> WHILE LPAREN ptr_expr RPAREN compound_stmt .)
 
 
-state 69
+state 88
 
     (12) compound_stmt -> stmt .
 
+    RCURL           reduce using rule 12 (compound_stmt -> stmt .)
     INT             reduce using rule 12 (compound_stmt -> stmt .)
     IF              reduce using rule 12 (compound_stmt -> stmt .)
     WHILE           reduce using rule 12 (compound_stmt -> stmt .)
     ID              reduce using rule 12 (compound_stmt -> stmt .)
     STAR            reduce using rule 12 (compound_stmt -> stmt .)
-    RCURL           reduce using rule 12 (compound_stmt -> stmt .)
     ELSE            reduce using rule 12 (compound_stmt -> stmt .)
 
 
-state 70
+state 89
 
-    (24) ptr_expr -> ptr_expr MINUS ptr_factor .
-    (26) ptr_factor -> ptr_factor . STAR ptr_term
-    (27) ptr_factor -> ptr_factor . SLASH ptr_term
+    (23) ptr_expr -> ptr_expr OR ptr_and_expr .
+    (25) ptr_and_expr -> ptr_and_expr . AND ptr_eq_expr
 
-    PLUS            reduce using rule 24 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    MINUS           reduce using rule 24 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    SEMICOLON       reduce using rule 24 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    RPAREN          reduce using rule 24 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    STAR            shift and go to state 56
-    SLASH           shift and go to state 57
+    OR              reduce using rule 23 (ptr_expr -> ptr_expr OR ptr_and_expr .)
+    SEMICOLON       reduce using rule 23 (ptr_expr -> ptr_expr OR ptr_and_expr .)
+    RPAREN          reduce using rule 23 (ptr_expr -> ptr_expr OR ptr_and_expr .)
+    AND             shift and go to state 64
 
 
-state 71
-
-    (23) ptr_expr -> ptr_expr PLUS ptr_factor .
-    (26) ptr_factor -> ptr_factor . STAR ptr_term
-    (27) ptr_factor -> ptr_factor . SLASH ptr_term
-
-    PLUS            reduce using rule 23 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    MINUS           reduce using rule 23 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    SEMICOLON       reduce using rule 23 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    RPAREN          reduce using rule 23 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    STAR            shift and go to state 56
-    SLASH           shift and go to state 57
-
-
-state 72
+state 90
 
     (9) if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .
     (10) if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt . ELSE compound_stmt
 
   ! shift/reduce conflict for ELSE resolved as shift
+    RCURL           reduce using rule 9 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .)
     INT             reduce using rule 9 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .)
     IF              reduce using rule 9 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .)
     WHILE           reduce using rule 9 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .)
     ID              reduce using rule 9 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .)
     STAR            reduce using rule 9 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .)
-    RCURL           reduce using rule 9 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .)
-    ELSE            shift and go to state 74
+    ELSE            shift and go to state 96
 
   ! ELSE            [ reduce using rule 9 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .) ]
 
 
-state 73
+state 91
+
+    (28) ptr_eq_expr -> ptr_eq_expr NOT EQUALS ptr_lt_expr .
+    (30) ptr_lt_expr -> ptr_lt_expr . LT ptr_add_expr
+    (31) ptr_lt_expr -> ptr_lt_expr . GT ptr_add_expr
+    (32) ptr_lt_expr -> ptr_lt_expr . LT EQUALS ptr_add_expr
+    (33) ptr_lt_expr -> ptr_lt_expr . GT EQUALS ptr_add_expr
+
+    EQUALS          reduce using rule 28 (ptr_eq_expr -> ptr_eq_expr NOT EQUALS ptr_lt_expr .)
+    NOT             reduce using rule 28 (ptr_eq_expr -> ptr_eq_expr NOT EQUALS ptr_lt_expr .)
+    AND             reduce using rule 28 (ptr_eq_expr -> ptr_eq_expr NOT EQUALS ptr_lt_expr .)
+    RPAREN          reduce using rule 28 (ptr_eq_expr -> ptr_eq_expr NOT EQUALS ptr_lt_expr .)
+    OR              reduce using rule 28 (ptr_eq_expr -> ptr_eq_expr NOT EQUALS ptr_lt_expr .)
+    SEMICOLON       reduce using rule 28 (ptr_eq_expr -> ptr_eq_expr NOT EQUALS ptr_lt_expr .)
+    LT              shift and go to state 65
+    GT              shift and go to state 66
+
+
+state 92
+
+    (27) ptr_eq_expr -> ptr_eq_expr EQUALS EQUALS ptr_lt_expr .
+    (30) ptr_lt_expr -> ptr_lt_expr . LT ptr_add_expr
+    (31) ptr_lt_expr -> ptr_lt_expr . GT ptr_add_expr
+    (32) ptr_lt_expr -> ptr_lt_expr . LT EQUALS ptr_add_expr
+    (33) ptr_lt_expr -> ptr_lt_expr . GT EQUALS ptr_add_expr
+
+    EQUALS          reduce using rule 27 (ptr_eq_expr -> ptr_eq_expr EQUALS EQUALS ptr_lt_expr .)
+    NOT             reduce using rule 27 (ptr_eq_expr -> ptr_eq_expr EQUALS EQUALS ptr_lt_expr .)
+    AND             reduce using rule 27 (ptr_eq_expr -> ptr_eq_expr EQUALS EQUALS ptr_lt_expr .)
+    RPAREN          reduce using rule 27 (ptr_eq_expr -> ptr_eq_expr EQUALS EQUALS ptr_lt_expr .)
+    OR              reduce using rule 27 (ptr_eq_expr -> ptr_eq_expr EQUALS EQUALS ptr_lt_expr .)
+    SEMICOLON       reduce using rule 27 (ptr_eq_expr -> ptr_eq_expr EQUALS EQUALS ptr_lt_expr .)
+    LT              shift and go to state 65
+    GT              shift and go to state 66
+
+
+state 93
+
+    (32) ptr_lt_expr -> ptr_lt_expr LT EQUALS ptr_add_expr .
+    (35) ptr_add_expr -> ptr_add_expr . PLUS ptr_factor
+    (36) ptr_add_expr -> ptr_add_expr . MINUS ptr_factor
+
+    LT              reduce using rule 32 (ptr_lt_expr -> ptr_lt_expr LT EQUALS ptr_add_expr .)
+    GT              reduce using rule 32 (ptr_lt_expr -> ptr_lt_expr LT EQUALS ptr_add_expr .)
+    EQUALS          reduce using rule 32 (ptr_lt_expr -> ptr_lt_expr LT EQUALS ptr_add_expr .)
+    NOT             reduce using rule 32 (ptr_lt_expr -> ptr_lt_expr LT EQUALS ptr_add_expr .)
+    AND             reduce using rule 32 (ptr_lt_expr -> ptr_lt_expr LT EQUALS ptr_add_expr .)
+    RPAREN          reduce using rule 32 (ptr_lt_expr -> ptr_lt_expr LT EQUALS ptr_add_expr .)
+    OR              reduce using rule 32 (ptr_lt_expr -> ptr_lt_expr LT EQUALS ptr_add_expr .)
+    SEMICOLON       reduce using rule 32 (ptr_lt_expr -> ptr_lt_expr LT EQUALS ptr_add_expr .)
+    PLUS            shift and go to state 67
+    MINUS           shift and go to state 68
+
+
+state 94
+
+    (33) ptr_lt_expr -> ptr_lt_expr GT EQUALS ptr_add_expr .
+    (35) ptr_add_expr -> ptr_add_expr . PLUS ptr_factor
+    (36) ptr_add_expr -> ptr_add_expr . MINUS ptr_factor
+
+    LT              reduce using rule 33 (ptr_lt_expr -> ptr_lt_expr GT EQUALS ptr_add_expr .)
+    GT              reduce using rule 33 (ptr_lt_expr -> ptr_lt_expr GT EQUALS ptr_add_expr .)
+    EQUALS          reduce using rule 33 (ptr_lt_expr -> ptr_lt_expr GT EQUALS ptr_add_expr .)
+    NOT             reduce using rule 33 (ptr_lt_expr -> ptr_lt_expr GT EQUALS ptr_add_expr .)
+    AND             reduce using rule 33 (ptr_lt_expr -> ptr_lt_expr GT EQUALS ptr_add_expr .)
+    RPAREN          reduce using rule 33 (ptr_lt_expr -> ptr_lt_expr GT EQUALS ptr_add_expr .)
+    OR              reduce using rule 33 (ptr_lt_expr -> ptr_lt_expr GT EQUALS ptr_add_expr .)
+    SEMICOLON       reduce using rule 33 (ptr_lt_expr -> ptr_lt_expr GT EQUALS ptr_add_expr .)
+    PLUS            shift and go to state 67
+    MINUS           shift and go to state 68
+
+
+state 95
 
     (13) compound_stmt -> LCURL body . RCURL
+    (3) body -> body . stmt
+    (5) stmt -> . decl SEMICOLON
+    (6) stmt -> . assgn SEMICOLON
+    (7) stmt -> . if_stmt
+    (8) stmt -> . while_stmt
+    (16) decl -> . INT decl_list
+    (14) assgn -> . ptr_assgn
+    (15) assgn -> . num_assgn
+    (9) if_stmt -> . IF LPAREN ptr_expr RPAREN compound_stmt
+    (10) if_stmt -> . IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt
+    (11) while_stmt -> . WHILE LPAREN ptr_expr RPAREN compound_stmt
+    (21) ptr_assgn -> . ptr EQUALS ptr_expr
+    (22) num_assgn -> . ID EQUALS ptr_expr
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
 
-    RCURL           shift and go to state 75
+    RCURL           shift and go to state 97
+    INT             shift and go to state 19
+    IF              shift and go to state 17
+    WHILE           shift and go to state 9
+    ID              shift and go to state 16
+    STAR            shift and go to state 8
 
+    decl                           shift and go to state 7
+    if_stmt                        shift and go to state 18
+    assgn                          shift and go to state 11
+    num_assgn                      shift and go to state 14
+    ptr_assgn                      shift and go to state 20
+    stmt                           shift and go to state 31
+    ptr                            shift and go to state 10
+    while_stmt                     shift and go to state 21
 
-state 74
+state 96
 
     (10) if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE . compound_stmt
     (12) compound_stmt -> . stmt
@@ -1286,11 +2063,11 @@ state 74
     (11) while_stmt -> . WHILE LPAREN ptr_expr RPAREN compound_stmt
     (21) ptr_assgn -> . ptr EQUALS ptr_expr
     (22) num_assgn -> . ID EQUALS ptr_expr
-    (36) ptr -> . STAR ptr
-    (37) ptr -> . STAR ID
-    (38) ptr -> . STAR addr
+    (48) ptr -> . STAR ptr
+    (49) ptr -> . STAR ID
+    (50) ptr -> . STAR addr
 
-    LCURL           shift and go to state 67
+    LCURL           shift and go to state 86
     INT             shift and go to state 19
     IF              shift and go to state 17
     WHILE           shift and go to state 9
@@ -1302,37 +2079,37 @@ state 74
     assgn                          shift and go to state 11
     num_assgn                      shift and go to state 14
     ptr_assgn                      shift and go to state 20
-    stmt                           shift and go to state 69
+    stmt                           shift and go to state 88
     ptr                            shift and go to state 10
     while_stmt                     shift and go to state 21
-    compound_stmt                  shift and go to state 76
+    compound_stmt                  shift and go to state 98
 
-state 75
+state 97
 
     (13) compound_stmt -> LCURL body RCURL .
 
+    RCURL           reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
     INT             reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
     IF              reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
     WHILE           reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
     ID              reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
     STAR            reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
-    RCURL           reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
     ELSE            reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
 
 
-state 76
+state 98
 
     (10) if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt .
 
+    RCURL           reduce using rule 10 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt .)
     INT             reduce using rule 10 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt .)
     IF              reduce using rule 10 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt .)
     WHILE           reduce using rule 10 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt .)
     ID              reduce using rule 10 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt .)
     STAR            reduce using rule 10 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt .)
-    RCURL           reduce using rule 10 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt .)
     ELSE            reduce using rule 10 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt .)
 
 WARNING: 
 WARNING: Conflicts:
 WARNING: 
-WARNING: shift/reduce conflict for ELSE in state 72 resolved as shift
+WARNING: shift/reduce conflict for ELSE in state 90 resolved as shift
