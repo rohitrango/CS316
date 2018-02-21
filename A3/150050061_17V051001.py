@@ -12,6 +12,8 @@ tokens = ['ID', 'STAR', 'AND', 'NUM', 'LPAREN', 'RPAREN', 'COMMA', 'LCURL', 'RCU
 			'INT', 'VOID', 'MAIN',
 			# Symbols 
 			'PLUS', 'MINUS', 'SLASH',
+			# For A3
+			'IF', 'ELSE', 'WHILE',
 		 ]
 
 t_ID = r'[a-zA-Z][a-zA-Z0-9]*'
@@ -37,7 +39,20 @@ stat_num = 0
 
 # Variables for A2
 ast_list = []
+cfg_ast = []
 
+
+def t_IF(t):
+	r'if'
+	return t
+
+def t_ELSE(t):
+	r'else'
+	return t
+
+def t_WHILE(t):
+	r'while'
+	return t
 
 def t_NUM(t):
 	r'[0-9]+'
@@ -81,7 +96,7 @@ Data Structure for Abstract Syntax Tree
 
 class AbstractSyntaxTreeNode():
 
-	def __init__(self, operator, name=None, operands=[]):
+	def __init__(self, operator, operands=[], name=None):
 		self.operator = operator
 		self.name = name
 		self.operands = operands
@@ -122,41 +137,80 @@ def p_def_prog(p):
 	''' prog : VOID MAIN LPAREN RPAREN LCURL body RCURL
 			 | VOID MAIN LPAREN RPAREN LCURL RCURL
 	'''
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+	if len(p) == 7:
+		p[0] = AbstractSyntaxTreeNode("PROG", [])
+	else:
+		p[0] = AbstractSyntaxTreeNode("PROG", [p[6]])
 
 
 def p_def_body(p):
 	''' body : stmt body
 			 | stmt
 	'''
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+	if len(p) == 2:
+		p[0] = AbstractSyntaxTreeNode("BODY", [p[1]])
+	else:
+		p[0] = p[2]
+		p[0].addChild(p[1])
 
 
 def p_def_stmt(p):
 	''' stmt : decl SEMICOLON 
-			 | assgn_list SEMICOLON
+			 | assgn SEMICOLON
+			 | if_stmt 
+			 | while_stmt
 	'''
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+	p[0] = p[1]
 
 
-def p_def_assgn_list(p):
-	''' assgn_list : assgn_list COMMA assgn 
-			  | assgn 
+# Adding for A3 -> if and while
+#############################################################
+
+def p_def_if_stmt(p):
 	'''
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+		if_stmt : IF LPAREN ptr_expr RPAREN compound_stmt
+				| IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt
+	'''
+	# Only an if-stmt
+	if len(p) == 6:
+		p[0] = AbstractSyntaxTreeNode("IF", [p[3], p[5]])
+	else:
+		p[0] = AbstractSyntaxTreeNode("IF", [p[3], p[5], p[7]])
+	cfg_ast.append(p[0])
 
+
+def p_def_while_stmt(p):
+	'''
+		while_stmt : WHILE LPAREN ptr_expr RPAREN compound_stmt
+	'''
+	p[0] = AbstractSyntaxTreeNode("WHILE", [p[3], p[5]])
+	cfg_ast.append(p[0])
+
+def p_def_compound_stmt(p):
+	'''
+		compound_stmt : stmt
+					  | LCURL body RCURL
+	'''
+	if len(p) == 2:
+		p[0] = p[1]
+	else:
+		p[0] = p[2]
+
+
+#############################################################
 
 def p_def_assgn(p):
 	''' assgn : ptr_assgn
 	 		  | num_assgn
 	'''
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+	p[0] = p[1]
 
 
 def p_def_decl(p):
 	''' decl : INT decl_list
 	'''
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+	p[0] = AbstractSyntaxTreeNode("DECL", [p[1]])
+
 
 
 def p_def_decl_list(p):
@@ -165,12 +219,17 @@ def p_def_decl_list(p):
 				 | ID
 				 | ptr
 	'''
-	p[0] = dict([(i, v) for i, v in enumerate(p[1:])])
+	if len(p) == 2:
+		p[0] = AbstractSyntaxTreeNode("DECL_LIST", [p[1]])
+	else:
+		p[0] = p[1]
+		p[0].addChild(p[3])
+
 
 def p_def_ptr_assgn(p):
 	''' ptr_assgn : ptr EQUALS ptr_expr '''
 
-	p[0] = AbstractSyntaxTreeNode("ASGN", None, [p[1], p[3]])
+	p[0] = AbstractSyntaxTreeNode("ASGN", [p[1], p[3]])
 	ast_list.append(p[0])
 
 def p_def_num_assgn(p):
@@ -180,10 +239,10 @@ def p_def_num_assgn(p):
 	if p[3].isConst():
 		print("Syntax error: Static assignments to constants not allowed, line no. {0}".format(p.lineno(1)))
 		raise Exception
-	p[1] = AbstractSyntaxTreeNode("VAR", p[1])
+	p[1] = AbstractSyntaxTreeNode("VAR", [], p[1])
 	# if isinstance(p[3], str):
 	# 	p[3] = AbstractSyntaxTreeNode("VAR", p[3])
-	p[0] = AbstractSyntaxTreeNode("ASGN", None, [p[1], p[3]])
+	p[0] = AbstractSyntaxTreeNode("ASGN", [p[1], p[3]])
 	ast_list.append(p[0])
 
 
@@ -200,7 +259,7 @@ def p_def_ptr_expr(p):
 			s = "PLUS"
 		else:
 			s = "MINUS"
-		p[0] = AbstractSyntaxTreeNode(s, None, [p[1], p[3]])
+		p[0] = AbstractSyntaxTreeNode(s, [p[1], p[3]])
 
 
 def p_def_ptr_factor(p):
@@ -216,7 +275,7 @@ def p_def_ptr_factor(p):
 			s = "MUL"
 		else:
 			s = "DIV"
-		p[0] = AbstractSyntaxTreeNode(s, None, [p[1], p[3]])
+		p[0] = AbstractSyntaxTreeNode(s, [p[1], p[3]])
 
 
 def p_def_ptr_term(p):
@@ -226,7 +285,7 @@ def p_def_ptr_term(p):
 	if len(p) == 2:
 		p[0] = p[1]
 	else:
-		p[0] = AbstractSyntaxTreeNode("UMINUS", None, [p[2]])
+		p[0] = AbstractSyntaxTreeNode("UMINUS", [p[2]])
 
 
 def p_def_ptr_expr_base(p):
@@ -238,9 +297,9 @@ def p_def_ptr_expr_base(p):
 	'''
 	if len(p) == 2:
 		if isinstance(p[1], str):
-			p[1] = AbstractSyntaxTreeNode("VAR", p[1])
+			p[1] = AbstractSyntaxTreeNode("VAR", [], p[1])
 		elif isinstance(p[1], int):
-			p[1] = AbstractSyntaxTreeNode("CONST", str(p[1]))
+			p[1] = AbstractSyntaxTreeNode("CONST", [], str(p[1]))
 
 		p[0] = p[1]
 
@@ -255,9 +314,9 @@ def p_def_ptr(p):
 			 | STAR addr
 	'''
 	if isinstance(p[2], str):
-		p[2] = AbstractSyntaxTreeNode("VAR", p[2])
+		p[2] = AbstractSyntaxTreeNode("VAR", [], p[2])
 
-	p[0] = AbstractSyntaxTreeNode("DEREF", None, [p[2]])
+	p[0] = AbstractSyntaxTreeNode("DEREF", [p[2]])
 
 
 def p_def_addr(p):
@@ -266,9 +325,9 @@ def p_def_addr(p):
 			 | AND addr
 	'''
 	if isinstance(p[2], str):
-		p[2] = AbstractSyntaxTreeNode("VAR", p[2])
+		p[2] = AbstractSyntaxTreeNode("VAR", [],  p[2])
 
-	p[0] = AbstractSyntaxTreeNode("ADDR", None, [p[2]])
+	p[0] = AbstractSyntaxTreeNode("ADDR", [p[2]])
 
 
 
@@ -300,8 +359,11 @@ if __name__ == "__main__":
 	except Exception:
 		pass
 
-	output_file = 'Parser_ast_' + filename + '.txt'	
-	with open(output_file, 'w+') as file:
-		for l in ast_list:
-			file.write(repr(l) + "\n")
-			file.write("\n")
+	for l in cfg_ast:
+		print(l)
+		print("\n")
+	# output_file = 'Parser_ast_' + filename + '.txt'	
+	# with open(output_file, 'w+') as file:
+	# 	for l in ast_list:
+	# 		file.write(repr(l) + "\n")
+	# 		file.write("\n")
