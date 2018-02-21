@@ -122,6 +122,10 @@ Parser
 '''
 
 precedence = (
+
+	('left', 'THEN'),
+	('left', 'ELSE'),
+
 	('left', 'PLUS', 'MINUS'),
 	('left', 'STAR', 'SLASH'),
 	('right', 'UMINUS'),
@@ -164,7 +168,7 @@ def p_def_stmt(p):
 
 def p_def_if_stmt(p):
 	'''
-		if_stmt : IF LPAREN ptr_expr RPAREN compound_stmt
+		if_stmt : IF LPAREN ptr_expr RPAREN compound_stmt 				%prec THEN
 				| IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt
 	'''
 	# Only an if-stmt

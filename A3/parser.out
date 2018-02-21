@@ -1926,7 +1926,6 @@ state 90
     (9) if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .
     (10) if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt . ELSE compound_stmt
 
-  ! shift/reduce conflict for ELSE resolved as shift
     RCURL           reduce using rule 9 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .)
     INT             reduce using rule 9 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .)
     IF              reduce using rule 9 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt .)
@@ -2109,7 +2108,3 @@ state 98
     STAR            reduce using rule 10 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt .)
     ELSE            reduce using rule 10 (if_stmt -> IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt .)
 
-WARNING: 
-WARNING: Conflicts:
-WARNING: 
-WARNING: shift/reduce conflict for ELSE in state 90 resolved as shift
