@@ -1,4 +1,0 @@
-
-<bb 0>
-if(*f<*g)goto End
-Else goto End
