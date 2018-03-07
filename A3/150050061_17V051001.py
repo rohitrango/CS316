@@ -91,7 +91,7 @@ Data Structure for Abstract Syntax Tree
 -----------------------------------------------------------------------
 '''
 
-class AbstractSyntaxTreeNode():
+class AbstractSyntaxTreeNode(object):
 
 	def __init__(self, operator, operands=[], name=None):
 		self.operator = operator
@@ -115,6 +115,19 @@ class AbstractSyntaxTreeNode():
 			return self.operator == "CONST"
 		else:
 			return all(x.isConst() for x in self.operands)
+
+
+
+# This is for body statements since they are printed differently in the reference implementation
+class AbstractBodyTreeNode(AbstractSyntaxTreeNode):
+	def __init__(self, operator, operands=[], name=None):
+		super(AbstractBodyTreeNode, self).__init__(operator, operands, name)
+
+	def __repr__(self, depth=0):
+		res = ""
+		for child in self.operands:
+			res += child.__repr__(depth=depth)+"\n"
+		return res
 
 '''
 -----------------------------------------------------------------------
@@ -149,7 +162,7 @@ def p_def_body(p):
 			 | stmt
 	'''
 	if len(p) == 2:
-		p[0] = AbstractSyntaxTreeNode("BODY", [p[1]])
+		p[0] = AbstractBodyTreeNode("BODY", [p[1]])
 	else:
 		p[0] = p[1]
 		p[0].addChild(p[2])
