@@ -2,2080 +2,2077 @@ Created by PLY version 3.10 (http://www.dabeaz.com/ply)
 
 Grammar
 
-Rule 0     S' -> prog
-Rule 1     prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL
-Rule 2     prog -> VOID MAIN LPAREN RPAREN LCURL RCURL
-Rule 3     body -> body stmt
-Rule 4     body -> stmt
-Rule 5     stmt -> decl SEMICOLON
-Rule 6     stmt -> assgn SEMICOLON
-Rule 7     stmt -> if_stmt
-Rule 8     stmt -> while_stmt
-Rule 9     if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt
-Rule 10    if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt
-Rule 11    while_stmt -> WHILE LPAREN bool_expr RPAREN compound_stmt
-Rule 12    compound_stmt -> stmt
-Rule 13    compound_stmt -> LCURL body RCURL
-Rule 14    assgn -> ptr_assgn
-Rule 15    assgn -> num_assgn
-Rule 16    decl -> INT decl_list
-Rule 17    decl_list -> decl_list COMMA ID
-Rule 18    decl_list -> decl_list COMMA ptr
-Rule 19    decl_list -> ID
-Rule 20    decl_list -> ptr
-Rule 21    ptr_assgn -> ptr EQUALS ptr_expr
-Rule 22    num_assgn -> ID EQUALS ptr_expr
-Rule 23    bool_expr -> bool_expr OR OR a_bool_expr
-Rule 24    bool_expr -> a_bool_expr
-Rule 25    a_bool_expr -> a_bool_expr AND AND n_bool_expr
-Rule 26    a_bool_expr -> n_bool_expr
-Rule 27    n_bool_expr -> NOT n_bool_expr
-Rule 28    n_bool_expr -> sub_bool_expr
-Rule 29    sub_bool_expr -> ptr_expr GT ptr_expr
-Rule 30    sub_bool_expr -> ptr_expr GT EQUALS ptr_expr
-Rule 31    sub_bool_expr -> ptr_expr LT ptr_expr
-Rule 32    sub_bool_expr -> ptr_expr LT EQUALS ptr_expr
-Rule 33    sub_bool_expr -> ptr_expr EQUALS EQUALS ptr_expr
-Rule 34    sub_bool_expr -> ptr_expr NOT EQUALS ptr_expr
-Rule 35    ptr_expr -> ptr_expr PLUS ptr_factor
-Rule 36    ptr_expr -> ptr_expr MINUS ptr_factor
-Rule 37    ptr_expr -> ptr_factor
-Rule 38    ptr_factor -> ptr_factor STAR ptr_term
-Rule 39    ptr_factor -> ptr_factor SLASH ptr_term
-Rule 40    ptr_factor -> ptr_term
-Rule 41    ptr_term -> MINUS ptr_term
-Rule 42    ptr_term -> ptr_expr_base
-Rule 43    ptr_expr_base -> ID
-Rule 44    ptr_expr_base -> NUM
-Rule 45    ptr_expr_base -> ptr
-Rule 46    ptr_expr_base -> addr
-Rule 47    ptr_expr_base -> LPAREN ptr_expr RPAREN
-Rule 48    ptr -> STAR ptr
-Rule 49    ptr -> STAR ID
-Rule 50    ptr -> STAR addr
-Rule 51    addr -> AND ID
-Rule 52    addr -> AND ptr
-Rule 53    addr -> AND addr
+Rule 0     S' -> program
+Rule 1     empty -> <empty>
+Rule 2     program -> main_proc
+Rule 3     main_proc -> VOID MAIN LPAREN RPAREN { variable_declaration_list statement_list }
+Rule 4     statement_list -> statement_list statement
+Rule 5     statement_list -> empty
+Rule 6     statement -> ctrlflow
+Rule 7     statement -> assignment_statement
+Rule 8     ctrlflow -> IF LPAREN condition RPAREN statement_block
+Rule 9     ctrlflow -> WHILE LPAREN condition RPAREN statement_block
+Rule 10    ctrlflow -> IF LPAREN condition RPAREN statement_block ELSE statement_block
+Rule 11    statement_block -> { statement_list }
+Rule 12    statement_block -> ;
+Rule 13    statement_block -> statement
+Rule 14    condition -> LPAREN condition RPAREN
+Rule 15    condition -> expression LESSTHEN expression
+Rule 16    condition -> expression GREATTHEN expression
+Rule 17    condition -> expression LESSTHENE expression
+Rule 18    condition -> expression GREATTHENE expression
+Rule 19    condition -> expression ISEQL expression
+Rule 20    condition -> expression ISNEQL expression
+Rule 21    condition -> condition LAND condition
+Rule 22    condition -> condition LOR condition
+Rule 23    condition -> LNOT condition
+Rule 24    variable_declaration_list -> empty
+Rule 25    variable_declaration_list -> variable_declaration variable_declaration_list
+Rule 26    variable_declaration -> INT var_list ;
+Rule 27    var_list -> var_list , variable_dec
+Rule 28    var_list -> var_list , ptr_var
+Rule 29    var_list -> variable_dec
+Rule 30    var_list -> ptr_var
+Rule 31    ptr_var -> TIMES ptr_var
+Rule 32    ptr_var -> TIMES variable_dec
+Rule 33    assignment_statement -> lvalue EQUAL expression ;
+Rule 34    expression -> expression PLUS expression
+Rule 35    expression -> expression TIMES expression
+Rule 36    expression -> expression MINUS expression
+Rule 37    expression -> expression DIVIDE expression
+Rule 38    expression -> ptr_expr
+Rule 39    expression -> addr_expr
+Rule 40    expression -> variable
+Rule 41    expression -> LPAREN expression RPAREN
+Rule 42    expression -> MINUS expression
+Rule 43    expression -> NUMBER
+Rule 44    ptr_expr -> TIMES variable
+Rule 45    ptr_expr -> TIMES ptr_expr
+Rule 46    ptr_expr -> TIMES addr_expr
+Rule 47    addr_expr -> ADDR variable
+Rule 48    addr_expr -> ADDR ptr_expr
+Rule 49    lvalue -> variable
+Rule 50    lvalue -> ptr_expr
+Rule 51    variable -> NAME
+Rule 52    variable_dec -> NAME
 
 Terminals, with rules where they appear
 
-AND                  : 25 25 51 52 53
-COMMA                : 17 18
+,                    : 27 28
+;                    : 12 26 33
+ADDR                 : 47 48
+DIVIDE               : 37
 ELSE                 : 10
-EQUALS               : 21 22 30 32 33 33 34
-GT                   : 29 30
-ID                   : 17 19 22 43 49 51
-IF                   : 9 10
-INT                  : 16
-LCURL                : 1 2 13
-LPAREN               : 1 2 9 10 11 47
-LT                   : 31 32
-MAIN                 : 1 2
-MINUS                : 36 41
-NOT                  : 27 34
-NUM                  : 44
-OR                   : 23 23
-PLUS                 : 35
-RCURL                : 1 2 13
-RPAREN               : 1 2 9 10 11 47
-SEMICOLON            : 5 6
-SLASH                : 39
-STAR                 : 38 48 49 50
-VOID                 : 1 2
-WHILE                : 11
+EQUAL                : 33
+GREATTHEN            : 16
+GREATTHENE           : 18
+IF                   : 8 10
+INT                  : 26
+ISEQL                : 19
+ISNEQL               : 20
+LAND                 : 21
+LESSTHEN             : 15
+LESSTHENE            : 17
+LNOT                 : 23
+LOR                  : 22
+LPAREN               : 3 8 9 10 14 41
+MAIN                 : 3
+MINUS                : 36 42
+NAME                 : 51 52
+NUMBER               : 43
+PLUS                 : 34
+RPAREN               : 3 8 9 10 14 41
+TIMES                : 31 32 35 44 45 46
+VOID                 : 3
+WHILE                : 9
 error                : 
+{                    : 3 11
+}                    : 3 11
 
 Nonterminals, with rules where they appear
 
-a_bool_expr          : 23 24 25
-addr                 : 46 50 53
-assgn                : 6
-body                 : 1 3 13
-bool_expr            : 9 10 11 23
-compound_stmt        : 9 10 10 11
-decl                 : 5
-decl_list            : 16 17 18
-if_stmt              : 7
-n_bool_expr          : 25 26 27
-num_assgn            : 15
-prog                 : 0
-ptr                  : 18 20 21 45 48 52
-ptr_assgn            : 14
-ptr_expr             : 21 22 29 29 30 30 31 31 32 32 33 33 34 34 35 36 47
-ptr_expr_base        : 42
-ptr_factor           : 35 36 37 38 39
-ptr_term             : 38 39 40 41
-stmt                 : 3 4 12
-sub_bool_expr        : 28
-while_stmt           : 8
+addr_expr            : 39 46
+assignment_statement : 7
+condition            : 8 9 10 14 21 21 22 22 23
+ctrlflow             : 6
+empty                : 5 24
+expression           : 15 15 16 16 17 17 18 18 19 19 20 20 33 34 34 35 35 36 36 37 37 41 42
+lvalue               : 33
+main_proc            : 2
+program              : 0
+ptr_expr             : 38 45 48 50
+ptr_var              : 28 30 31
+statement            : 4 13
+statement_block      : 8 9 10 10
+statement_list       : 3 4 11
+var_list             : 26 27 28
+variable             : 40 44 47 49
+variable_dec         : 27 29 32
+variable_declaration : 25
+variable_declaration_list : 3 25
 
 Parsing method: LALR
 
 state 0
 
-    (0) S' -> . prog
-    (1) prog -> . VOID MAIN LPAREN RPAREN LCURL body RCURL
-    (2) prog -> . VOID MAIN LPAREN RPAREN LCURL RCURL
+    (0) S' -> . program
+    (2) program -> . main_proc
+    (3) main_proc -> . VOID MAIN LPAREN RPAREN { variable_declaration_list statement_list }
 
-    VOID            shift and go to state 1
+    VOID            shift and go to state 3
 
-    prog                           shift and go to state 2
+    program                        shift and go to state 1
+    main_proc                      shift and go to state 2
 
 state 1
 
-    (1) prog -> VOID . MAIN LPAREN RPAREN LCURL body RCURL
-    (2) prog -> VOID . MAIN LPAREN RPAREN LCURL RCURL
+    (0) S' -> program .
 
-    MAIN            shift and go to state 3
 
 
 state 2
 
-    (0) S' -> prog .
+    (2) program -> main_proc .
 
+    $end            reduce using rule 2 (program -> main_proc .)
 
 
 state 3
 
-    (1) prog -> VOID MAIN . LPAREN RPAREN LCURL body RCURL
-    (2) prog -> VOID MAIN . LPAREN RPAREN LCURL RCURL
+    (3) main_proc -> VOID . MAIN LPAREN RPAREN { variable_declaration_list statement_list }
 
-    LPAREN          shift and go to state 4
+    MAIN            shift and go to state 4
 
 
 state 4
 
-    (1) prog -> VOID MAIN LPAREN . RPAREN LCURL body RCURL
-    (2) prog -> VOID MAIN LPAREN . RPAREN LCURL RCURL
+    (3) main_proc -> VOID MAIN . LPAREN RPAREN { variable_declaration_list statement_list }
 
-    RPAREN          shift and go to state 5
+    LPAREN          shift and go to state 5
 
 
 state 5
 
-    (1) prog -> VOID MAIN LPAREN RPAREN . LCURL body RCURL
-    (2) prog -> VOID MAIN LPAREN RPAREN . LCURL RCURL
+    (3) main_proc -> VOID MAIN LPAREN . RPAREN { variable_declaration_list statement_list }
 
-    LCURL           shift and go to state 6
+    RPAREN          shift and go to state 6
 
 
 state 6
 
-    (1) prog -> VOID MAIN LPAREN RPAREN LCURL . body RCURL
-    (2) prog -> VOID MAIN LPAREN RPAREN LCURL . RCURL
-    (3) body -> . body stmt
-    (4) body -> . stmt
-    (5) stmt -> . decl SEMICOLON
-    (6) stmt -> . assgn SEMICOLON
-    (7) stmt -> . if_stmt
-    (8) stmt -> . while_stmt
-    (16) decl -> . INT decl_list
-    (14) assgn -> . ptr_assgn
-    (15) assgn -> . num_assgn
-    (9) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt
-    (10) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt
-    (11) while_stmt -> . WHILE LPAREN bool_expr RPAREN compound_stmt
-    (21) ptr_assgn -> . ptr EQUALS ptr_expr
-    (22) num_assgn -> . ID EQUALS ptr_expr
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
+    (3) main_proc -> VOID MAIN LPAREN RPAREN . { variable_declaration_list statement_list }
 
-    RCURL           shift and go to state 12
-    INT             shift and go to state 19
-    IF              shift and go to state 17
-    WHILE           shift and go to state 9
-    ID              shift and go to state 16
-    STAR            shift and go to state 8
+    {               shift and go to state 7
 
-    body                           shift and go to state 13
-    decl                           shift and go to state 7
-    if_stmt                        shift and go to state 18
-    assgn                          shift and go to state 11
-    num_assgn                      shift and go to state 14
-    ptr_assgn                      shift and go to state 20
-    stmt                           shift and go to state 15
-    ptr                            shift and go to state 10
-    while_stmt                     shift and go to state 21
 
 state 7
 
-    (5) stmt -> decl . SEMICOLON
+    (3) main_proc -> VOID MAIN LPAREN RPAREN { . variable_declaration_list statement_list }
+    (24) variable_declaration_list -> . empty
+    (25) variable_declaration_list -> . variable_declaration variable_declaration_list
+    (1) empty -> .
+    (26) variable_declaration -> . INT var_list ;
 
-    SEMICOLON       shift and go to state 22
+    }               reduce using rule 1 (empty -> .)
+    IF              reduce using rule 1 (empty -> .)
+    WHILE           reduce using rule 1 (empty -> .)
+    NAME            reduce using rule 1 (empty -> .)
+    TIMES           reduce using rule 1 (empty -> .)
+    INT             shift and go to state 10
 
+    variable_declaration           shift and go to state 9
+    empty                          shift and go to state 11
+    variable_declaration_list      shift and go to state 8
 
 state 8
 
-    (48) ptr -> STAR . ptr
-    (49) ptr -> STAR . ID
-    (50) ptr -> STAR . addr
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (3) main_proc -> VOID MAIN LPAREN RPAREN { variable_declaration_list . statement_list }
+    (4) statement_list -> . statement_list statement
+    (5) statement_list -> . empty
+    (1) empty -> .
 
-    ID              shift and go to state 26
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    }               reduce using rule 1 (empty -> .)
+    IF              reduce using rule 1 (empty -> .)
+    WHILE           reduce using rule 1 (empty -> .)
+    NAME            reduce using rule 1 (empty -> .)
+    TIMES           reduce using rule 1 (empty -> .)
 
-    ptr                            shift and go to state 25
-    addr                           shift and go to state 24
+    empty                          shift and go to state 13
+    statement_list                 shift and go to state 12
 
 state 9
 
-    (11) while_stmt -> WHILE . LPAREN bool_expr RPAREN compound_stmt
+    (25) variable_declaration_list -> variable_declaration . variable_declaration_list
+    (24) variable_declaration_list -> . empty
+    (25) variable_declaration_list -> . variable_declaration variable_declaration_list
+    (1) empty -> .
+    (26) variable_declaration -> . INT var_list ;
 
-    LPAREN          shift and go to state 27
+    }               reduce using rule 1 (empty -> .)
+    IF              reduce using rule 1 (empty -> .)
+    WHILE           reduce using rule 1 (empty -> .)
+    NAME            reduce using rule 1 (empty -> .)
+    TIMES           reduce using rule 1 (empty -> .)
+    INT             shift and go to state 10
 
+    variable_declaration           shift and go to state 9
+    empty                          shift and go to state 11
+    variable_declaration_list      shift and go to state 14
 
 state 10
 
-    (21) ptr_assgn -> ptr . EQUALS ptr_expr
+    (26) variable_declaration -> INT . var_list ;
+    (27) var_list -> . var_list , variable_dec
+    (28) var_list -> . var_list , ptr_var
+    (29) var_list -> . variable_dec
+    (30) var_list -> . ptr_var
+    (52) variable_dec -> . NAME
+    (31) ptr_var -> . TIMES ptr_var
+    (32) ptr_var -> . TIMES variable_dec
 
-    EQUALS          shift and go to state 28
+    NAME            shift and go to state 17
+    TIMES           shift and go to state 19
 
+    ptr_var                        shift and go to state 15
+    var_list                       shift and go to state 16
+    variable_dec                   shift and go to state 18
 
 state 11
 
-    (6) stmt -> assgn . SEMICOLON
+    (24) variable_declaration_list -> empty .
 
-    SEMICOLON       shift and go to state 29
+    }               reduce using rule 24 (variable_declaration_list -> empty .)
+    IF              reduce using rule 24 (variable_declaration_list -> empty .)
+    WHILE           reduce using rule 24 (variable_declaration_list -> empty .)
+    NAME            reduce using rule 24 (variable_declaration_list -> empty .)
+    TIMES           reduce using rule 24 (variable_declaration_list -> empty .)
 
 
 state 12
 
-    (2) prog -> VOID MAIN LPAREN RPAREN LCURL RCURL .
+    (3) main_proc -> VOID MAIN LPAREN RPAREN { variable_declaration_list statement_list . }
+    (4) statement_list -> statement_list . statement
+    (6) statement -> . ctrlflow
+    (7) statement -> . assignment_statement
+    (8) ctrlflow -> . IF LPAREN condition RPAREN statement_block
+    (9) ctrlflow -> . WHILE LPAREN condition RPAREN statement_block
+    (10) ctrlflow -> . IF LPAREN condition RPAREN statement_block ELSE statement_block
+    (33) assignment_statement -> . lvalue EQUAL expression ;
+    (49) lvalue -> . variable
+    (50) lvalue -> . ptr_expr
+    (51) variable -> . NAME
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
 
-    $end            reduce using rule 2 (prog -> VOID MAIN LPAREN RPAREN LCURL RCURL .)
+    }               shift and go to state 29
+    IF              shift and go to state 22
+    WHILE           shift and go to state 27
+    NAME            shift and go to state 20
+    TIMES           shift and go to state 24
 
+    lvalue                         shift and go to state 23
+    statement                      shift and go to state 21
+    assignment_statement           shift and go to state 28
+    variable                       shift and go to state 26
+    ctrlflow                       shift and go to state 25
+    ptr_expr                       shift and go to state 30
 
 state 13
 
-    (1) prog -> VOID MAIN LPAREN RPAREN LCURL body . RCURL
-    (3) body -> body . stmt
-    (5) stmt -> . decl SEMICOLON
-    (6) stmt -> . assgn SEMICOLON
-    (7) stmt -> . if_stmt
-    (8) stmt -> . while_stmt
-    (16) decl -> . INT decl_list
-    (14) assgn -> . ptr_assgn
-    (15) assgn -> . num_assgn
-    (9) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt
-    (10) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt
-    (11) while_stmt -> . WHILE LPAREN bool_expr RPAREN compound_stmt
-    (21) ptr_assgn -> . ptr EQUALS ptr_expr
-    (22) num_assgn -> . ID EQUALS ptr_expr
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
+    (5) statement_list -> empty .
 
-    RCURL           shift and go to state 30
-    INT             shift and go to state 19
-    IF              shift and go to state 17
-    WHILE           shift and go to state 9
-    ID              shift and go to state 16
-    STAR            shift and go to state 8
+    }               reduce using rule 5 (statement_list -> empty .)
+    IF              reduce using rule 5 (statement_list -> empty .)
+    WHILE           reduce using rule 5 (statement_list -> empty .)
+    NAME            reduce using rule 5 (statement_list -> empty .)
+    TIMES           reduce using rule 5 (statement_list -> empty .)
 
-    decl                           shift and go to state 7
-    if_stmt                        shift and go to state 18
-    assgn                          shift and go to state 11
-    num_assgn                      shift and go to state 14
-    ptr_assgn                      shift and go to state 20
-    stmt                           shift and go to state 31
-    ptr                            shift and go to state 10
-    while_stmt                     shift and go to state 21
 
 state 14
 
-    (15) assgn -> num_assgn .
+    (25) variable_declaration_list -> variable_declaration variable_declaration_list .
 
-    SEMICOLON       reduce using rule 15 (assgn -> num_assgn .)
+    }               reduce using rule 25 (variable_declaration_list -> variable_declaration variable_declaration_list .)
+    IF              reduce using rule 25 (variable_declaration_list -> variable_declaration variable_declaration_list .)
+    WHILE           reduce using rule 25 (variable_declaration_list -> variable_declaration variable_declaration_list .)
+    NAME            reduce using rule 25 (variable_declaration_list -> variable_declaration variable_declaration_list .)
+    TIMES           reduce using rule 25 (variable_declaration_list -> variable_declaration variable_declaration_list .)
 
 
 state 15
 
-    (4) body -> stmt .
+    (30) var_list -> ptr_var .
 
-    RCURL           reduce using rule 4 (body -> stmt .)
-    INT             reduce using rule 4 (body -> stmt .)
-    IF              reduce using rule 4 (body -> stmt .)
-    WHILE           reduce using rule 4 (body -> stmt .)
-    ID              reduce using rule 4 (body -> stmt .)
-    STAR            reduce using rule 4 (body -> stmt .)
+    ;               reduce using rule 30 (var_list -> ptr_var .)
+    ,               reduce using rule 30 (var_list -> ptr_var .)
 
 
 state 16
 
-    (22) num_assgn -> ID . EQUALS ptr_expr
+    (26) variable_declaration -> INT var_list . ;
+    (27) var_list -> var_list . , variable_dec
+    (28) var_list -> var_list . , ptr_var
 
-    EQUALS          shift and go to state 32
+    ;               shift and go to state 31
+    ,               shift and go to state 32
 
 
 state 17
 
-    (9) if_stmt -> IF . LPAREN bool_expr RPAREN compound_stmt
-    (10) if_stmt -> IF . LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt
+    (52) variable_dec -> NAME .
 
-    LPAREN          shift and go to state 33
+    ;               reduce using rule 52 (variable_dec -> NAME .)
+    ,               reduce using rule 52 (variable_dec -> NAME .)
 
 
 state 18
 
-    (7) stmt -> if_stmt .
+    (29) var_list -> variable_dec .
 
-    RCURL           reduce using rule 7 (stmt -> if_stmt .)
-    INT             reduce using rule 7 (stmt -> if_stmt .)
-    IF              reduce using rule 7 (stmt -> if_stmt .)
-    WHILE           reduce using rule 7 (stmt -> if_stmt .)
-    ID              reduce using rule 7 (stmt -> if_stmt .)
-    STAR            reduce using rule 7 (stmt -> if_stmt .)
-    ELSE            reduce using rule 7 (stmt -> if_stmt .)
+    ;               reduce using rule 29 (var_list -> variable_dec .)
+    ,               reduce using rule 29 (var_list -> variable_dec .)
 
 
 state 19
 
-    (16) decl -> INT . decl_list
-    (17) decl_list -> . decl_list COMMA ID
-    (18) decl_list -> . decl_list COMMA ptr
-    (19) decl_list -> . ID
-    (20) decl_list -> . ptr
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
+    (31) ptr_var -> TIMES . ptr_var
+    (32) ptr_var -> TIMES . variable_dec
+    (31) ptr_var -> . TIMES ptr_var
+    (32) ptr_var -> . TIMES variable_dec
+    (52) variable_dec -> . NAME
 
-    ID              shift and go to state 36
-    STAR            shift and go to state 8
+    TIMES           shift and go to state 19
+    NAME            shift and go to state 17
 
-    ptr                            shift and go to state 35
-    decl_list                      shift and go to state 34
+    ptr_var                        shift and go to state 33
+    variable_dec                   shift and go to state 34
 
 state 20
 
-    (14) assgn -> ptr_assgn .
+    (51) variable -> NAME .
 
-    SEMICOLON       reduce using rule 14 (assgn -> ptr_assgn .)
+    PLUS            reduce using rule 51 (variable -> NAME .)
+    TIMES           reduce using rule 51 (variable -> NAME .)
+    MINUS           reduce using rule 51 (variable -> NAME .)
+    DIVIDE          reduce using rule 51 (variable -> NAME .)
+    RPAREN          reduce using rule 51 (variable -> NAME .)
+    LAND            reduce using rule 51 (variable -> NAME .)
+    LOR             reduce using rule 51 (variable -> NAME .)
+    LESSTHEN        reduce using rule 51 (variable -> NAME .)
+    GREATTHEN       reduce using rule 51 (variable -> NAME .)
+    LESSTHENE       reduce using rule 51 (variable -> NAME .)
+    GREATTHENE      reduce using rule 51 (variable -> NAME .)
+    ISEQL           reduce using rule 51 (variable -> NAME .)
+    ISNEQL          reduce using rule 51 (variable -> NAME .)
+    EQUAL           reduce using rule 51 (variable -> NAME .)
+    ;               reduce using rule 51 (variable -> NAME .)
 
 
 state 21
 
-    (8) stmt -> while_stmt .
+    (4) statement_list -> statement_list statement .
 
-    RCURL           reduce using rule 8 (stmt -> while_stmt .)
-    INT             reduce using rule 8 (stmt -> while_stmt .)
-    IF              reduce using rule 8 (stmt -> while_stmt .)
-    WHILE           reduce using rule 8 (stmt -> while_stmt .)
-    ID              reduce using rule 8 (stmt -> while_stmt .)
-    STAR            reduce using rule 8 (stmt -> while_stmt .)
-    ELSE            reduce using rule 8 (stmt -> while_stmt .)
+    }               reduce using rule 4 (statement_list -> statement_list statement .)
+    IF              reduce using rule 4 (statement_list -> statement_list statement .)
+    WHILE           reduce using rule 4 (statement_list -> statement_list statement .)
+    NAME            reduce using rule 4 (statement_list -> statement_list statement .)
+    TIMES           reduce using rule 4 (statement_list -> statement_list statement .)
 
 
 state 22
 
-    (5) stmt -> decl SEMICOLON .
+    (8) ctrlflow -> IF . LPAREN condition RPAREN statement_block
+    (10) ctrlflow -> IF . LPAREN condition RPAREN statement_block ELSE statement_block
 
-    RCURL           reduce using rule 5 (stmt -> decl SEMICOLON .)
-    INT             reduce using rule 5 (stmt -> decl SEMICOLON .)
-    IF              reduce using rule 5 (stmt -> decl SEMICOLON .)
-    WHILE           reduce using rule 5 (stmt -> decl SEMICOLON .)
-    ID              reduce using rule 5 (stmt -> decl SEMICOLON .)
-    STAR            reduce using rule 5 (stmt -> decl SEMICOLON .)
-    ELSE            reduce using rule 5 (stmt -> decl SEMICOLON .)
+    LPAREN          shift and go to state 35
 
 
 state 23
 
-    (51) addr -> AND . ID
-    (52) addr -> AND . ptr
-    (53) addr -> AND . addr
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (33) assignment_statement -> lvalue . EQUAL expression ;
 
-    ID              shift and go to state 38
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    EQUAL           shift and go to state 36
 
-    ptr                            shift and go to state 39
-    addr                           shift and go to state 37
 
 state 24
 
-    (50) ptr -> STAR addr .
+    (44) ptr_expr -> TIMES . variable
+    (45) ptr_expr -> TIMES . ptr_expr
+    (46) ptr_expr -> TIMES . addr_expr
+    (51) variable -> . NAME
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
 
-    STAR            reduce using rule 50 (ptr -> STAR addr .)
-    SLASH           reduce using rule 50 (ptr -> STAR addr .)
-    GT              reduce using rule 50 (ptr -> STAR addr .)
-    LT              reduce using rule 50 (ptr -> STAR addr .)
-    EQUALS          reduce using rule 50 (ptr -> STAR addr .)
-    NOT             reduce using rule 50 (ptr -> STAR addr .)
-    PLUS            reduce using rule 50 (ptr -> STAR addr .)
-    MINUS           reduce using rule 50 (ptr -> STAR addr .)
-    SEMICOLON       reduce using rule 50 (ptr -> STAR addr .)
-    RPAREN          reduce using rule 50 (ptr -> STAR addr .)
-    AND             reduce using rule 50 (ptr -> STAR addr .)
-    OR              reduce using rule 50 (ptr -> STAR addr .)
-    COMMA           reduce using rule 50 (ptr -> STAR addr .)
+    NAME            shift and go to state 20
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
 
+    variable                       shift and go to state 38
+    ptr_expr                       shift and go to state 39
+    addr_expr                      shift and go to state 40
 
 state 25
 
-    (48) ptr -> STAR ptr .
+    (6) statement -> ctrlflow .
 
-    STAR            reduce using rule 48 (ptr -> STAR ptr .)
-    SLASH           reduce using rule 48 (ptr -> STAR ptr .)
-    GT              reduce using rule 48 (ptr -> STAR ptr .)
-    LT              reduce using rule 48 (ptr -> STAR ptr .)
-    EQUALS          reduce using rule 48 (ptr -> STAR ptr .)
-    NOT             reduce using rule 48 (ptr -> STAR ptr .)
-    PLUS            reduce using rule 48 (ptr -> STAR ptr .)
-    MINUS           reduce using rule 48 (ptr -> STAR ptr .)
-    SEMICOLON       reduce using rule 48 (ptr -> STAR ptr .)
-    RPAREN          reduce using rule 48 (ptr -> STAR ptr .)
-    AND             reduce using rule 48 (ptr -> STAR ptr .)
-    OR              reduce using rule 48 (ptr -> STAR ptr .)
-    COMMA           reduce using rule 48 (ptr -> STAR ptr .)
+    ELSE            reduce using rule 6 (statement -> ctrlflow .)
+    }               reduce using rule 6 (statement -> ctrlflow .)
+    IF              reduce using rule 6 (statement -> ctrlflow .)
+    WHILE           reduce using rule 6 (statement -> ctrlflow .)
+    NAME            reduce using rule 6 (statement -> ctrlflow .)
+    TIMES           reduce using rule 6 (statement -> ctrlflow .)
 
 
 state 26
 
-    (49) ptr -> STAR ID .
+    (49) lvalue -> variable .
 
-    STAR            reduce using rule 49 (ptr -> STAR ID .)
-    SLASH           reduce using rule 49 (ptr -> STAR ID .)
-    GT              reduce using rule 49 (ptr -> STAR ID .)
-    LT              reduce using rule 49 (ptr -> STAR ID .)
-    EQUALS          reduce using rule 49 (ptr -> STAR ID .)
-    NOT             reduce using rule 49 (ptr -> STAR ID .)
-    PLUS            reduce using rule 49 (ptr -> STAR ID .)
-    MINUS           reduce using rule 49 (ptr -> STAR ID .)
-    SEMICOLON       reduce using rule 49 (ptr -> STAR ID .)
-    RPAREN          reduce using rule 49 (ptr -> STAR ID .)
-    AND             reduce using rule 49 (ptr -> STAR ID .)
-    OR              reduce using rule 49 (ptr -> STAR ID .)
-    COMMA           reduce using rule 49 (ptr -> STAR ID .)
+    EQUAL           reduce using rule 49 (lvalue -> variable .)
 
 
 state 27
 
-    (11) while_stmt -> WHILE LPAREN . bool_expr RPAREN compound_stmt
-    (23) bool_expr -> . bool_expr OR OR a_bool_expr
-    (24) bool_expr -> . a_bool_expr
-    (25) a_bool_expr -> . a_bool_expr AND AND n_bool_expr
-    (26) a_bool_expr -> . n_bool_expr
-    (27) n_bool_expr -> . NOT n_bool_expr
-    (28) n_bool_expr -> . sub_bool_expr
-    (29) sub_bool_expr -> . ptr_expr GT ptr_expr
-    (30) sub_bool_expr -> . ptr_expr GT EQUALS ptr_expr
-    (31) sub_bool_expr -> . ptr_expr LT ptr_expr
-    (32) sub_bool_expr -> . ptr_expr LT EQUALS ptr_expr
-    (33) sub_bool_expr -> . ptr_expr EQUALS EQUALS ptr_expr
-    (34) sub_bool_expr -> . ptr_expr NOT EQUALS ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (9) ctrlflow -> WHILE . LPAREN condition RPAREN statement_block
 
-    NOT             shift and go to state 54
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    LPAREN          shift and go to state 41
 
-    n_bool_expr                    shift and go to state 53
-    addr                           shift and go to state 46
-    bool_expr                      shift and go to state 50
-    sub_bool_expr                  shift and go to state 41
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    a_bool_expr                    shift and go to state 43
-    ptr                            shift and go to state 47
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 51
 
 state 28
 
-    (21) ptr_assgn -> ptr EQUALS . ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (7) statement -> assignment_statement .
 
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    ELSE            reduce using rule 7 (statement -> assignment_statement .)
+    }               reduce using rule 7 (statement -> assignment_statement .)
+    IF              reduce using rule 7 (statement -> assignment_statement .)
+    WHILE           reduce using rule 7 (statement -> assignment_statement .)
+    NAME            reduce using rule 7 (statement -> assignment_statement .)
+    TIMES           reduce using rule 7 (statement -> assignment_statement .)
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 55
-    ptr                            shift and go to state 47
 
 state 29
 
-    (6) stmt -> assgn SEMICOLON .
+    (3) main_proc -> VOID MAIN LPAREN RPAREN { variable_declaration_list statement_list } .
 
-    RCURL           reduce using rule 6 (stmt -> assgn SEMICOLON .)
-    INT             reduce using rule 6 (stmt -> assgn SEMICOLON .)
-    IF              reduce using rule 6 (stmt -> assgn SEMICOLON .)
-    WHILE           reduce using rule 6 (stmt -> assgn SEMICOLON .)
-    ID              reduce using rule 6 (stmt -> assgn SEMICOLON .)
-    STAR            reduce using rule 6 (stmt -> assgn SEMICOLON .)
-    ELSE            reduce using rule 6 (stmt -> assgn SEMICOLON .)
+    $end            reduce using rule 3 (main_proc -> VOID MAIN LPAREN RPAREN { variable_declaration_list statement_list } .)
 
 
 state 30
 
-    (1) prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL .
+    (50) lvalue -> ptr_expr .
 
-    $end            reduce using rule 1 (prog -> VOID MAIN LPAREN RPAREN LCURL body RCURL .)
+    EQUAL           reduce using rule 50 (lvalue -> ptr_expr .)
 
 
 state 31
 
-    (3) body -> body stmt .
+    (26) variable_declaration -> INT var_list ; .
 
-    RCURL           reduce using rule 3 (body -> body stmt .)
-    INT             reduce using rule 3 (body -> body stmt .)
-    IF              reduce using rule 3 (body -> body stmt .)
-    WHILE           reduce using rule 3 (body -> body stmt .)
-    ID              reduce using rule 3 (body -> body stmt .)
-    STAR            reduce using rule 3 (body -> body stmt .)
+    INT             reduce using rule 26 (variable_declaration -> INT var_list ; .)
+    }               reduce using rule 26 (variable_declaration -> INT var_list ; .)
+    IF              reduce using rule 26 (variable_declaration -> INT var_list ; .)
+    WHILE           reduce using rule 26 (variable_declaration -> INT var_list ; .)
+    NAME            reduce using rule 26 (variable_declaration -> INT var_list ; .)
+    TIMES           reduce using rule 26 (variable_declaration -> INT var_list ; .)
 
 
 state 32
 
-    (22) num_assgn -> ID EQUALS . ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (27) var_list -> var_list , . variable_dec
+    (28) var_list -> var_list , . ptr_var
+    (52) variable_dec -> . NAME
+    (31) ptr_var -> . TIMES ptr_var
+    (32) ptr_var -> . TIMES variable_dec
 
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    NAME            shift and go to state 17
+    TIMES           shift and go to state 19
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 56
-    ptr                            shift and go to state 47
+    ptr_var                        shift and go to state 42
+    variable_dec                   shift and go to state 43
 
 state 33
 
-    (9) if_stmt -> IF LPAREN . bool_expr RPAREN compound_stmt
-    (10) if_stmt -> IF LPAREN . bool_expr RPAREN compound_stmt ELSE compound_stmt
-    (23) bool_expr -> . bool_expr OR OR a_bool_expr
-    (24) bool_expr -> . a_bool_expr
-    (25) a_bool_expr -> . a_bool_expr AND AND n_bool_expr
-    (26) a_bool_expr -> . n_bool_expr
-    (27) n_bool_expr -> . NOT n_bool_expr
-    (28) n_bool_expr -> . sub_bool_expr
-    (29) sub_bool_expr -> . ptr_expr GT ptr_expr
-    (30) sub_bool_expr -> . ptr_expr GT EQUALS ptr_expr
-    (31) sub_bool_expr -> . ptr_expr LT ptr_expr
-    (32) sub_bool_expr -> . ptr_expr LT EQUALS ptr_expr
-    (33) sub_bool_expr -> . ptr_expr EQUALS EQUALS ptr_expr
-    (34) sub_bool_expr -> . ptr_expr NOT EQUALS ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (31) ptr_var -> TIMES ptr_var .
 
-    NOT             shift and go to state 54
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    ;               reduce using rule 31 (ptr_var -> TIMES ptr_var .)
+    ,               reduce using rule 31 (ptr_var -> TIMES ptr_var .)
 
-    n_bool_expr                    shift and go to state 53
-    addr                           shift and go to state 46
-    bool_expr                      shift and go to state 57
-    sub_bool_expr                  shift and go to state 41
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    a_bool_expr                    shift and go to state 43
-    ptr                            shift and go to state 47
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 51
 
 state 34
 
-    (16) decl -> INT decl_list .
-    (17) decl_list -> decl_list . COMMA ID
-    (18) decl_list -> decl_list . COMMA ptr
+    (32) ptr_var -> TIMES variable_dec .
 
-    SEMICOLON       reduce using rule 16 (decl -> INT decl_list .)
-    COMMA           shift and go to state 58
+    ;               reduce using rule 32 (ptr_var -> TIMES variable_dec .)
+    ,               reduce using rule 32 (ptr_var -> TIMES variable_dec .)
 
 
 state 35
 
-    (20) decl_list -> ptr .
+    (8) ctrlflow -> IF LPAREN . condition RPAREN statement_block
+    (10) ctrlflow -> IF LPAREN . condition RPAREN statement_block ELSE statement_block
+    (14) condition -> . LPAREN condition RPAREN
+    (15) condition -> . expression LESSTHEN expression
+    (16) condition -> . expression GREATTHEN expression
+    (17) condition -> . expression LESSTHENE expression
+    (18) condition -> . expression GREATTHENE expression
+    (19) condition -> . expression ISEQL expression
+    (20) condition -> . expression ISNEQL expression
+    (21) condition -> . condition LAND condition
+    (22) condition -> . condition LOR condition
+    (23) condition -> . LNOT condition
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    COMMA           reduce using rule 20 (decl_list -> ptr .)
-    SEMICOLON       reduce using rule 20 (decl_list -> ptr .)
+    LPAREN          shift and go to state 44
+    LNOT            shift and go to state 50
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    condition                      shift and go to state 46
+    addr_expr                      shift and go to state 51
+    variable                       shift and go to state 45
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 52
 
 state 36
 
-    (19) decl_list -> ID .
+    (33) assignment_statement -> lvalue EQUAL . expression ;
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    COMMA           reduce using rule 19 (decl_list -> ID .)
-    SEMICOLON       reduce using rule 19 (decl_list -> ID .)
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    addr_expr                      shift and go to state 51
+    variable                       shift and go to state 45
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 54
 
 state 37
 
-    (53) addr -> AND addr .
+    (47) addr_expr -> ADDR . variable
+    (48) addr_expr -> ADDR . ptr_expr
+    (51) variable -> . NAME
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
 
-    STAR            reduce using rule 53 (addr -> AND addr .)
-    SLASH           reduce using rule 53 (addr -> AND addr .)
-    GT              reduce using rule 53 (addr -> AND addr .)
-    LT              reduce using rule 53 (addr -> AND addr .)
-    EQUALS          reduce using rule 53 (addr -> AND addr .)
-    NOT             reduce using rule 53 (addr -> AND addr .)
-    PLUS            reduce using rule 53 (addr -> AND addr .)
-    MINUS           reduce using rule 53 (addr -> AND addr .)
-    AND             reduce using rule 53 (addr -> AND addr .)
-    RPAREN          reduce using rule 53 (addr -> AND addr .)
-    OR              reduce using rule 53 (addr -> AND addr .)
-    SEMICOLON       reduce using rule 53 (addr -> AND addr .)
-    COMMA           reduce using rule 53 (addr -> AND addr .)
+    NAME            shift and go to state 20
+    TIMES           shift and go to state 24
 
+    variable                       shift and go to state 55
+    ptr_expr                       shift and go to state 56
 
 state 38
 
-    (51) addr -> AND ID .
+    (44) ptr_expr -> TIMES variable .
 
-    STAR            reduce using rule 51 (addr -> AND ID .)
-    SLASH           reduce using rule 51 (addr -> AND ID .)
-    GT              reduce using rule 51 (addr -> AND ID .)
-    LT              reduce using rule 51 (addr -> AND ID .)
-    EQUALS          reduce using rule 51 (addr -> AND ID .)
-    NOT             reduce using rule 51 (addr -> AND ID .)
-    PLUS            reduce using rule 51 (addr -> AND ID .)
-    MINUS           reduce using rule 51 (addr -> AND ID .)
-    AND             reduce using rule 51 (addr -> AND ID .)
-    RPAREN          reduce using rule 51 (addr -> AND ID .)
-    OR              reduce using rule 51 (addr -> AND ID .)
-    SEMICOLON       reduce using rule 51 (addr -> AND ID .)
-    COMMA           reduce using rule 51 (addr -> AND ID .)
+    EQUAL           reduce using rule 44 (ptr_expr -> TIMES variable .)
+    LESSTHEN        reduce using rule 44 (ptr_expr -> TIMES variable .)
+    GREATTHEN       reduce using rule 44 (ptr_expr -> TIMES variable .)
+    LESSTHENE       reduce using rule 44 (ptr_expr -> TIMES variable .)
+    GREATTHENE      reduce using rule 44 (ptr_expr -> TIMES variable .)
+    ISEQL           reduce using rule 44 (ptr_expr -> TIMES variable .)
+    ISNEQL          reduce using rule 44 (ptr_expr -> TIMES variable .)
+    PLUS            reduce using rule 44 (ptr_expr -> TIMES variable .)
+    TIMES           reduce using rule 44 (ptr_expr -> TIMES variable .)
+    MINUS           reduce using rule 44 (ptr_expr -> TIMES variable .)
+    DIVIDE          reduce using rule 44 (ptr_expr -> TIMES variable .)
+    ;               reduce using rule 44 (ptr_expr -> TIMES variable .)
+    RPAREN          reduce using rule 44 (ptr_expr -> TIMES variable .)
+    LAND            reduce using rule 44 (ptr_expr -> TIMES variable .)
+    LOR             reduce using rule 44 (ptr_expr -> TIMES variable .)
 
 
 state 39
 
-    (52) addr -> AND ptr .
+    (45) ptr_expr -> TIMES ptr_expr .
 
-    STAR            reduce using rule 52 (addr -> AND ptr .)
-    SLASH           reduce using rule 52 (addr -> AND ptr .)
-    GT              reduce using rule 52 (addr -> AND ptr .)
-    LT              reduce using rule 52 (addr -> AND ptr .)
-    EQUALS          reduce using rule 52 (addr -> AND ptr .)
-    NOT             reduce using rule 52 (addr -> AND ptr .)
-    PLUS            reduce using rule 52 (addr -> AND ptr .)
-    MINUS           reduce using rule 52 (addr -> AND ptr .)
-    AND             reduce using rule 52 (addr -> AND ptr .)
-    RPAREN          reduce using rule 52 (addr -> AND ptr .)
-    OR              reduce using rule 52 (addr -> AND ptr .)
-    SEMICOLON       reduce using rule 52 (addr -> AND ptr .)
-    COMMA           reduce using rule 52 (addr -> AND ptr .)
+    EQUAL           reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    LESSTHEN        reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    GREATTHEN       reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    LESSTHENE       reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    GREATTHENE      reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    ISEQL           reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    ISNEQL          reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    PLUS            reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    TIMES           reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    MINUS           reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    DIVIDE          reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    ;               reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    RPAREN          reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    LAND            reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
+    LOR             reduce using rule 45 (ptr_expr -> TIMES ptr_expr .)
 
 
 state 40
 
-    (47) ptr_expr_base -> LPAREN . ptr_expr RPAREN
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (46) ptr_expr -> TIMES addr_expr .
 
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    EQUAL           reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    LESSTHEN        reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    GREATTHEN       reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    LESSTHENE       reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    GREATTHENE      reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    ISEQL           reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    ISNEQL          reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    PLUS            reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    TIMES           reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    MINUS           reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    DIVIDE          reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    ;               reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    RPAREN          reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    LAND            reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
+    LOR             reduce using rule 46 (ptr_expr -> TIMES addr_expr .)
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 59
-    ptr                            shift and go to state 47
 
 state 41
 
-    (28) n_bool_expr -> sub_bool_expr .
+    (9) ctrlflow -> WHILE LPAREN . condition RPAREN statement_block
+    (14) condition -> . LPAREN condition RPAREN
+    (15) condition -> . expression LESSTHEN expression
+    (16) condition -> . expression GREATTHEN expression
+    (17) condition -> . expression LESSTHENE expression
+    (18) condition -> . expression GREATTHENE expression
+    (19) condition -> . expression ISEQL expression
+    (20) condition -> . expression ISNEQL expression
+    (21) condition -> . condition LAND condition
+    (22) condition -> . condition LOR condition
+    (23) condition -> . LNOT condition
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    AND             reduce using rule 28 (n_bool_expr -> sub_bool_expr .)
-    RPAREN          reduce using rule 28 (n_bool_expr -> sub_bool_expr .)
-    OR              reduce using rule 28 (n_bool_expr -> sub_bool_expr .)
+    LPAREN          shift and go to state 44
+    LNOT            shift and go to state 50
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    condition                      shift and go to state 57
+    addr_expr                      shift and go to state 51
+    variable                       shift and go to state 45
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 52
 
 state 42
 
-    (40) ptr_factor -> ptr_term .
+    (28) var_list -> var_list , ptr_var .
 
-    STAR            reduce using rule 40 (ptr_factor -> ptr_term .)
-    SLASH           reduce using rule 40 (ptr_factor -> ptr_term .)
-    GT              reduce using rule 40 (ptr_factor -> ptr_term .)
-    LT              reduce using rule 40 (ptr_factor -> ptr_term .)
-    EQUALS          reduce using rule 40 (ptr_factor -> ptr_term .)
-    NOT             reduce using rule 40 (ptr_factor -> ptr_term .)
-    PLUS            reduce using rule 40 (ptr_factor -> ptr_term .)
-    MINUS           reduce using rule 40 (ptr_factor -> ptr_term .)
-    AND             reduce using rule 40 (ptr_factor -> ptr_term .)
-    RPAREN          reduce using rule 40 (ptr_factor -> ptr_term .)
-    OR              reduce using rule 40 (ptr_factor -> ptr_term .)
-    SEMICOLON       reduce using rule 40 (ptr_factor -> ptr_term .)
+    ;               reduce using rule 28 (var_list -> var_list , ptr_var .)
+    ,               reduce using rule 28 (var_list -> var_list , ptr_var .)
 
 
 state 43
 
-    (24) bool_expr -> a_bool_expr .
-    (25) a_bool_expr -> a_bool_expr . AND AND n_bool_expr
+    (27) var_list -> var_list , variable_dec .
 
-    RPAREN          reduce using rule 24 (bool_expr -> a_bool_expr .)
-    OR              reduce using rule 24 (bool_expr -> a_bool_expr .)
-    AND             shift and go to state 60
+    ;               reduce using rule 27 (var_list -> var_list , variable_dec .)
+    ,               reduce using rule 27 (var_list -> var_list , variable_dec .)
 
 
 state 44
 
-    (37) ptr_expr -> ptr_factor .
-    (38) ptr_factor -> ptr_factor . STAR ptr_term
-    (39) ptr_factor -> ptr_factor . SLASH ptr_term
+    (14) condition -> LPAREN . condition RPAREN
+    (41) expression -> LPAREN . expression RPAREN
+    (14) condition -> . LPAREN condition RPAREN
+    (15) condition -> . expression LESSTHEN expression
+    (16) condition -> . expression GREATTHEN expression
+    (17) condition -> . expression LESSTHENE expression
+    (18) condition -> . expression GREATTHENE expression
+    (19) condition -> . expression ISEQL expression
+    (20) condition -> . expression ISNEQL expression
+    (21) condition -> . condition LAND condition
+    (22) condition -> . condition LOR condition
+    (23) condition -> . LNOT condition
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    PLUS            reduce using rule 37 (ptr_expr -> ptr_factor .)
-    MINUS           reduce using rule 37 (ptr_expr -> ptr_factor .)
-    AND             reduce using rule 37 (ptr_expr -> ptr_factor .)
-    RPAREN          reduce using rule 37 (ptr_expr -> ptr_factor .)
-    OR              reduce using rule 37 (ptr_expr -> ptr_factor .)
-    GT              reduce using rule 37 (ptr_expr -> ptr_factor .)
-    LT              reduce using rule 37 (ptr_expr -> ptr_factor .)
-    EQUALS          reduce using rule 37 (ptr_expr -> ptr_factor .)
-    NOT             reduce using rule 37 (ptr_expr -> ptr_factor .)
-    SEMICOLON       reduce using rule 37 (ptr_expr -> ptr_factor .)
-    STAR            shift and go to state 61
-    SLASH           shift and go to state 62
+    LPAREN          shift and go to state 44
+    LNOT            shift and go to state 50
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    condition                      shift and go to state 58
+    addr_expr                      shift and go to state 51
+    variable                       shift and go to state 45
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 59
 
 state 45
 
-    (41) ptr_term -> MINUS . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (40) expression -> variable .
 
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    LESSTHEN        reduce using rule 40 (expression -> variable .)
+    GREATTHEN       reduce using rule 40 (expression -> variable .)
+    LESSTHENE       reduce using rule 40 (expression -> variable .)
+    GREATTHENE      reduce using rule 40 (expression -> variable .)
+    ISEQL           reduce using rule 40 (expression -> variable .)
+    ISNEQL          reduce using rule 40 (expression -> variable .)
+    PLUS            reduce using rule 40 (expression -> variable .)
+    TIMES           reduce using rule 40 (expression -> variable .)
+    MINUS           reduce using rule 40 (expression -> variable .)
+    DIVIDE          reduce using rule 40 (expression -> variable .)
+    RPAREN          reduce using rule 40 (expression -> variable .)
+    LAND            reduce using rule 40 (expression -> variable .)
+    LOR             reduce using rule 40 (expression -> variable .)
+    ;               reduce using rule 40 (expression -> variable .)
 
-    addr                           shift and go to state 46
-    ptr_expr_base                  shift and go to state 48
-    ptr                            shift and go to state 47
-    ptr_term                       shift and go to state 63
 
 state 46
 
-    (46) ptr_expr_base -> addr .
+    (8) ctrlflow -> IF LPAREN condition . RPAREN statement_block
+    (10) ctrlflow -> IF LPAREN condition . RPAREN statement_block ELSE statement_block
+    (21) condition -> condition . LAND condition
+    (22) condition -> condition . LOR condition
 
-    STAR            reduce using rule 46 (ptr_expr_base -> addr .)
-    SLASH           reduce using rule 46 (ptr_expr_base -> addr .)
-    PLUS            reduce using rule 46 (ptr_expr_base -> addr .)
-    MINUS           reduce using rule 46 (ptr_expr_base -> addr .)
-    AND             reduce using rule 46 (ptr_expr_base -> addr .)
-    RPAREN          reduce using rule 46 (ptr_expr_base -> addr .)
-    OR              reduce using rule 46 (ptr_expr_base -> addr .)
-    SEMICOLON       reduce using rule 46 (ptr_expr_base -> addr .)
-    GT              reduce using rule 46 (ptr_expr_base -> addr .)
-    LT              reduce using rule 46 (ptr_expr_base -> addr .)
-    EQUALS          reduce using rule 46 (ptr_expr_base -> addr .)
-    NOT             reduce using rule 46 (ptr_expr_base -> addr .)
+    RPAREN          shift and go to state 61
+    LAND            shift and go to state 62
+    LOR             shift and go to state 60
 
 
 state 47
 
-    (45) ptr_expr_base -> ptr .
+    (38) expression -> ptr_expr .
 
-    STAR            reduce using rule 45 (ptr_expr_base -> ptr .)
-    SLASH           reduce using rule 45 (ptr_expr_base -> ptr .)
-    PLUS            reduce using rule 45 (ptr_expr_base -> ptr .)
-    MINUS           reduce using rule 45 (ptr_expr_base -> ptr .)
-    AND             reduce using rule 45 (ptr_expr_base -> ptr .)
-    RPAREN          reduce using rule 45 (ptr_expr_base -> ptr .)
-    OR              reduce using rule 45 (ptr_expr_base -> ptr .)
-    SEMICOLON       reduce using rule 45 (ptr_expr_base -> ptr .)
-    GT              reduce using rule 45 (ptr_expr_base -> ptr .)
-    LT              reduce using rule 45 (ptr_expr_base -> ptr .)
-    EQUALS          reduce using rule 45 (ptr_expr_base -> ptr .)
-    NOT             reduce using rule 45 (ptr_expr_base -> ptr .)
+    LESSTHEN        reduce using rule 38 (expression -> ptr_expr .)
+    GREATTHEN       reduce using rule 38 (expression -> ptr_expr .)
+    LESSTHENE       reduce using rule 38 (expression -> ptr_expr .)
+    GREATTHENE      reduce using rule 38 (expression -> ptr_expr .)
+    ISEQL           reduce using rule 38 (expression -> ptr_expr .)
+    ISNEQL          reduce using rule 38 (expression -> ptr_expr .)
+    PLUS            reduce using rule 38 (expression -> ptr_expr .)
+    TIMES           reduce using rule 38 (expression -> ptr_expr .)
+    MINUS           reduce using rule 38 (expression -> ptr_expr .)
+    DIVIDE          reduce using rule 38 (expression -> ptr_expr .)
+    RPAREN          reduce using rule 38 (expression -> ptr_expr .)
+    LAND            reduce using rule 38 (expression -> ptr_expr .)
+    LOR             reduce using rule 38 (expression -> ptr_expr .)
+    ;               reduce using rule 38 (expression -> ptr_expr .)
 
 
 state 48
 
-    (42) ptr_term -> ptr_expr_base .
+    (42) expression -> MINUS . expression
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    STAR            reduce using rule 42 (ptr_term -> ptr_expr_base .)
-    SLASH           reduce using rule 42 (ptr_term -> ptr_expr_base .)
-    PLUS            reduce using rule 42 (ptr_term -> ptr_expr_base .)
-    MINUS           reduce using rule 42 (ptr_term -> ptr_expr_base .)
-    AND             reduce using rule 42 (ptr_term -> ptr_expr_base .)
-    RPAREN          reduce using rule 42 (ptr_term -> ptr_expr_base .)
-    OR              reduce using rule 42 (ptr_term -> ptr_expr_base .)
-    GT              reduce using rule 42 (ptr_term -> ptr_expr_base .)
-    LT              reduce using rule 42 (ptr_term -> ptr_expr_base .)
-    EQUALS          reduce using rule 42 (ptr_term -> ptr_expr_base .)
-    NOT             reduce using rule 42 (ptr_term -> ptr_expr_base .)
-    SEMICOLON       reduce using rule 42 (ptr_term -> ptr_expr_base .)
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    variable                       shift and go to state 45
+    addr_expr                      shift and go to state 51
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 63
 
 state 49
 
-    (44) ptr_expr_base -> NUM .
+    (43) expression -> NUMBER .
 
-    STAR            reduce using rule 44 (ptr_expr_base -> NUM .)
-    SLASH           reduce using rule 44 (ptr_expr_base -> NUM .)
-    PLUS            reduce using rule 44 (ptr_expr_base -> NUM .)
-    MINUS           reduce using rule 44 (ptr_expr_base -> NUM .)
-    AND             reduce using rule 44 (ptr_expr_base -> NUM .)
-    RPAREN          reduce using rule 44 (ptr_expr_base -> NUM .)
-    OR              reduce using rule 44 (ptr_expr_base -> NUM .)
-    SEMICOLON       reduce using rule 44 (ptr_expr_base -> NUM .)
-    GT              reduce using rule 44 (ptr_expr_base -> NUM .)
-    LT              reduce using rule 44 (ptr_expr_base -> NUM .)
-    EQUALS          reduce using rule 44 (ptr_expr_base -> NUM .)
-    NOT             reduce using rule 44 (ptr_expr_base -> NUM .)
+    LESSTHEN        reduce using rule 43 (expression -> NUMBER .)
+    GREATTHEN       reduce using rule 43 (expression -> NUMBER .)
+    LESSTHENE       reduce using rule 43 (expression -> NUMBER .)
+    GREATTHENE      reduce using rule 43 (expression -> NUMBER .)
+    ISEQL           reduce using rule 43 (expression -> NUMBER .)
+    ISNEQL          reduce using rule 43 (expression -> NUMBER .)
+    PLUS            reduce using rule 43 (expression -> NUMBER .)
+    TIMES           reduce using rule 43 (expression -> NUMBER .)
+    MINUS           reduce using rule 43 (expression -> NUMBER .)
+    DIVIDE          reduce using rule 43 (expression -> NUMBER .)
+    RPAREN          reduce using rule 43 (expression -> NUMBER .)
+    LAND            reduce using rule 43 (expression -> NUMBER .)
+    LOR             reduce using rule 43 (expression -> NUMBER .)
+    ;               reduce using rule 43 (expression -> NUMBER .)
 
 
 state 50
 
-    (11) while_stmt -> WHILE LPAREN bool_expr . RPAREN compound_stmt
-    (23) bool_expr -> bool_expr . OR OR a_bool_expr
+    (23) condition -> LNOT . condition
+    (14) condition -> . LPAREN condition RPAREN
+    (15) condition -> . expression LESSTHEN expression
+    (16) condition -> . expression GREATTHEN expression
+    (17) condition -> . expression LESSTHENE expression
+    (18) condition -> . expression GREATTHENE expression
+    (19) condition -> . expression ISEQL expression
+    (20) condition -> . expression ISNEQL expression
+    (21) condition -> . condition LAND condition
+    (22) condition -> . condition LOR condition
+    (23) condition -> . LNOT condition
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    RPAREN          shift and go to state 64
-    OR              shift and go to state 65
+    LPAREN          shift and go to state 44
+    LNOT            shift and go to state 50
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    condition                      shift and go to state 64
+    addr_expr                      shift and go to state 51
+    variable                       shift and go to state 45
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 52
 
 state 51
 
-    (29) sub_bool_expr -> ptr_expr . GT ptr_expr
-    (30) sub_bool_expr -> ptr_expr . GT EQUALS ptr_expr
-    (31) sub_bool_expr -> ptr_expr . LT ptr_expr
-    (32) sub_bool_expr -> ptr_expr . LT EQUALS ptr_expr
-    (33) sub_bool_expr -> ptr_expr . EQUALS EQUALS ptr_expr
-    (34) sub_bool_expr -> ptr_expr . NOT EQUALS ptr_expr
-    (35) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (36) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (39) expression -> addr_expr .
 
-    GT              shift and go to state 66
-    LT              shift and go to state 68
-    EQUALS          shift and go to state 67
-    NOT             shift and go to state 70
-    PLUS            shift and go to state 69
-    MINUS           shift and go to state 71
+    LESSTHEN        reduce using rule 39 (expression -> addr_expr .)
+    GREATTHEN       reduce using rule 39 (expression -> addr_expr .)
+    LESSTHENE       reduce using rule 39 (expression -> addr_expr .)
+    GREATTHENE      reduce using rule 39 (expression -> addr_expr .)
+    ISEQL           reduce using rule 39 (expression -> addr_expr .)
+    ISNEQL          reduce using rule 39 (expression -> addr_expr .)
+    PLUS            reduce using rule 39 (expression -> addr_expr .)
+    TIMES           reduce using rule 39 (expression -> addr_expr .)
+    MINUS           reduce using rule 39 (expression -> addr_expr .)
+    DIVIDE          reduce using rule 39 (expression -> addr_expr .)
+    RPAREN          reduce using rule 39 (expression -> addr_expr .)
+    LAND            reduce using rule 39 (expression -> addr_expr .)
+    LOR             reduce using rule 39 (expression -> addr_expr .)
+    ;               reduce using rule 39 (expression -> addr_expr .)
 
 
 state 52
 
-    (43) ptr_expr_base -> ID .
+    (15) condition -> expression . LESSTHEN expression
+    (16) condition -> expression . GREATTHEN expression
+    (17) condition -> expression . LESSTHENE expression
+    (18) condition -> expression . GREATTHENE expression
+    (19) condition -> expression . ISEQL expression
+    (20) condition -> expression . ISNEQL expression
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    STAR            reduce using rule 43 (ptr_expr_base -> ID .)
-    SLASH           reduce using rule 43 (ptr_expr_base -> ID .)
-    PLUS            reduce using rule 43 (ptr_expr_base -> ID .)
-    MINUS           reduce using rule 43 (ptr_expr_base -> ID .)
-    AND             reduce using rule 43 (ptr_expr_base -> ID .)
-    RPAREN          reduce using rule 43 (ptr_expr_base -> ID .)
-    OR              reduce using rule 43 (ptr_expr_base -> ID .)
-    SEMICOLON       reduce using rule 43 (ptr_expr_base -> ID .)
-    GT              reduce using rule 43 (ptr_expr_base -> ID .)
-    LT              reduce using rule 43 (ptr_expr_base -> ID .)
-    EQUALS          reduce using rule 43 (ptr_expr_base -> ID .)
-    NOT             reduce using rule 43 (ptr_expr_base -> ID .)
+    LESSTHEN        shift and go to state 73
+    GREATTHEN       shift and go to state 72
+    LESSTHENE       shift and go to state 74
+    GREATTHENE      shift and go to state 71
+    ISEQL           shift and go to state 66
+    ISNEQL          shift and go to state 70
+    PLUS            shift and go to state 69
+    TIMES           shift and go to state 67
+    MINUS           shift and go to state 65
+    DIVIDE          shift and go to state 68
 
 
 state 53
 
-    (26) a_bool_expr -> n_bool_expr .
+    (41) expression -> LPAREN . expression RPAREN
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    AND             reduce using rule 26 (a_bool_expr -> n_bool_expr .)
-    RPAREN          reduce using rule 26 (a_bool_expr -> n_bool_expr .)
-    OR              reduce using rule 26 (a_bool_expr -> n_bool_expr .)
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    variable                       shift and go to state 45
+    addr_expr                      shift and go to state 51
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 75
 
 state 54
 
-    (27) n_bool_expr -> NOT . n_bool_expr
-    (27) n_bool_expr -> . NOT n_bool_expr
-    (28) n_bool_expr -> . sub_bool_expr
-    (29) sub_bool_expr -> . ptr_expr GT ptr_expr
-    (30) sub_bool_expr -> . ptr_expr GT EQUALS ptr_expr
-    (31) sub_bool_expr -> . ptr_expr LT ptr_expr
-    (32) sub_bool_expr -> . ptr_expr LT EQUALS ptr_expr
-    (33) sub_bool_expr -> . ptr_expr EQUALS EQUALS ptr_expr
-    (34) sub_bool_expr -> . ptr_expr NOT EQUALS ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (33) assignment_statement -> lvalue EQUAL expression . ;
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    NOT             shift and go to state 54
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    ;               shift and go to state 76
+    PLUS            shift and go to state 69
+    TIMES           shift and go to state 67
+    MINUS           shift and go to state 65
+    DIVIDE          shift and go to state 68
 
-    n_bool_expr                    shift and go to state 72
-    addr                           shift and go to state 46
-    sub_bool_expr                  shift and go to state 41
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 51
-    ptr                            shift and go to state 47
 
 state 55
 
-    (21) ptr_assgn -> ptr EQUALS ptr_expr .
-    (35) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (36) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (47) addr_expr -> ADDR variable .
 
-    SEMICOLON       reduce using rule 21 (ptr_assgn -> ptr EQUALS ptr_expr .)
-    PLUS            shift and go to state 69
-    MINUS           shift and go to state 71
+    PLUS            reduce using rule 47 (addr_expr -> ADDR variable .)
+    TIMES           reduce using rule 47 (addr_expr -> ADDR variable .)
+    MINUS           reduce using rule 47 (addr_expr -> ADDR variable .)
+    DIVIDE          reduce using rule 47 (addr_expr -> ADDR variable .)
+    RPAREN          reduce using rule 47 (addr_expr -> ADDR variable .)
+    LAND            reduce using rule 47 (addr_expr -> ADDR variable .)
+    LOR             reduce using rule 47 (addr_expr -> ADDR variable .)
+    LESSTHEN        reduce using rule 47 (addr_expr -> ADDR variable .)
+    GREATTHEN       reduce using rule 47 (addr_expr -> ADDR variable .)
+    LESSTHENE       reduce using rule 47 (addr_expr -> ADDR variable .)
+    GREATTHENE      reduce using rule 47 (addr_expr -> ADDR variable .)
+    ISEQL           reduce using rule 47 (addr_expr -> ADDR variable .)
+    ISNEQL          reduce using rule 47 (addr_expr -> ADDR variable .)
+    ;               reduce using rule 47 (addr_expr -> ADDR variable .)
+    EQUAL           reduce using rule 47 (addr_expr -> ADDR variable .)
 
 
 state 56
 
-    (22) num_assgn -> ID EQUALS ptr_expr .
-    (35) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (36) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (48) addr_expr -> ADDR ptr_expr .
 
-    SEMICOLON       reduce using rule 22 (num_assgn -> ID EQUALS ptr_expr .)
-    PLUS            shift and go to state 69
-    MINUS           shift and go to state 71
+    PLUS            reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    TIMES           reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    MINUS           reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    DIVIDE          reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    RPAREN          reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    LAND            reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    LOR             reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    LESSTHEN        reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    GREATTHEN       reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    LESSTHENE       reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    GREATTHENE      reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    ISEQL           reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    ISNEQL          reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    ;               reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
+    EQUAL           reduce using rule 48 (addr_expr -> ADDR ptr_expr .)
 
 
 state 57
 
-    (9) if_stmt -> IF LPAREN bool_expr . RPAREN compound_stmt
-    (10) if_stmt -> IF LPAREN bool_expr . RPAREN compound_stmt ELSE compound_stmt
-    (23) bool_expr -> bool_expr . OR OR a_bool_expr
+    (9) ctrlflow -> WHILE LPAREN condition . RPAREN statement_block
+    (21) condition -> condition . LAND condition
+    (22) condition -> condition . LOR condition
 
-    RPAREN          shift and go to state 73
-    OR              shift and go to state 65
+    RPAREN          shift and go to state 77
+    LAND            shift and go to state 62
+    LOR             shift and go to state 60
 
 
 state 58
 
-    (17) decl_list -> decl_list COMMA . ID
-    (18) decl_list -> decl_list COMMA . ptr
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
+    (14) condition -> LPAREN condition . RPAREN
+    (21) condition -> condition . LAND condition
+    (22) condition -> condition . LOR condition
 
-    ID              shift and go to state 75
-    STAR            shift and go to state 8
+    RPAREN          shift and go to state 78
+    LAND            shift and go to state 62
+    LOR             shift and go to state 60
 
-    ptr                            shift and go to state 74
 
 state 59
 
-    (47) ptr_expr_base -> LPAREN ptr_expr . RPAREN
-    (35) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (36) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (41) expression -> LPAREN expression . RPAREN
+    (15) condition -> expression . LESSTHEN expression
+    (16) condition -> expression . GREATTHEN expression
+    (17) condition -> expression . LESSTHENE expression
+    (18) condition -> expression . GREATTHENE expression
+    (19) condition -> expression . ISEQL expression
+    (20) condition -> expression . ISNEQL expression
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    RPAREN          shift and go to state 76
+    RPAREN          shift and go to state 79
+    LESSTHEN        shift and go to state 73
+    GREATTHEN       shift and go to state 72
+    LESSTHENE       shift and go to state 74
+    GREATTHENE      shift and go to state 71
+    ISEQL           shift and go to state 66
+    ISNEQL          shift and go to state 70
     PLUS            shift and go to state 69
-    MINUS           shift and go to state 71
+    TIMES           shift and go to state 67
+    MINUS           shift and go to state 65
+    DIVIDE          shift and go to state 68
 
 
 state 60
 
-    (25) a_bool_expr -> a_bool_expr AND . AND n_bool_expr
+    (22) condition -> condition LOR . condition
+    (14) condition -> . LPAREN condition RPAREN
+    (15) condition -> . expression LESSTHEN expression
+    (16) condition -> . expression GREATTHEN expression
+    (17) condition -> . expression LESSTHENE expression
+    (18) condition -> . expression GREATTHENE expression
+    (19) condition -> . expression ISEQL expression
+    (20) condition -> . expression ISNEQL expression
+    (21) condition -> . condition LAND condition
+    (22) condition -> . condition LOR condition
+    (23) condition -> . LNOT condition
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    AND             shift and go to state 77
+    LPAREN          shift and go to state 44
+    LNOT            shift and go to state 50
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    condition                      shift and go to state 80
+    addr_expr                      shift and go to state 51
+    variable                       shift and go to state 45
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 52
 
 state 61
 
-    (38) ptr_factor -> ptr_factor STAR . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (8) ctrlflow -> IF LPAREN condition RPAREN . statement_block
+    (10) ctrlflow -> IF LPAREN condition RPAREN . statement_block ELSE statement_block
+    (11) statement_block -> . { statement_list }
+    (12) statement_block -> . ;
+    (13) statement_block -> . statement
+    (6) statement -> . ctrlflow
+    (7) statement -> . assignment_statement
+    (8) ctrlflow -> . IF LPAREN condition RPAREN statement_block
+    (9) ctrlflow -> . WHILE LPAREN condition RPAREN statement_block
+    (10) ctrlflow -> . IF LPAREN condition RPAREN statement_block ELSE statement_block
+    (33) assignment_statement -> . lvalue EQUAL expression ;
+    (49) lvalue -> . variable
+    (50) lvalue -> . ptr_expr
+    (51) variable -> . NAME
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
 
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    {               shift and go to state 84
+    ;               shift and go to state 82
+    IF              shift and go to state 22
+    WHILE           shift and go to state 27
+    NAME            shift and go to state 20
+    TIMES           shift and go to state 24
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 78
-    ptr_expr_base                  shift and go to state 48
-    ptr                            shift and go to state 47
+    statement                      shift and go to state 81
+    assignment_statement           shift and go to state 28
+    ctrlflow                       shift and go to state 25
+    variable                       shift and go to state 26
+    lvalue                         shift and go to state 23
+    ptr_expr                       shift and go to state 30
+    statement_block                shift and go to state 83
 
 state 62
 
-    (39) ptr_factor -> ptr_factor SLASH . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (21) condition -> condition LAND . condition
+    (14) condition -> . LPAREN condition RPAREN
+    (15) condition -> . expression LESSTHEN expression
+    (16) condition -> . expression GREATTHEN expression
+    (17) condition -> . expression LESSTHENE expression
+    (18) condition -> . expression GREATTHENE expression
+    (19) condition -> . expression ISEQL expression
+    (20) condition -> . expression ISNEQL expression
+    (21) condition -> . condition LAND condition
+    (22) condition -> . condition LOR condition
+    (23) condition -> . LNOT condition
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    LPAREN          shift and go to state 44
+    LNOT            shift and go to state 50
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 79
-    ptr_expr_base                  shift and go to state 48
-    ptr                            shift and go to state 47
+    condition                      shift and go to state 85
+    addr_expr                      shift and go to state 51
+    variable                       shift and go to state 45
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 52
 
 state 63
 
-    (41) ptr_term -> MINUS ptr_term .
+    (42) expression -> MINUS expression .
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    STAR            reduce using rule 41 (ptr_term -> MINUS ptr_term .)
-    SLASH           reduce using rule 41 (ptr_term -> MINUS ptr_term .)
-    PLUS            reduce using rule 41 (ptr_term -> MINUS ptr_term .)
-    MINUS           reduce using rule 41 (ptr_term -> MINUS ptr_term .)
-    AND             reduce using rule 41 (ptr_term -> MINUS ptr_term .)
-    RPAREN          reduce using rule 41 (ptr_term -> MINUS ptr_term .)
-    OR              reduce using rule 41 (ptr_term -> MINUS ptr_term .)
-    GT              reduce using rule 41 (ptr_term -> MINUS ptr_term .)
-    LT              reduce using rule 41 (ptr_term -> MINUS ptr_term .)
-    EQUALS          reduce using rule 41 (ptr_term -> MINUS ptr_term .)
-    NOT             reduce using rule 41 (ptr_term -> MINUS ptr_term .)
-    SEMICOLON       reduce using rule 41 (ptr_term -> MINUS ptr_term .)
+    LESSTHEN        reduce using rule 42 (expression -> MINUS expression .)
+    GREATTHEN       reduce using rule 42 (expression -> MINUS expression .)
+    LESSTHENE       reduce using rule 42 (expression -> MINUS expression .)
+    GREATTHENE      reduce using rule 42 (expression -> MINUS expression .)
+    ISEQL           reduce using rule 42 (expression -> MINUS expression .)
+    ISNEQL          reduce using rule 42 (expression -> MINUS expression .)
+    PLUS            reduce using rule 42 (expression -> MINUS expression .)
+    TIMES           reduce using rule 42 (expression -> MINUS expression .)
+    MINUS           reduce using rule 42 (expression -> MINUS expression .)
+    DIVIDE          reduce using rule 42 (expression -> MINUS expression .)
+    RPAREN          reduce using rule 42 (expression -> MINUS expression .)
+    LAND            reduce using rule 42 (expression -> MINUS expression .)
+    LOR             reduce using rule 42 (expression -> MINUS expression .)
+    ;               reduce using rule 42 (expression -> MINUS expression .)
+
+  ! PLUS            [ shift and go to state 69 ]
+  ! TIMES           [ shift and go to state 67 ]
+  ! MINUS           [ shift and go to state 65 ]
+  ! DIVIDE          [ shift and go to state 68 ]
 
 
 state 64
 
-    (11) while_stmt -> WHILE LPAREN bool_expr RPAREN . compound_stmt
-    (12) compound_stmt -> . stmt
-    (13) compound_stmt -> . LCURL body RCURL
-    (5) stmt -> . decl SEMICOLON
-    (6) stmt -> . assgn SEMICOLON
-    (7) stmt -> . if_stmt
-    (8) stmt -> . while_stmt
-    (16) decl -> . INT decl_list
-    (14) assgn -> . ptr_assgn
-    (15) assgn -> . num_assgn
-    (9) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt
-    (10) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt
-    (11) while_stmt -> . WHILE LPAREN bool_expr RPAREN compound_stmt
-    (21) ptr_assgn -> . ptr EQUALS ptr_expr
-    (22) num_assgn -> . ID EQUALS ptr_expr
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
+    (23) condition -> LNOT condition .
+    (21) condition -> condition . LAND condition
+    (22) condition -> condition . LOR condition
 
-    LCURL           shift and go to state 80
-    INT             shift and go to state 19
-    IF              shift and go to state 17
-    WHILE           shift and go to state 9
-    ID              shift and go to state 16
-    STAR            shift and go to state 8
+    RPAREN          reduce using rule 23 (condition -> LNOT condition .)
+    LAND            reduce using rule 23 (condition -> LNOT condition .)
+    LOR             reduce using rule 23 (condition -> LNOT condition .)
 
-    decl                           shift and go to state 7
-    if_stmt                        shift and go to state 18
-    assgn                          shift and go to state 11
-    num_assgn                      shift and go to state 14
-    ptr_assgn                      shift and go to state 20
-    stmt                           shift and go to state 82
-    ptr                            shift and go to state 10
-    while_stmt                     shift and go to state 21
-    compound_stmt                  shift and go to state 81
+  ! LAND            [ shift and go to state 62 ]
+  ! LOR             [ shift and go to state 60 ]
+
 
 state 65
 
-    (23) bool_expr -> bool_expr OR . OR a_bool_expr
+    (36) expression -> expression MINUS . expression
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    OR              shift and go to state 83
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    variable                       shift and go to state 45
+    addr_expr                      shift and go to state 51
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 86
 
 state 66
 
-    (29) sub_bool_expr -> ptr_expr GT . ptr_expr
-    (30) sub_bool_expr -> ptr_expr GT . EQUALS ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (19) condition -> expression ISEQL . expression
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    EQUALS          shift and go to state 84
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 85
-    ptr                            shift and go to state 47
+    variable                       shift and go to state 45
+    addr_expr                      shift and go to state 51
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 87
 
 state 67
 
-    (33) sub_bool_expr -> ptr_expr EQUALS . EQUALS ptr_expr
+    (35) expression -> expression TIMES . expression
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    EQUALS          shift and go to state 86
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    variable                       shift and go to state 45
+    addr_expr                      shift and go to state 51
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 88
 
 state 68
 
-    (31) sub_bool_expr -> ptr_expr LT . ptr_expr
-    (32) sub_bool_expr -> ptr_expr LT . EQUALS ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (37) expression -> expression DIVIDE . expression
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    EQUALS          shift and go to state 87
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 88
-    ptr                            shift and go to state 47
+    variable                       shift and go to state 45
+    addr_expr                      shift and go to state 51
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 89
 
 state 69
 
-    (35) ptr_expr -> ptr_expr PLUS . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (34) expression -> expression PLUS . expression
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 89
-    ptr                            shift and go to state 47
+    variable                       shift and go to state 45
+    addr_expr                      shift and go to state 51
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 90
 
 state 70
 
-    (34) sub_bool_expr -> ptr_expr NOT . EQUALS ptr_expr
+    (20) condition -> expression ISNEQL . expression
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    EQUALS          shift and go to state 90
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    variable                       shift and go to state 45
+    addr_expr                      shift and go to state 51
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 91
 
 state 71
 
-    (36) ptr_expr -> ptr_expr MINUS . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (18) condition -> expression GREATTHENE . expression
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 91
-    ptr                            shift and go to state 47
+    variable                       shift and go to state 45
+    addr_expr                      shift and go to state 51
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 92
 
 state 72
 
-    (27) n_bool_expr -> NOT n_bool_expr .
+    (16) condition -> expression GREATTHEN . expression
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    AND             reduce using rule 27 (n_bool_expr -> NOT n_bool_expr .)
-    RPAREN          reduce using rule 27 (n_bool_expr -> NOT n_bool_expr .)
-    OR              reduce using rule 27 (n_bool_expr -> NOT n_bool_expr .)
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    variable                       shift and go to state 45
+    addr_expr                      shift and go to state 51
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 93
 
 state 73
 
-    (9) if_stmt -> IF LPAREN bool_expr RPAREN . compound_stmt
-    (10) if_stmt -> IF LPAREN bool_expr RPAREN . compound_stmt ELSE compound_stmt
-    (12) compound_stmt -> . stmt
-    (13) compound_stmt -> . LCURL body RCURL
-    (5) stmt -> . decl SEMICOLON
-    (6) stmt -> . assgn SEMICOLON
-    (7) stmt -> . if_stmt
-    (8) stmt -> . while_stmt
-    (16) decl -> . INT decl_list
-    (14) assgn -> . ptr_assgn
-    (15) assgn -> . num_assgn
-    (9) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt
-    (10) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt
-    (11) while_stmt -> . WHILE LPAREN bool_expr RPAREN compound_stmt
-    (21) ptr_assgn -> . ptr EQUALS ptr_expr
-    (22) num_assgn -> . ID EQUALS ptr_expr
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
+    (15) condition -> expression LESSTHEN . expression
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    LCURL           shift and go to state 80
-    INT             shift and go to state 19
-    IF              shift and go to state 17
-    WHILE           shift and go to state 9
-    ID              shift and go to state 16
-    STAR            shift and go to state 8
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
-    decl                           shift and go to state 7
-    if_stmt                        shift and go to state 18
-    assgn                          shift and go to state 11
-    num_assgn                      shift and go to state 14
-    ptr_assgn                      shift and go to state 20
-    stmt                           shift and go to state 82
-    ptr                            shift and go to state 10
-    while_stmt                     shift and go to state 21
-    compound_stmt                  shift and go to state 92
+    variable                       shift and go to state 45
+    addr_expr                      shift and go to state 51
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 94
 
 state 74
 
-    (18) decl_list -> decl_list COMMA ptr .
+    (17) condition -> expression LESSTHENE . expression
+    (34) expression -> . expression PLUS expression
+    (35) expression -> . expression TIMES expression
+    (36) expression -> . expression MINUS expression
+    (37) expression -> . expression DIVIDE expression
+    (38) expression -> . ptr_expr
+    (39) expression -> . addr_expr
+    (40) expression -> . variable
+    (41) expression -> . LPAREN expression RPAREN
+    (42) expression -> . MINUS expression
+    (43) expression -> . NUMBER
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
+    (47) addr_expr -> . ADDR variable
+    (48) addr_expr -> . ADDR ptr_expr
+    (51) variable -> . NAME
 
-    COMMA           reduce using rule 18 (decl_list -> decl_list COMMA ptr .)
-    SEMICOLON       reduce using rule 18 (decl_list -> decl_list COMMA ptr .)
+    LPAREN          shift and go to state 53
+    MINUS           shift and go to state 48
+    NUMBER          shift and go to state 49
+    TIMES           shift and go to state 24
+    ADDR            shift and go to state 37
+    NAME            shift and go to state 20
 
+    variable                       shift and go to state 45
+    addr_expr                      shift and go to state 51
+    ptr_expr                       shift and go to state 47
+    expression                     shift and go to state 95
 
 state 75
 
-    (17) decl_list -> decl_list COMMA ID .
+    (41) expression -> LPAREN expression . RPAREN
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    COMMA           reduce using rule 17 (decl_list -> decl_list COMMA ID .)
-    SEMICOLON       reduce using rule 17 (decl_list -> decl_list COMMA ID .)
+    RPAREN          shift and go to state 79
+    PLUS            shift and go to state 69
+    TIMES           shift and go to state 67
+    MINUS           shift and go to state 65
+    DIVIDE          shift and go to state 68
 
 
 state 76
 
-    (47) ptr_expr_base -> LPAREN ptr_expr RPAREN .
+    (33) assignment_statement -> lvalue EQUAL expression ; .
 
-    STAR            reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    SLASH           reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    PLUS            reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    MINUS           reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    AND             reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    RPAREN          reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    OR              reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    SEMICOLON       reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    GT              reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    LT              reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    EQUALS          reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
-    NOT             reduce using rule 47 (ptr_expr_base -> LPAREN ptr_expr RPAREN .)
+    }               reduce using rule 33 (assignment_statement -> lvalue EQUAL expression ; .)
+    IF              reduce using rule 33 (assignment_statement -> lvalue EQUAL expression ; .)
+    WHILE           reduce using rule 33 (assignment_statement -> lvalue EQUAL expression ; .)
+    NAME            reduce using rule 33 (assignment_statement -> lvalue EQUAL expression ; .)
+    TIMES           reduce using rule 33 (assignment_statement -> lvalue EQUAL expression ; .)
+    ELSE            reduce using rule 33 (assignment_statement -> lvalue EQUAL expression ; .)
 
 
 state 77
 
-    (25) a_bool_expr -> a_bool_expr AND AND . n_bool_expr
-    (27) n_bool_expr -> . NOT n_bool_expr
-    (28) n_bool_expr -> . sub_bool_expr
-    (29) sub_bool_expr -> . ptr_expr GT ptr_expr
-    (30) sub_bool_expr -> . ptr_expr GT EQUALS ptr_expr
-    (31) sub_bool_expr -> . ptr_expr LT ptr_expr
-    (32) sub_bool_expr -> . ptr_expr LT EQUALS ptr_expr
-    (33) sub_bool_expr -> . ptr_expr EQUALS EQUALS ptr_expr
-    (34) sub_bool_expr -> . ptr_expr NOT EQUALS ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (9) ctrlflow -> WHILE LPAREN condition RPAREN . statement_block
+    (11) statement_block -> . { statement_list }
+    (12) statement_block -> . ;
+    (13) statement_block -> . statement
+    (6) statement -> . ctrlflow
+    (7) statement -> . assignment_statement
+    (8) ctrlflow -> . IF LPAREN condition RPAREN statement_block
+    (9) ctrlflow -> . WHILE LPAREN condition RPAREN statement_block
+    (10) ctrlflow -> . IF LPAREN condition RPAREN statement_block ELSE statement_block
+    (33) assignment_statement -> . lvalue EQUAL expression ;
+    (49) lvalue -> . variable
+    (50) lvalue -> . ptr_expr
+    (51) variable -> . NAME
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
 
-    NOT             shift and go to state 54
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    {               shift and go to state 84
+    ;               shift and go to state 82
+    IF              shift and go to state 22
+    WHILE           shift and go to state 27
+    NAME            shift and go to state 20
+    TIMES           shift and go to state 24
 
-    n_bool_expr                    shift and go to state 93
-    addr                           shift and go to state 46
-    sub_bool_expr                  shift and go to state 41
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 51
-    ptr                            shift and go to state 47
+    statement                      shift and go to state 81
+    assignment_statement           shift and go to state 28
+    ctrlflow                       shift and go to state 25
+    variable                       shift and go to state 26
+    lvalue                         shift and go to state 23
+    ptr_expr                       shift and go to state 30
+    statement_block                shift and go to state 96
 
 state 78
 
-    (38) ptr_factor -> ptr_factor STAR ptr_term .
+    (14) condition -> LPAREN condition RPAREN .
 
-    STAR            reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
-    SLASH           reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
-    GT              reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
-    LT              reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
-    EQUALS          reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
-    NOT             reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
-    PLUS            reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
-    MINUS           reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
-    AND             reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
-    RPAREN          reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
-    OR              reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
-    SEMICOLON       reduce using rule 38 (ptr_factor -> ptr_factor STAR ptr_term .)
+    RPAREN          reduce using rule 14 (condition -> LPAREN condition RPAREN .)
+    LAND            reduce using rule 14 (condition -> LPAREN condition RPAREN .)
+    LOR             reduce using rule 14 (condition -> LPAREN condition RPAREN .)
 
 
 state 79
 
-    (39) ptr_factor -> ptr_factor SLASH ptr_term .
+    (41) expression -> LPAREN expression RPAREN .
 
-    STAR            reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    SLASH           reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    GT              reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    LT              reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    EQUALS          reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    NOT             reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    PLUS            reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    MINUS           reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    AND             reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    RPAREN          reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    OR              reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
-    SEMICOLON       reduce using rule 39 (ptr_factor -> ptr_factor SLASH ptr_term .)
+    LESSTHEN        reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    GREATTHEN       reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    LESSTHENE       reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    GREATTHENE      reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    ISEQL           reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    ISNEQL          reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    PLUS            reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    TIMES           reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    MINUS           reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    DIVIDE          reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    RPAREN          reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    LAND            reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    LOR             reduce using rule 41 (expression -> LPAREN expression RPAREN .)
+    ;               reduce using rule 41 (expression -> LPAREN expression RPAREN .)
 
 
 state 80
 
-    (13) compound_stmt -> LCURL . body RCURL
-    (3) body -> . body stmt
-    (4) body -> . stmt
-    (5) stmt -> . decl SEMICOLON
-    (6) stmt -> . assgn SEMICOLON
-    (7) stmt -> . if_stmt
-    (8) stmt -> . while_stmt
-    (16) decl -> . INT decl_list
-    (14) assgn -> . ptr_assgn
-    (15) assgn -> . num_assgn
-    (9) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt
-    (10) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt
-    (11) while_stmt -> . WHILE LPAREN bool_expr RPAREN compound_stmt
-    (21) ptr_assgn -> . ptr EQUALS ptr_expr
-    (22) num_assgn -> . ID EQUALS ptr_expr
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
+    (22) condition -> condition LOR condition .
+    (21) condition -> condition . LAND condition
+    (22) condition -> condition . LOR condition
 
-    INT             shift and go to state 19
-    IF              shift and go to state 17
-    WHILE           shift and go to state 9
-    ID              shift and go to state 16
-    STAR            shift and go to state 8
+    RPAREN          reduce using rule 22 (condition -> condition LOR condition .)
+    LAND            reduce using rule 22 (condition -> condition LOR condition .)
+    LOR             reduce using rule 22 (condition -> condition LOR condition .)
 
-    body                           shift and go to state 94
-    decl                           shift and go to state 7
-    if_stmt                        shift and go to state 18
-    assgn                          shift and go to state 11
-    num_assgn                      shift and go to state 14
-    ptr_assgn                      shift and go to state 20
-    stmt                           shift and go to state 15
-    ptr                            shift and go to state 10
-    while_stmt                     shift and go to state 21
+  ! LAND            [ shift and go to state 62 ]
+  ! LOR             [ shift and go to state 60 ]
+
 
 state 81
 
-    (11) while_stmt -> WHILE LPAREN bool_expr RPAREN compound_stmt .
+    (13) statement_block -> statement .
 
-    RCURL           reduce using rule 11 (while_stmt -> WHILE LPAREN bool_expr RPAREN compound_stmt .)
-    INT             reduce using rule 11 (while_stmt -> WHILE LPAREN bool_expr RPAREN compound_stmt .)
-    IF              reduce using rule 11 (while_stmt -> WHILE LPAREN bool_expr RPAREN compound_stmt .)
-    WHILE           reduce using rule 11 (while_stmt -> WHILE LPAREN bool_expr RPAREN compound_stmt .)
-    ID              reduce using rule 11 (while_stmt -> WHILE LPAREN bool_expr RPAREN compound_stmt .)
-    STAR            reduce using rule 11 (while_stmt -> WHILE LPAREN bool_expr RPAREN compound_stmt .)
-    ELSE            reduce using rule 11 (while_stmt -> WHILE LPAREN bool_expr RPAREN compound_stmt .)
+    ELSE            reduce using rule 13 (statement_block -> statement .)
+    }               reduce using rule 13 (statement_block -> statement .)
+    IF              reduce using rule 13 (statement_block -> statement .)
+    WHILE           reduce using rule 13 (statement_block -> statement .)
+    NAME            reduce using rule 13 (statement_block -> statement .)
+    TIMES           reduce using rule 13 (statement_block -> statement .)
 
 
 state 82
 
-    (12) compound_stmt -> stmt .
+    (12) statement_block -> ; .
 
-    RCURL           reduce using rule 12 (compound_stmt -> stmt .)
-    INT             reduce using rule 12 (compound_stmt -> stmt .)
-    IF              reduce using rule 12 (compound_stmt -> stmt .)
-    WHILE           reduce using rule 12 (compound_stmt -> stmt .)
-    ID              reduce using rule 12 (compound_stmt -> stmt .)
-    STAR            reduce using rule 12 (compound_stmt -> stmt .)
-    ELSE            reduce using rule 12 (compound_stmt -> stmt .)
+    ELSE            reduce using rule 12 (statement_block -> ; .)
+    }               reduce using rule 12 (statement_block -> ; .)
+    IF              reduce using rule 12 (statement_block -> ; .)
+    WHILE           reduce using rule 12 (statement_block -> ; .)
+    NAME            reduce using rule 12 (statement_block -> ; .)
+    TIMES           reduce using rule 12 (statement_block -> ; .)
 
 
 state 83
 
-    (23) bool_expr -> bool_expr OR OR . a_bool_expr
-    (25) a_bool_expr -> . a_bool_expr AND AND n_bool_expr
-    (26) a_bool_expr -> . n_bool_expr
-    (27) n_bool_expr -> . NOT n_bool_expr
-    (28) n_bool_expr -> . sub_bool_expr
-    (29) sub_bool_expr -> . ptr_expr GT ptr_expr
-    (30) sub_bool_expr -> . ptr_expr GT EQUALS ptr_expr
-    (31) sub_bool_expr -> . ptr_expr LT ptr_expr
-    (32) sub_bool_expr -> . ptr_expr LT EQUALS ptr_expr
-    (33) sub_bool_expr -> . ptr_expr EQUALS EQUALS ptr_expr
-    (34) sub_bool_expr -> . ptr_expr NOT EQUALS ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (8) ctrlflow -> IF LPAREN condition RPAREN statement_block .
+    (10) ctrlflow -> IF LPAREN condition RPAREN statement_block . ELSE statement_block
 
-    NOT             shift and go to state 54
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    }               reduce using rule 8 (ctrlflow -> IF LPAREN condition RPAREN statement_block .)
+    IF              reduce using rule 8 (ctrlflow -> IF LPAREN condition RPAREN statement_block .)
+    WHILE           reduce using rule 8 (ctrlflow -> IF LPAREN condition RPAREN statement_block .)
+    NAME            reduce using rule 8 (ctrlflow -> IF LPAREN condition RPAREN statement_block .)
+    TIMES           reduce using rule 8 (ctrlflow -> IF LPAREN condition RPAREN statement_block .)
+    ELSE            shift and go to state 97
 
-    n_bool_expr                    shift and go to state 53
-    addr                           shift and go to state 46
-    sub_bool_expr                  shift and go to state 41
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    a_bool_expr                    shift and go to state 95
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 51
-    ptr                            shift and go to state 47
+  ! ELSE            [ reduce using rule 8 (ctrlflow -> IF LPAREN condition RPAREN statement_block .) ]
+
 
 state 84
 
-    (30) sub_bool_expr -> ptr_expr GT EQUALS . ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (11) statement_block -> { . statement_list }
+    (4) statement_list -> . statement_list statement
+    (5) statement_list -> . empty
+    (1) empty -> .
 
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    }               reduce using rule 1 (empty -> .)
+    IF              reduce using rule 1 (empty -> .)
+    WHILE           reduce using rule 1 (empty -> .)
+    NAME            reduce using rule 1 (empty -> .)
+    TIMES           reduce using rule 1 (empty -> .)
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 96
-    ptr                            shift and go to state 47
+    empty                          shift and go to state 13
+    statement_list                 shift and go to state 98
 
 state 85
 
-    (29) sub_bool_expr -> ptr_expr GT ptr_expr .
-    (35) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (36) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (21) condition -> condition LAND condition .
+    (21) condition -> condition . LAND condition
+    (22) condition -> condition . LOR condition
 
-    AND             reduce using rule 29 (sub_bool_expr -> ptr_expr GT ptr_expr .)
-    RPAREN          reduce using rule 29 (sub_bool_expr -> ptr_expr GT ptr_expr .)
-    OR              reduce using rule 29 (sub_bool_expr -> ptr_expr GT ptr_expr .)
-    PLUS            shift and go to state 69
-    MINUS           shift and go to state 71
+    RPAREN          reduce using rule 21 (condition -> condition LAND condition .)
+    LAND            reduce using rule 21 (condition -> condition LAND condition .)
+    LOR             reduce using rule 21 (condition -> condition LAND condition .)
+
+  ! LAND            [ shift and go to state 62 ]
+  ! LOR             [ shift and go to state 60 ]
 
 
 state 86
 
-    (33) sub_bool_expr -> ptr_expr EQUALS EQUALS . ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (36) expression -> expression MINUS expression .
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    LESSTHEN        reduce using rule 36 (expression -> expression MINUS expression .)
+    GREATTHEN       reduce using rule 36 (expression -> expression MINUS expression .)
+    LESSTHENE       reduce using rule 36 (expression -> expression MINUS expression .)
+    GREATTHENE      reduce using rule 36 (expression -> expression MINUS expression .)
+    ISEQL           reduce using rule 36 (expression -> expression MINUS expression .)
+    ISNEQL          reduce using rule 36 (expression -> expression MINUS expression .)
+    PLUS            reduce using rule 36 (expression -> expression MINUS expression .)
+    MINUS           reduce using rule 36 (expression -> expression MINUS expression .)
+    RPAREN          reduce using rule 36 (expression -> expression MINUS expression .)
+    LAND            reduce using rule 36 (expression -> expression MINUS expression .)
+    LOR             reduce using rule 36 (expression -> expression MINUS expression .)
+    ;               reduce using rule 36 (expression -> expression MINUS expression .)
+    TIMES           shift and go to state 67
+    DIVIDE          shift and go to state 68
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 97
-    ptr                            shift and go to state 47
+  ! TIMES           [ reduce using rule 36 (expression -> expression MINUS expression .) ]
+  ! DIVIDE          [ reduce using rule 36 (expression -> expression MINUS expression .) ]
+  ! PLUS            [ shift and go to state 69 ]
+  ! MINUS           [ shift and go to state 65 ]
+
 
 state 87
 
-    (32) sub_bool_expr -> ptr_expr LT EQUALS . ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (19) condition -> expression ISEQL expression .
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    RPAREN          reduce using rule 19 (condition -> expression ISEQL expression .)
+    LAND            reduce using rule 19 (condition -> expression ISEQL expression .)
+    LOR             reduce using rule 19 (condition -> expression ISEQL expression .)
+    PLUS            shift and go to state 69
+    TIMES           shift and go to state 67
+    MINUS           shift and go to state 65
+    DIVIDE          shift and go to state 68
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 98
-    ptr                            shift and go to state 47
 
 state 88
 
-    (31) sub_bool_expr -> ptr_expr LT ptr_expr .
-    (35) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (36) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (35) expression -> expression TIMES expression .
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    AND             reduce using rule 31 (sub_bool_expr -> ptr_expr LT ptr_expr .)
-    RPAREN          reduce using rule 31 (sub_bool_expr -> ptr_expr LT ptr_expr .)
-    OR              reduce using rule 31 (sub_bool_expr -> ptr_expr LT ptr_expr .)
-    PLUS            shift and go to state 69
-    MINUS           shift and go to state 71
+    LESSTHEN        reduce using rule 35 (expression -> expression TIMES expression .)
+    GREATTHEN       reduce using rule 35 (expression -> expression TIMES expression .)
+    LESSTHENE       reduce using rule 35 (expression -> expression TIMES expression .)
+    GREATTHENE      reduce using rule 35 (expression -> expression TIMES expression .)
+    ISEQL           reduce using rule 35 (expression -> expression TIMES expression .)
+    ISNEQL          reduce using rule 35 (expression -> expression TIMES expression .)
+    PLUS            reduce using rule 35 (expression -> expression TIMES expression .)
+    TIMES           reduce using rule 35 (expression -> expression TIMES expression .)
+    MINUS           reduce using rule 35 (expression -> expression TIMES expression .)
+    DIVIDE          reduce using rule 35 (expression -> expression TIMES expression .)
+    RPAREN          reduce using rule 35 (expression -> expression TIMES expression .)
+    LAND            reduce using rule 35 (expression -> expression TIMES expression .)
+    LOR             reduce using rule 35 (expression -> expression TIMES expression .)
+    ;               reduce using rule 35 (expression -> expression TIMES expression .)
+
+  ! PLUS            [ shift and go to state 69 ]
+  ! TIMES           [ shift and go to state 67 ]
+  ! MINUS           [ shift and go to state 65 ]
+  ! DIVIDE          [ shift and go to state 68 ]
 
 
 state 89
 
-    (35) ptr_expr -> ptr_expr PLUS ptr_factor .
-    (38) ptr_factor -> ptr_factor . STAR ptr_term
-    (39) ptr_factor -> ptr_factor . SLASH ptr_term
+    (37) expression -> expression DIVIDE expression .
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    PLUS            reduce using rule 35 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    MINUS           reduce using rule 35 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    AND             reduce using rule 35 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    RPAREN          reduce using rule 35 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    OR              reduce using rule 35 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    GT              reduce using rule 35 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    LT              reduce using rule 35 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    EQUALS          reduce using rule 35 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    NOT             reduce using rule 35 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    SEMICOLON       reduce using rule 35 (ptr_expr -> ptr_expr PLUS ptr_factor .)
-    STAR            shift and go to state 61
-    SLASH           shift and go to state 62
+    LESSTHEN        reduce using rule 37 (expression -> expression DIVIDE expression .)
+    GREATTHEN       reduce using rule 37 (expression -> expression DIVIDE expression .)
+    LESSTHENE       reduce using rule 37 (expression -> expression DIVIDE expression .)
+    GREATTHENE      reduce using rule 37 (expression -> expression DIVIDE expression .)
+    ISEQL           reduce using rule 37 (expression -> expression DIVIDE expression .)
+    ISNEQL          reduce using rule 37 (expression -> expression DIVIDE expression .)
+    PLUS            reduce using rule 37 (expression -> expression DIVIDE expression .)
+    TIMES           reduce using rule 37 (expression -> expression DIVIDE expression .)
+    MINUS           reduce using rule 37 (expression -> expression DIVIDE expression .)
+    DIVIDE          reduce using rule 37 (expression -> expression DIVIDE expression .)
+    RPAREN          reduce using rule 37 (expression -> expression DIVIDE expression .)
+    LAND            reduce using rule 37 (expression -> expression DIVIDE expression .)
+    LOR             reduce using rule 37 (expression -> expression DIVIDE expression .)
+    ;               reduce using rule 37 (expression -> expression DIVIDE expression .)
+
+  ! PLUS            [ shift and go to state 69 ]
+  ! TIMES           [ shift and go to state 67 ]
+  ! MINUS           [ shift and go to state 65 ]
+  ! DIVIDE          [ shift and go to state 68 ]
 
 
 state 90
 
-    (34) sub_bool_expr -> ptr_expr NOT EQUALS . ptr_expr
-    (35) ptr_expr -> . ptr_expr PLUS ptr_factor
-    (36) ptr_expr -> . ptr_expr MINUS ptr_factor
-    (37) ptr_expr -> . ptr_factor
-    (38) ptr_factor -> . ptr_factor STAR ptr_term
-    (39) ptr_factor -> . ptr_factor SLASH ptr_term
-    (40) ptr_factor -> . ptr_term
-    (41) ptr_term -> . MINUS ptr_term
-    (42) ptr_term -> . ptr_expr_base
-    (43) ptr_expr_base -> . ID
-    (44) ptr_expr_base -> . NUM
-    (45) ptr_expr_base -> . ptr
-    (46) ptr_expr_base -> . addr
-    (47) ptr_expr_base -> . LPAREN ptr_expr RPAREN
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
-    (51) addr -> . AND ID
-    (52) addr -> . AND ptr
-    (53) addr -> . AND addr
+    (34) expression -> expression PLUS expression .
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    MINUS           shift and go to state 45
-    ID              shift and go to state 52
-    NUM             shift and go to state 49
-    LPAREN          shift and go to state 40
-    STAR            shift and go to state 8
-    AND             shift and go to state 23
+    LESSTHEN        reduce using rule 34 (expression -> expression PLUS expression .)
+    GREATTHEN       reduce using rule 34 (expression -> expression PLUS expression .)
+    LESSTHENE       reduce using rule 34 (expression -> expression PLUS expression .)
+    GREATTHENE      reduce using rule 34 (expression -> expression PLUS expression .)
+    ISEQL           reduce using rule 34 (expression -> expression PLUS expression .)
+    ISNEQL          reduce using rule 34 (expression -> expression PLUS expression .)
+    PLUS            reduce using rule 34 (expression -> expression PLUS expression .)
+    MINUS           reduce using rule 34 (expression -> expression PLUS expression .)
+    RPAREN          reduce using rule 34 (expression -> expression PLUS expression .)
+    LAND            reduce using rule 34 (expression -> expression PLUS expression .)
+    LOR             reduce using rule 34 (expression -> expression PLUS expression .)
+    ;               reduce using rule 34 (expression -> expression PLUS expression .)
+    TIMES           shift and go to state 67
+    DIVIDE          shift and go to state 68
 
-    addr                           shift and go to state 46
-    ptr_term                       shift and go to state 42
-    ptr_expr_base                  shift and go to state 48
-    ptr_factor                     shift and go to state 44
-    ptr_expr                       shift and go to state 99
-    ptr                            shift and go to state 47
+  ! TIMES           [ reduce using rule 34 (expression -> expression PLUS expression .) ]
+  ! DIVIDE          [ reduce using rule 34 (expression -> expression PLUS expression .) ]
+  ! PLUS            [ shift and go to state 69 ]
+  ! MINUS           [ shift and go to state 65 ]
+
 
 state 91
 
-    (36) ptr_expr -> ptr_expr MINUS ptr_factor .
-    (38) ptr_factor -> ptr_factor . STAR ptr_term
-    (39) ptr_factor -> ptr_factor . SLASH ptr_term
+    (20) condition -> expression ISNEQL expression .
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    PLUS            reduce using rule 36 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    MINUS           reduce using rule 36 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    AND             reduce using rule 36 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    RPAREN          reduce using rule 36 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    OR              reduce using rule 36 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    GT              reduce using rule 36 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    LT              reduce using rule 36 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    EQUALS          reduce using rule 36 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    NOT             reduce using rule 36 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    SEMICOLON       reduce using rule 36 (ptr_expr -> ptr_expr MINUS ptr_factor .)
-    STAR            shift and go to state 61
-    SLASH           shift and go to state 62
+    RPAREN          reduce using rule 20 (condition -> expression ISNEQL expression .)
+    LAND            reduce using rule 20 (condition -> expression ISNEQL expression .)
+    LOR             reduce using rule 20 (condition -> expression ISNEQL expression .)
+    PLUS            shift and go to state 69
+    TIMES           shift and go to state 67
+    MINUS           shift and go to state 65
+    DIVIDE          shift and go to state 68
 
 
 state 92
 
-    (9) if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt .
-    (10) if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt . ELSE compound_stmt
+    (18) condition -> expression GREATTHENE expression .
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    RCURL           reduce using rule 9 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt .)
-    INT             reduce using rule 9 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt .)
-    IF              reduce using rule 9 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt .)
-    WHILE           reduce using rule 9 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt .)
-    ID              reduce using rule 9 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt .)
-    STAR            reduce using rule 9 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt .)
-    ELSE            shift and go to state 100
-
-  ! ELSE            [ reduce using rule 9 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt .) ]
+    RPAREN          reduce using rule 18 (condition -> expression GREATTHENE expression .)
+    LAND            reduce using rule 18 (condition -> expression GREATTHENE expression .)
+    LOR             reduce using rule 18 (condition -> expression GREATTHENE expression .)
+    PLUS            shift and go to state 69
+    TIMES           shift and go to state 67
+    MINUS           shift and go to state 65
+    DIVIDE          shift and go to state 68
 
 
 state 93
 
-    (25) a_bool_expr -> a_bool_expr AND AND n_bool_expr .
+    (16) condition -> expression GREATTHEN expression .
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    AND             reduce using rule 25 (a_bool_expr -> a_bool_expr AND AND n_bool_expr .)
-    RPAREN          reduce using rule 25 (a_bool_expr -> a_bool_expr AND AND n_bool_expr .)
-    OR              reduce using rule 25 (a_bool_expr -> a_bool_expr AND AND n_bool_expr .)
+    RPAREN          reduce using rule 16 (condition -> expression GREATTHEN expression .)
+    LAND            reduce using rule 16 (condition -> expression GREATTHEN expression .)
+    LOR             reduce using rule 16 (condition -> expression GREATTHEN expression .)
+    PLUS            shift and go to state 69
+    TIMES           shift and go to state 67
+    MINUS           shift and go to state 65
+    DIVIDE          shift and go to state 68
 
 
 state 94
 
-    (13) compound_stmt -> LCURL body . RCURL
-    (3) body -> body . stmt
-    (5) stmt -> . decl SEMICOLON
-    (6) stmt -> . assgn SEMICOLON
-    (7) stmt -> . if_stmt
-    (8) stmt -> . while_stmt
-    (16) decl -> . INT decl_list
-    (14) assgn -> . ptr_assgn
-    (15) assgn -> . num_assgn
-    (9) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt
-    (10) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt
-    (11) while_stmt -> . WHILE LPAREN bool_expr RPAREN compound_stmt
-    (21) ptr_assgn -> . ptr EQUALS ptr_expr
-    (22) num_assgn -> . ID EQUALS ptr_expr
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
+    (15) condition -> expression LESSTHEN expression .
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    RCURL           shift and go to state 101
-    INT             shift and go to state 19
-    IF              shift and go to state 17
-    WHILE           shift and go to state 9
-    ID              shift and go to state 16
-    STAR            shift and go to state 8
+    RPAREN          reduce using rule 15 (condition -> expression LESSTHEN expression .)
+    LAND            reduce using rule 15 (condition -> expression LESSTHEN expression .)
+    LOR             reduce using rule 15 (condition -> expression LESSTHEN expression .)
+    PLUS            shift and go to state 69
+    TIMES           shift and go to state 67
+    MINUS           shift and go to state 65
+    DIVIDE          shift and go to state 68
 
-    decl                           shift and go to state 7
-    if_stmt                        shift and go to state 18
-    assgn                          shift and go to state 11
-    num_assgn                      shift and go to state 14
-    ptr_assgn                      shift and go to state 20
-    stmt                           shift and go to state 31
-    ptr                            shift and go to state 10
-    while_stmt                     shift and go to state 21
 
 state 95
 
-    (23) bool_expr -> bool_expr OR OR a_bool_expr .
-    (25) a_bool_expr -> a_bool_expr . AND AND n_bool_expr
+    (17) condition -> expression LESSTHENE expression .
+    (34) expression -> expression . PLUS expression
+    (35) expression -> expression . TIMES expression
+    (36) expression -> expression . MINUS expression
+    (37) expression -> expression . DIVIDE expression
 
-    RPAREN          reduce using rule 23 (bool_expr -> bool_expr OR OR a_bool_expr .)
-    OR              reduce using rule 23 (bool_expr -> bool_expr OR OR a_bool_expr .)
-    AND             shift and go to state 60
+    RPAREN          reduce using rule 17 (condition -> expression LESSTHENE expression .)
+    LAND            reduce using rule 17 (condition -> expression LESSTHENE expression .)
+    LOR             reduce using rule 17 (condition -> expression LESSTHENE expression .)
+    PLUS            shift and go to state 69
+    TIMES           shift and go to state 67
+    MINUS           shift and go to state 65
+    DIVIDE          shift and go to state 68
 
 
 state 96
 
-    (30) sub_bool_expr -> ptr_expr GT EQUALS ptr_expr .
-    (35) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (36) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (9) ctrlflow -> WHILE LPAREN condition RPAREN statement_block .
 
-    AND             reduce using rule 30 (sub_bool_expr -> ptr_expr GT EQUALS ptr_expr .)
-    RPAREN          reduce using rule 30 (sub_bool_expr -> ptr_expr GT EQUALS ptr_expr .)
-    OR              reduce using rule 30 (sub_bool_expr -> ptr_expr GT EQUALS ptr_expr .)
-    PLUS            shift and go to state 69
-    MINUS           shift and go to state 71
+    }               reduce using rule 9 (ctrlflow -> WHILE LPAREN condition RPAREN statement_block .)
+    IF              reduce using rule 9 (ctrlflow -> WHILE LPAREN condition RPAREN statement_block .)
+    WHILE           reduce using rule 9 (ctrlflow -> WHILE LPAREN condition RPAREN statement_block .)
+    NAME            reduce using rule 9 (ctrlflow -> WHILE LPAREN condition RPAREN statement_block .)
+    TIMES           reduce using rule 9 (ctrlflow -> WHILE LPAREN condition RPAREN statement_block .)
+    ELSE            reduce using rule 9 (ctrlflow -> WHILE LPAREN condition RPAREN statement_block .)
 
 
 state 97
 
-    (33) sub_bool_expr -> ptr_expr EQUALS EQUALS ptr_expr .
-    (35) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (36) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (10) ctrlflow -> IF LPAREN condition RPAREN statement_block ELSE . statement_block
+    (11) statement_block -> . { statement_list }
+    (12) statement_block -> . ;
+    (13) statement_block -> . statement
+    (6) statement -> . ctrlflow
+    (7) statement -> . assignment_statement
+    (8) ctrlflow -> . IF LPAREN condition RPAREN statement_block
+    (9) ctrlflow -> . WHILE LPAREN condition RPAREN statement_block
+    (10) ctrlflow -> . IF LPAREN condition RPAREN statement_block ELSE statement_block
+    (33) assignment_statement -> . lvalue EQUAL expression ;
+    (49) lvalue -> . variable
+    (50) lvalue -> . ptr_expr
+    (51) variable -> . NAME
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
 
-    AND             reduce using rule 33 (sub_bool_expr -> ptr_expr EQUALS EQUALS ptr_expr .)
-    RPAREN          reduce using rule 33 (sub_bool_expr -> ptr_expr EQUALS EQUALS ptr_expr .)
-    OR              reduce using rule 33 (sub_bool_expr -> ptr_expr EQUALS EQUALS ptr_expr .)
-    PLUS            shift and go to state 69
-    MINUS           shift and go to state 71
+    {               shift and go to state 84
+    ;               shift and go to state 82
+    IF              shift and go to state 22
+    WHILE           shift and go to state 27
+    NAME            shift and go to state 20
+    TIMES           shift and go to state 24
 
+    statement                      shift and go to state 81
+    assignment_statement           shift and go to state 28
+    ctrlflow                       shift and go to state 25
+    variable                       shift and go to state 26
+    lvalue                         shift and go to state 23
+    ptr_expr                       shift and go to state 30
+    statement_block                shift and go to state 99
 
 state 98
 
-    (32) sub_bool_expr -> ptr_expr LT EQUALS ptr_expr .
-    (35) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (36) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (11) statement_block -> { statement_list . }
+    (4) statement_list -> statement_list . statement
+    (6) statement -> . ctrlflow
+    (7) statement -> . assignment_statement
+    (8) ctrlflow -> . IF LPAREN condition RPAREN statement_block
+    (9) ctrlflow -> . WHILE LPAREN condition RPAREN statement_block
+    (10) ctrlflow -> . IF LPAREN condition RPAREN statement_block ELSE statement_block
+    (33) assignment_statement -> . lvalue EQUAL expression ;
+    (49) lvalue -> . variable
+    (50) lvalue -> . ptr_expr
+    (51) variable -> . NAME
+    (44) ptr_expr -> . TIMES variable
+    (45) ptr_expr -> . TIMES ptr_expr
+    (46) ptr_expr -> . TIMES addr_expr
 
-    AND             reduce using rule 32 (sub_bool_expr -> ptr_expr LT EQUALS ptr_expr .)
-    RPAREN          reduce using rule 32 (sub_bool_expr -> ptr_expr LT EQUALS ptr_expr .)
-    OR              reduce using rule 32 (sub_bool_expr -> ptr_expr LT EQUALS ptr_expr .)
-    PLUS            shift and go to state 69
-    MINUS           shift and go to state 71
+    }               shift and go to state 100
+    IF              shift and go to state 22
+    WHILE           shift and go to state 27
+    NAME            shift and go to state 20
+    TIMES           shift and go to state 24
 
+    statement                      shift and go to state 21
+    assignment_statement           shift and go to state 28
+    ctrlflow                       shift and go to state 25
+    variable                       shift and go to state 26
+    lvalue                         shift and go to state 23
+    ptr_expr                       shift and go to state 30
 
 state 99
 
-    (34) sub_bool_expr -> ptr_expr NOT EQUALS ptr_expr .
-    (35) ptr_expr -> ptr_expr . PLUS ptr_factor
-    (36) ptr_expr -> ptr_expr . MINUS ptr_factor
+    (10) ctrlflow -> IF LPAREN condition RPAREN statement_block ELSE statement_block .
 
-    AND             reduce using rule 34 (sub_bool_expr -> ptr_expr NOT EQUALS ptr_expr .)
-    RPAREN          reduce using rule 34 (sub_bool_expr -> ptr_expr NOT EQUALS ptr_expr .)
-    OR              reduce using rule 34 (sub_bool_expr -> ptr_expr NOT EQUALS ptr_expr .)
-    PLUS            shift and go to state 69
-    MINUS           shift and go to state 71
+    }               reduce using rule 10 (ctrlflow -> IF LPAREN condition RPAREN statement_block ELSE statement_block .)
+    IF              reduce using rule 10 (ctrlflow -> IF LPAREN condition RPAREN statement_block ELSE statement_block .)
+    WHILE           reduce using rule 10 (ctrlflow -> IF LPAREN condition RPAREN statement_block ELSE statement_block .)
+    NAME            reduce using rule 10 (ctrlflow -> IF LPAREN condition RPAREN statement_block ELSE statement_block .)
+    TIMES           reduce using rule 10 (ctrlflow -> IF LPAREN condition RPAREN statement_block ELSE statement_block .)
+    ELSE            reduce using rule 10 (ctrlflow -> IF LPAREN condition RPAREN statement_block ELSE statement_block .)
 
 
 state 100
 
-    (10) if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt ELSE . compound_stmt
-    (12) compound_stmt -> . stmt
-    (13) compound_stmt -> . LCURL body RCURL
-    (5) stmt -> . decl SEMICOLON
-    (6) stmt -> . assgn SEMICOLON
-    (7) stmt -> . if_stmt
-    (8) stmt -> . while_stmt
-    (16) decl -> . INT decl_list
-    (14) assgn -> . ptr_assgn
-    (15) assgn -> . num_assgn
-    (9) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt
-    (10) if_stmt -> . IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt
-    (11) while_stmt -> . WHILE LPAREN bool_expr RPAREN compound_stmt
-    (21) ptr_assgn -> . ptr EQUALS ptr_expr
-    (22) num_assgn -> . ID EQUALS ptr_expr
-    (48) ptr -> . STAR ptr
-    (49) ptr -> . STAR ID
-    (50) ptr -> . STAR addr
+    (11) statement_block -> { statement_list } .
 
-    LCURL           shift and go to state 80
-    INT             shift and go to state 19
-    IF              shift and go to state 17
-    WHILE           shift and go to state 9
-    ID              shift and go to state 16
-    STAR            shift and go to state 8
-
-    decl                           shift and go to state 7
-    if_stmt                        shift and go to state 18
-    assgn                          shift and go to state 11
-    num_assgn                      shift and go to state 14
-    ptr_assgn                      shift and go to state 20
-    stmt                           shift and go to state 82
-    ptr                            shift and go to state 10
-    while_stmt                     shift and go to state 21
-    compound_stmt                  shift and go to state 102
-
-state 101
-
-    (13) compound_stmt -> LCURL body RCURL .
-
-    RCURL           reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
-    INT             reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
-    IF              reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
-    WHILE           reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
-    ID              reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
-    STAR            reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
-    ELSE            reduce using rule 13 (compound_stmt -> LCURL body RCURL .)
-
-
-state 102
-
-    (10) if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt .
-
-    RCURL           reduce using rule 10 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt .)
-    INT             reduce using rule 10 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt .)
-    IF              reduce using rule 10 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt .)
-    WHILE           reduce using rule 10 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt .)
-    ID              reduce using rule 10 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt .)
-    STAR            reduce using rule 10 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt .)
-    ELSE            reduce using rule 10 (if_stmt -> IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt .)
+    ELSE            reduce using rule 11 (statement_block -> { statement_list } .)
+    }               reduce using rule 11 (statement_block -> { statement_list } .)
+    IF              reduce using rule 11 (statement_block -> { statement_list } .)
+    WHILE           reduce using rule 11 (statement_block -> { statement_list } .)
+    NAME            reduce using rule 11 (statement_block -> { statement_list } .)
+    TIMES           reduce using rule 11 (statement_block -> { statement_list } .)
 
