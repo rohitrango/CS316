@@ -126,7 +126,8 @@ class AbstractBodyTreeNode(AbstractSyntaxTreeNode):
 	def __repr__(self, depth=0):
 		res = ""
 		for child in self.operands:
-			res += child.__repr__(depth=depth)+"\n"
+			if child.operator!="DECL":
+				res += child.__repr__(depth=depth)+"\n"
 		return res
 
 '''
@@ -155,6 +156,8 @@ def p_def_prog(p):
 		p[0] = AbstractSyntaxTreeNode("PROG", [])
 	else:
 		p[0] = AbstractSyntaxTreeNode("PROG", [p[6]])
+		cfg_ast.append(p[6])
+
 
 
 def p_def_body(p):
@@ -190,7 +193,7 @@ def p_def_if_stmt(p):
 		p[0] = AbstractSyntaxTreeNode("IF", [p[3], p[5]])
 	else:
 		p[0] = AbstractSyntaxTreeNode("IF", [p[3], p[5], p[7]])
-	cfg_ast.append(p[0])
+	# cfg_ast.append(p[0])
 
 
 def p_def_while_stmt(p):
@@ -198,7 +201,7 @@ def p_def_while_stmt(p):
 		while_stmt : WHILE LPAREN bool_expr RPAREN compound_stmt
 	'''
 	p[0] = AbstractSyntaxTreeNode("WHILE", [p[3], p[5]])
-	cfg_ast.append(p[0])
+	# cfg_ast.append(p[0])
 
 def p_def_compound_stmt(p):
 	'''
