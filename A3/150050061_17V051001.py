@@ -409,7 +409,6 @@ def p_error(p):
 		print("syntax error at {0}, line no. {1}".format(p.value, p.lineno))
 	else:
 		print("syntax error at EOF.")
-	raise Exception
 
 
 if __name__ == "__main__":
@@ -430,7 +429,6 @@ if __name__ == "__main__":
 
 	for l in cfg_ast:
 		print(l)
-		print("\n")
 	# output_file = 'Parser_ast_' + filename + '.txt'	
 	# with open(output_file, 'w+') as file:
 	# 	for l in ast_list:

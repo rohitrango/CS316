@@ -4,9 +4,12 @@ void main()
 
    a = &e;
 
-   while (*a <= 12) {
+   while(*a<=12){
 		
-       *a=*a+1;   
+       *a=*a+1;
+   
    }
+
+
 }
 
