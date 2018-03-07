@@ -102,6 +102,7 @@ class AbstractSyntaxTreeNode():
 		self.operands.append(child)
 
 	def __repr__(self, depth=0):
+		# print(self.operator, len(self.operands))
 		if len(self.operands) == 0:
 			return depth*"\t" + self.operator + "(" + self.name + ")"
 		else:
@@ -168,8 +169,8 @@ def p_def_stmt(p):
 
 def p_def_if_stmt(p):
 	'''
-		if_stmt : IF LPAREN ptr_expr RPAREN compound_stmt 				%prec THEN
-				| IF LPAREN ptr_expr RPAREN compound_stmt ELSE compound_stmt
+		if_stmt : IF LPAREN bool_expr RPAREN compound_stmt 				%prec THEN
+				| IF LPAREN bool_expr RPAREN compound_stmt ELSE compound_stmt
 	'''
 	# Only an if-stmt
 	if len(p) == 6:
@@ -181,7 +182,7 @@ def p_def_if_stmt(p):
 
 def p_def_while_stmt(p):
 	'''
-		while_stmt : WHILE LPAREN ptr_expr RPAREN compound_stmt
+		while_stmt : WHILE LPAREN bool_expr RPAREN compound_stmt
 	'''
 	p[0] = AbstractSyntaxTreeNode("WHILE", [p[3], p[5]])
 	cfg_ast.append(p[0])
@@ -209,7 +210,7 @@ def p_def_assgn(p):
 def p_def_decl(p):
 	''' decl : INT decl_list
 	'''
-	p[0] = AbstractSyntaxTreeNode("DECL", [p[1]])
+	p[0] = AbstractSyntaxTreeNode("DECL", [p[2]])
 
 
 
@@ -220,8 +221,12 @@ def p_def_decl_list(p):
 				 | ptr
 	'''
 	if len(p) == 2:
+		if not isinstance(p[1], AbstractSyntaxTreeNode):
+			p[1] = AbstractSyntaxTreeNode("VAR", [], p[1])
 		p[0] = AbstractSyntaxTreeNode("DECL_LIST", [p[1]])
 	else:
+		if not isinstance(p[3], AbstractSyntaxTreeNode):
+			p[3] = AbstractSyntaxTreeNode("VAR", [], p[3])
 		p[0] = p[1]
 		p[0].addChild(p[3])
 
@@ -236,9 +241,9 @@ def p_def_num_assgn(p):
 	''' num_assgn : ID EQUALS ptr_expr
 	'''
 	# Allow any expression after a num assignment, except assignments directly to constants
-	if p[3].isConst():
-		print("Syntax error: Static assignments to constants not allowed, line no. {0}".format(p.lineno(1)))
-		raise Exception
+	# if p[3].isConst():
+	# 	print("Syntax error: Static assignments to constants not allowed, line no. {0}".format(p.lineno(1)))
+	# 	raise Exception
 	p[1] = AbstractSyntaxTreeNode("VAR", [], p[1])
 	# if isinstance(p[3], str):
 	# 	p[3] = AbstractSyntaxTreeNode("VAR", p[3])
@@ -246,63 +251,62 @@ def p_def_num_assgn(p):
 	ast_list.append(p[0])
 
 
-def p_def_ptr_expr(p):
-	'''	ptr_expr : ptr_expr OR ptr_and_expr 
-				 | ptr_and_expr
+# This is the boolean expr expression ->
+# Precedence order -> || , && , !, (6 comparison ops)
+def p_def_bool_expr(p):
+	'''	bool_expr : bool_expr OR OR a_bool_expr 
+				  | a_bool_expr
 	'''
 	if len(p) == 2:
 		p[0] = p[1]
 	else:
-		p[0] = AbstractSyntaxTreeNode("OR", [p[1], p[3]])
+		p[0] = AbstractSyntaxTreeNode("OR", [p[1], p[4]])
 
 
-def p_def_ptr_and_expr(p):
-	'''	ptr_and_expr : ptr_and_expr AND ptr_eq_expr 
-				 | ptr_eq_expr
+def p_def_a_bool_expr(p):
+	'''	a_bool_expr : a_bool_expr AND AND n_bool_expr 
+				 	| n_bool_expr
 	'''
 	if len(p) == 2:
 		p[0] = p[1]
 	else:
-		p[0] = AbstractSyntaxTreeNode("AND", [p[1], p[3]])
+		p[0] = AbstractSyntaxTreeNode("AND", [p[1], p[4]])
 
-def p_def_ptr_eq_expr(p):
-	'''	ptr_eq_expr : ptr_eq_expr EQUALS EQUALS ptr_lt_expr
-				 | ptr_eq_expr NOT EQUALS ptr_lt_expr
-				 | ptr_lt_expr
+def p_def_n_bool_expr(p):
+	'''	n_bool_expr : NOT n_bool_expr 
+				 | sub_bool_expr
 	'''
 	if len(p) == 2:
 		p[0] = p[1]
 	else:
-		if p[2] == "!":
-			p[0] = AbstractSyntaxTreeNode("NEQ", [p[1], p[4]])
-		else:
-			p[0] = AbstractSyntaxTreeNode("EQ", [p[1], p[4]])
+		p[0] = AbstractSyntaxTreeNode("NOT", [p[2]])
 
 
-def p_def_ptr_lt_expr(p):
-	'''	ptr_lt_expr : ptr_lt_expr LT ptr_add_expr
-				 | ptr_lt_expr GT ptr_add_expr
-				 | ptr_lt_expr LT EQUALS ptr_add_expr
-				 | ptr_lt_expr GT EQUALS ptr_add_expr
-				 | ptr_add_expr
+# Sub expression that we have
+def p_def_sub_bool_expr(p):
+	''' sub_bool_expr : ptr_expr GT ptr_expr
+					  | ptr_expr GT EQUALS ptr_expr
+					  | ptr_expr LT ptr_expr
+					  | ptr_expr LT EQUALS ptr_expr
+					  | ptr_expr EQUALS EQUALS ptr_expr
+					  | ptr_expr NOT EQUALS ptr_expr
 	'''
-	if len(p) == 2:
-		p[0] = p[1]
-	
-	# LT or GT
-	elif len(p) == 4:
+	if len(p) == 4:
 		s = "LT" if p[2] == "<" else "GT"
 		p[0] = AbstractSyntaxTreeNode(s, [p[1], p[3]])
-
-	# LTE or GTE
 	else:
-		s = "LTE" if p[2] == "<" else "GTE"
-		p[0] = AbstractSyntaxTreeNode(s, [p[1], p[4]])
+		sym = {
+			">": "GE",
+			"<": "LE",
+			"=": "EQ",
+			"!": "NE",
+		}
+		p[0] = AbstractSyntaxTreeNode(sym[p[2]], [p[1], p[4]])
 
 
 def p_def_ptr_add_expr(p):
-	'''	ptr_add_expr : ptr_add_expr PLUS ptr_factor 
-				 | ptr_add_expr MINUS ptr_factor
+	'''	ptr_expr : ptr_expr PLUS ptr_factor 
+				 | ptr_expr MINUS ptr_factor
 				 | ptr_factor
 	'''
 	if len(p) == 2:
@@ -406,11 +410,7 @@ if __name__ == "__main__":
 	lex.input(data)
 
 	# Catch the syntax error
-	try:
-		yacc.parse(data)
-		print("Successfully Parsed")
-	except Exception:
-		pass
+	yacc.parse(data)
 
 	for l in cfg_ast:
 		print(l)
