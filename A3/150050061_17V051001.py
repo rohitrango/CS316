@@ -7,6 +7,7 @@ Team members:
 import ply.lex as lex
 import ply.yacc as yacc
 import sys
+from utils import *
 
 tokens = ['ID', 'STAR', 'AND', 'NUM', 'LPAREN', 'RPAREN', 'COMMA', 'LCURL', 'RCURL', 'SEMICOLON', 'EQUALS', 
 			# Symbols 
@@ -84,119 +85,6 @@ def t_error(t):
 	print("Illegal character '%s'" % t.value[0])
 	t.lexer.skip(1)
 
-
-'''
------------------------------------------------------------------------
-Data Structure for Abstract Syntax Tree
------------------------------------------------------------------------
-'''
-
-class AbstractSyntaxTreeNode(object):
-
-	def __init__(self, operator, operands=[], name=None):
-		self.operator = operator
-		self.name = name
-		self.operands = operands
-
-	def addChild(self, child):
-		self.operands.append(child)
-
-	def __repr__(self, depth=0):
-		# print(self.operator, len(self.operands))
-		if len(self.operands) == 0:
-			return depth*"\t" + self.operator + "(" + self.name + ")"
-		else:
-			return depth*"\t" + self.operator + "\n" + depth*"\t" + "(\n" \
-					+ ("\n" + (depth+1)*"\t" + ",\n").join(map(lambda x: x.__repr__(depth+1), self.operands)) + "\n" + depth*"\t" + ")" 
-		# return generateTreeFormat(self)
-
-	def isConst(self):
-		if len(self.operands) == 0:
-			return self.operator == "CONST"
-		else:
-			return all(x.isConst() for x in self.operands)
-
-
-
-# This is for body statements since they are printed differently in the reference implementation
-class AbstractBodyTreeNode(AbstractSyntaxTreeNode):
-	def __init__(self, operator, operands=[], name=None):
-		super(AbstractBodyTreeNode, self).__init__(operator, operands, name)
-
-	def __repr__(self, depth=0):
-		res = ""
-		for child in self.operands:
-			if child.operator!="DECL":
-				res += child.__repr__(depth=depth)+"\n"
-		return res
-
-
-#########################################
-## Block class
-#########################################
-class Block(object):
-
-	def __init__(self, number, contents):
-		self.number = number
-		self.contents = contents
-
-class Statement(object):
-	def __init__(self, op, params):
-		self.op = op
-		self.params = params
-
-
-# generate the CFG given a node
-def generateCFG(node):
-	bb_ctr = 0
-	t_ctr  = 0
-
-	def assignment_statement_list(node):
-		
-		def assignment_stmt_util(node):
-			# Assert that this is either a ptr_expr or a terminal
-			# Input : A node which can contain any expr
-			# Output: The first output is an RHS token (as an AST node)
-			#		, the second one is the list of statements formed so far
-			if node.operator in ["VAR", "CONST", "DEREF", "ADDR"]:
-				return node, []
-			else:
-				if len(node.operands) == 2:
-					n1, stmt1 = assignment_stmt_util(node.operands[0])
-					n2, stmt2 = assignment_stmt_util(node.operands[1])
-					n = AbstractSyntaxTreeNode(node.operator, [n1, n2])
-					t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr))
-					t_ctr += 1
-					asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
-					stmt = stmt1 + stmt2 + [asgn]
-					return t0, stmt
-				else:
-					return node.operands[0], [] 
-
-
-		# Assert that this is an assignment node
-		lhs = node.operands[0]
-		rhs, stmt_list = assignment_stmt_util(node.operands[1])
-		stmt_list.append(AbstractSyntaxTreeNode("ASGN", [lhs, rhs]))
-		return stmt_list
-
-	def if_stmt_statement_list(node):
-		return None
-
-	def while_stmt_statement_list(node):
-		return None
-
-	block_list = []
-	for op in node.operands:
-		if op.operator == "ASGN":
-			block_list.append(assignment_statement_list(op))
-		elif op.operator == "IF":
-			block_list.append(if_stmt_statement_list(op))
-		else:
-			block_list.append(while_stmt_statement_list(op))
-	return block_list
-
-
 '''
 -----------------------------------------------------------------------
 Parser
@@ -224,7 +112,6 @@ def p_def_prog(p):
 	else:
 		p[0] = AbstractSyntaxTreeNode("PROG", [p[6]])
 		cfg_ast.append(p[6])
-
 
 
 def p_def_body(p):
@@ -496,6 +383,12 @@ if __name__ == "__main__":
 
 	for l in cfg_ast:
 		print(l)
+
+	blk = generateCFG(cfg_ast[0])
+	for b in blk:
+		if b:
+			# Print the statement in printable format
+			print(b.printable())
 	# output_file = 'Parser_ast_' + filename + '.txt'	
 	# with open(output_file, 'w+') as file:
 	# 	for l in ast_list:
