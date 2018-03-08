@@ -114,6 +114,7 @@ def p_def_prog(p):
 		cfg_ast.append(p[6])
 
 
+
 def p_def_body(p):
 	''' body : body stmt
 			 | stmt
@@ -160,10 +161,17 @@ def p_def_while_stmt(p):
 def p_def_compound_stmt(p):
 	'''
 		compound_stmt : stmt
+					  | SEMICOLON
+					  | LCURL RCURL
 					  | LCURL body RCURL
 	'''
 	if len(p) == 2:
-		p[0] = p[1]
+		if not isinstance(p[1], str):
+			p[0] = p[1]
+		else:
+			p[0] = AbstractBodyTreeNode("BODY", [])
+	elif len(p) == 3:
+		p[0] = AbstractBodyTreeNode("BODY", [])
 	else:
 		p[0] = p[2]
 
@@ -384,11 +392,11 @@ if __name__ == "__main__":
 	for l in cfg_ast:
 		print(l)
 
-	blk = generateCFG(cfg_ast[0])
-	for b in blk:
-		if b:
-			# Print the statement in printable format
-			print(b.printable())
+	# blk = generateCFG(cfg_ast[0])
+	# for b in blk:
+	# 	if b:
+	# 		# Print the statement in printable format
+	# 		print(b.printable())
 	# output_file = 'Parser_ast_' + filename + '.txt'	
 	# with open(output_file, 'w+') as file:
 	# 	for l in ast_list:
