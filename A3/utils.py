@@ -115,6 +115,11 @@ class Block(object):
 		string = "<bb" + str(self.number) + ">"
 		for op in self.contents:
 			string += ("\n" + op.printable())
+		if self.goto2 is None:
+			string += ("\ngoto <bb" + str(self.goto) + ">")
+		else:
+			string += ("\nif(" + self.contents[-1].printable().split(" ")[0] + ") goto <bb" + str(self.goto) + ">")
+			string += ("\nelse goto <bb" + str(self.goto2) + ">")
 		return string
 
 
@@ -144,11 +149,13 @@ def generateCFG(node):
 				block_list.append(cur_block)
 
 			if_blocks, bb_ctr, t_ctr = if_stmt_statement_list(op, bb_ctr, t_ctr)
+			if len(block_list) > 0:
+				block_list[-1].goto = if_blocks[0].number
+			bb_ctr += 1
+			if_blocks[-1].goto = bb_ctr
 			# We got a list of blocks
 			cur_block = Block(bb_ctr, [])
 			for blk in if_blocks:
-				if blk.goto is None:
-					blk.goto = bb_ctr
 				block_list.append(blk)
 		elif op.operator == "WHILE":
 
@@ -266,19 +273,31 @@ def if_stmt_statement_list(node, bb_ctr, t_ctr):
 	# of the function. 
 	# if_body has to contain at least one block, even if its nothing, so that we can specify a goto
 	if_body, bb_ctr, t_ctr = body_statement_list(node.operands[1], bb_ctr, t_ctr)
-	if len(if_body) > 0:
-		cond_block.goto = if_body[0].number
+	if len(if_body) == 0:
+		bb_ctr += 1
+		if_body = [Block(bb_ctr)]
+	cond_block.goto = if_body[0].number
 
 	if len(node.operands) == 3:
 		else_body, bb_ctr, t_ctr = body_statement_list(node.operands[2], bb_ctr, t_ctr)
-		if len(else_body) > 0:
-			cond_block.goto2 = else_body[0].number
+		if len(else_body) == 0:
+			bb_ctr += 1
+			else_body = [Block(bb_ctr)]
 	else:
-		else_body = []
+		bb_ctr += 1
+		else_body = [Block(bb_ctr)]
+	cond_block.goto2 = else_body[0].number
+
+	# Both the if body and else body point to this
+	bb_ctr += 1
+	last_block = Block(bb_ctr)
+	if_body[-1].goto = last_block.number
+	else_body[-1].goto = last_block.number
 
 	if_blk_list.append(cond_block)
 	if_blk_list.extend(if_body)
 	if_blk_list.extend(else_body)
+	if_blk_list.append(last_block)
 	return if_blk_list, bb_ctr, t_ctr
 
 
@@ -300,9 +319,14 @@ def body_statement_list(node, bb_ctr, t_ctr):
 		elif op.operator == "IF":
 			if c_blk.contents != []:
 				bb_ctr += 1
+				c_blk.goto = bb_ctr
 				blk_body_list.append(c_blk)
 
 			if_blocks, bb_ctr, t_ctr = if_stmt_statement_list(op, bb_ctr, t_ctr)
+			if len(blk_body_list) > 0:
+				blk_body_list[-1].goto = if_blocks[0].number
+			bb_ctr += 1
+			if_blocks[-1].goto = bb_ctr
 			# We got a list of blocks
 			c_blk = Block(bb_ctr, [])
 			for blk in if_blocks:
@@ -319,5 +343,7 @@ def body_statement_list(node, bb_ctr, t_ctr):
 				if blk.goto is None:
 					blk.goto = bb_ctr
 				blk_body_list.append(blk)
-
+	if c_blk.contents != []:
+		bb_ctr += 1
+		blk_body_list.append(c_blk)
 	return blk_body_list, bb_ctr, t_ctr
