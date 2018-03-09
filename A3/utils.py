@@ -275,23 +275,23 @@ def if_stmt_statement_list(node, bb_ctr, t_ctr):
 	# if_body has to contain at least one block, even if its nothing, so that we can specify a goto
 	if_body, bb_ctr, t_ctr = body_statement_list(node.operands[1], bb_ctr, t_ctr)
 	if len(if_body) == 0:
-		bb_ctr += 1
 		if_body = [Block(bb_ctr)]
+		bb_ctr += 1
 	cond_block.goto = if_body[0].number
 
 	if len(node.operands) == 3:
 		else_body, bb_ctr, t_ctr = body_statement_list(node.operands[2], bb_ctr, t_ctr)
 		if len(else_body) == 0:
-			bb_ctr += 1
 			else_body = [Block(bb_ctr)]
+			bb_ctr += 1
 	else:
-		bb_ctr += 1
 		else_body = [Block(bb_ctr)]
+		bb_ctr += 1
 	cond_block.goto2 = else_body[0].number
 
 	# Both the if body and else body point to this
-	bb_ctr += 1
 	last_block = Block(bb_ctr)
+	bb_ctr += 1
 	if_body[-1].goto = last_block.number
 	else_body[-1].goto = last_block.number
 
@@ -349,7 +349,6 @@ def body_statement_list(node, bb_ctr, t_ctr):
 			if_blocks, bb_ctr, t_ctr = if_stmt_statement_list(op, bb_ctr, t_ctr)
 			if len(blk_body_list) > 0:
 				blk_body_list[-1].goto = if_blocks[0].number
-			bb_ctr += 1
 			if_blocks[-1].goto = bb_ctr
 			# We got a list of blocks
 			c_blk = Block(bb_ctr, [])
