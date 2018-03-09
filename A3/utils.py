@@ -113,7 +113,7 @@ class Block(object):
 			raise NotImplementedError
 
 	def __repr__(self):
-		string = "<bb" + str(self.number) + ">"
+		string = "<bb " + str(self.number) + ">"
 		# Check if it's the end block
 		if self.end:
 			string += "\nEnd"
@@ -121,10 +121,10 @@ class Block(object):
 			for op in self.contents:
 				string += ("\n" + op.printable())
 			if self.goto2 is None:
-				string += ("\ngoto <bb" + str(self.goto) + ">")
+				string += ("\ngoto <bb " + str(self.goto) + ">")
 			else:
-				string += ("\nif(" + self.contents[-1].printable().split(" ")[0] + ") goto <bb" + str(self.goto) + ">")
-				string += ("\nelse goto <bb" + str(self.goto2) + ">")
+				string += ("\nif(" + self.contents[-1].printable().split(" ")[0] + ") goto <bb " + str(self.goto) + ">")
+				string += ("\nelse goto <bb " + str(self.goto2) + ">")
 		return string
 
 
@@ -182,6 +182,7 @@ def update_block_list(cfg):
 					cfg[idx].goto2 = g1_list[next_block_idx]
 
 			if cfg[idx].goto < 0:
+				print(cfg[idx].number, cfg[idx].goto, indexmap)
 				next_block_idx = indexmap[cfg[idx].goto]
 				g1_list[idx]   = g1_list[next_block_idx]
 				cfg[idx].goto  = g1_list[next_block_idx]
@@ -399,5 +400,8 @@ def body_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 
 	if c_blk.contents != []:
 		bb_ctr += 1
+		c_blk.goto = bb_ctr
 		blk_body_list.append(c_blk)
+
+
 	return blk_body_list, bb_ctr, t_ctr, neg_ctr
