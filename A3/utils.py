@@ -9,6 +9,7 @@ sym_to_name_mapping = {
 	'MINUS'	: '-',
 	'DIV' 	: '/',
 	'MUL'	: '*',
+	'UMINUS': '-',
 }
 
 bool_to_name_mapping = {
@@ -60,12 +61,22 @@ class AbstractSyntaxTreeNode(object):
 		elif self.operator == "DEREF":
 			return "*" + self.operands[0].printable()
 		elif self.operator in sym_to_name_mapping.keys():
-			return self.operands[0].printable() + " " + sym_to_name_mapping[self.operator] + " " + self.operands[1].printable()
+			# Take care of UMINUS
+			# print(self.operator, len(self.operands))
+			if len(self.operands) == 1:
+				return "-" + self.operands[0].printable()
+			else:
+				return self.operands[0].printable() + " " + sym_to_name_mapping[self.operator] + " " + self.operands[1].printable()
+
+
 		elif self.operator in bool_to_name_mapping.keys():
 			if self.operator == "NOT":
 				return "!" + self.operands[0].printable()
 			else:
 				return self.operands[0].printable() + " " + bool_to_name_mapping[self.operator] + " " + self.operands[1].printable()
+		else:
+			print(self)
+			raise Exception
 
 
 # This is for body statements since they are printed differently in the reference implementation
@@ -180,8 +191,17 @@ def assignment_statement_list(node, bb_ctr, t_ctr):
 				asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
 				stmt = stmt1 + stmt2 + [asgn]
 				return t0, stmt, bb_ctr, t_ctr
+			elif len(node.operands) == 1:
+				# UMINUS
+				n1, stmt1, bb_ctr, t_ctr = assignment_stmt_util(node.operands[0], bb_ctr, t_ctr)
+				n = AbstractSyntaxTreeNode(node.operator, [n1])
+				t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr))
+				t_ctr += 1
+				asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
+				stmt = stmt1 + [asgn]
+				return t0, stmt, bb_ctr, t_ctr
 			else:
-				return node.operands[0], [], bb_ctr, t_ctr
+				raise Exception
 
 	# Assert that this is an assignment node
 	lhs = node.operands[0]
@@ -286,8 +306,6 @@ def body_statement_list(node, bb_ctr, t_ctr):
 			# We got a list of blocks
 			c_blk = Block(bb_ctr, [])
 			for blk in if_blocks:
-				if blk.goto is None:
-					blk.goto = bb_ctr
 				blk_body_list.append(blk)
 		elif op.operator == "WHILE":
 			if c_blk.contents != []:

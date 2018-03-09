@@ -167,7 +167,7 @@ def p_def_compound_stmt(p):
 	'''
 	if len(p) == 2:
 		if not isinstance(p[1], str):
-			p[0] = p[1]
+			p[0] = AbstractBodyTreeNode("BODY", [p[1]])
 		else:
 			p[0] = AbstractBodyTreeNode("BODY", [])
 	elif len(p) == 3:
@@ -392,10 +392,10 @@ if __name__ == "__main__":
 	# for l in cfg_ast:
 	# 	print(l)
 
-	blk = generateCFG(cfg_ast[0])
-	for b in blk:
-		print(b)
-		print("")
+	# blk = generateCFG(cfg_ast[0])
+	# for b in blk:
+	# 	print(b)
+	# 	print("")
 	# 	if b:
 	# 		# Print the statement in printable format
 	# 		print(b.printable())
