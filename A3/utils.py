@@ -131,49 +131,7 @@ def generateCFG(node):
 	# Master code. Keep a list of block iterms along with the current block. As you keep getting more statements,
 	# Keep adding it to the block. When you get an if or while statement, you have to close this block, and update its 
 	# goto. In the end just add an end block.
-	block_list = []
-	cur_block  = Block(bb_ctr, [])
-	for op in node.operands:
-		if op.operator == "ASGN":
-			# This is an assignment, here, we put in the assignment
-			# add all the statements as a part of the block.
-			# C contains all the assignments that were formed as part of the single complex
-			# assignment statement. cur_block simply takes in all the statements
-			C, bb_ctr, t_ctr = assignment_statement_list(op, bb_ctr, t_ctr)
-			cur_block.addStmts(C)
-		elif op.operator == "IF":
-			# Here, C will return a list of blocks, instead of a list of statements.
-			# The job is to check all the blocks which do not have a goto, and assign a goto as the one
-			if cur_block.contents != []:
-				bb_ctr += 1
-				block_list.append(cur_block)
-
-			if_blocks, bb_ctr, t_ctr = if_stmt_statement_list(op, bb_ctr, t_ctr)
-			if len(block_list) > 0:
-				block_list[-1].goto = if_blocks[0].number
-			bb_ctr += 1
-			if_blocks[-1].goto = bb_ctr
-			# We got a list of blocks
-			cur_block = Block(bb_ctr, [])
-			for blk in if_blocks:
-				block_list.append(blk)
-		elif op.operator == "WHILE":
-
-			if cur_block.contents != []:
-				bb_ctr += 1
-				cur_block.goto = bb_ctr
-				block_list.append(cur_block)
-
-			while_blocks, bb_ctr, t_ctr = while_stmt_statement_list(op, bb_ctr, t_ctr)
-			if len(block_list) > 0:
-				block_list[-1].goto = while_blocks[0].number
-			while_blocks[-1].goto = bb_ctr
-			cur_block = Block(bb_ctr, [])
-			for blk in while_blocks:
-				block_list.append(blk)
-
-	if len(cur_block.contents) > 0:
-		block_list.append(cur_block)
+	block_list, bb_ctr, t_ctr = body_statement_list(node, bb_ctr, t_ctr)
 
 	return block_list
 

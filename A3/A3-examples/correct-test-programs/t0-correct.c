@@ -5,7 +5,18 @@ void main()
    a = &e;
 
    while(*a<=12){
-		*a = -*a + (*a + 1)/((*a**a) - 1/ *a);   
+   	a= b;
+   	if(a>c);
+   	else
+   		b = a;
+   	c = b;
+   	c= a+b;
+   	if (a>b)
+   		if (b>c)
+   			if(c>d)
+   				d = a;
+   			else
+				e=a;   				
    }
 
 
