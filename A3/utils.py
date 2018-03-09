@@ -161,14 +161,15 @@ def generateCFG(node):
 
 			if cur_block.contents != []:
 				bb_ctr += 1
+				cur_block.goto = bb_ctr
 				block_list.append(cur_block)
 
-			C, bb_ctr, t_ctr = while_stmt_statement_list(op, bb_ctr, t_ctr)
-			# We got a list of blocks
+			while_blocks, bb_ctr, t_ctr = while_stmt_statement_list(op, bb_ctr, t_ctr)
+			if len(block_list) > 0:
+				block_list[-1].goto = while_blocks[0].number
+			while_blocks[-1].goto = bb_ctr
 			cur_block = Block(bb_ctr, [])
-			for blk in if_blocks:
-				if blk.goto is None:
-					blk.goto = bb_ctr
+			for blk in while_blocks:
 				block_list.append(blk)
 
 	if len(cur_block.contents) > 0:
@@ -302,7 +303,30 @@ def if_stmt_statement_list(node, bb_ctr, t_ctr):
 
 
 def while_stmt_statement_list(node, bb_ctr, t_ctr):
-	return None, bb_ctr, t_ctr
+	while_blk_list = []
+
+	condition = node.operands[0]
+	cond_block = Block(bb_ctr, [])
+	bb_ctr += 1
+
+	C, bb_ctr, t_ctr = condition_stmt_list(condition, bb_ctr, t_ctr)
+	cond_block.addStmts(C)
+
+	while_body, bb_ctr, t_ctr = body_statement_list(node.operands[1], bb_ctr, t_ctr)
+	if len(while_body) == 0:
+		while_body = [Block(bb_ctr)]
+		bb_ctr += 1
+	cond_block.goto = while_body[0].number
+	while_body[-1].goto = cond_block.number
+
+	last_block = Block(bb_ctr)
+	bb_ctr += 1
+	cond_block.goto2 = last_block.number
+
+	while_blk_list.append(cond_block)
+	while_blk_list.extend(while_body)
+	while_blk_list.append(last_block)
+	return while_blk_list, bb_ctr, t_ctr
 
 
 # This is the caller function for the body.
@@ -334,14 +358,15 @@ def body_statement_list(node, bb_ctr, t_ctr):
 		elif op.operator == "WHILE":
 			if c_blk.contents != []:
 				bb_ctr += 1
+				c_blk.goto = bb_ctr
 				blk_body_list.append(c_blk)
 
-			C, bb_ctr, t_ctr = while_stmt_statement_list(op, bb_ctr, t_ctr)
-			# We got a list of blocks
+			while_blocks, bb_ctr, t_ctr = while_stmt_statement_list(op, bb_ctr, t_ctr)
+			if len(blk_body_list) > 0:
+				blk_body_list[-1].goto = while_blocks[0].number
+			while_blocks[-1].goto = bb_ctr
 			c_blk = Block(bb_ctr, [])
-			for blk in if_blocks:
-				if blk.goto is None:
-					blk.goto = bb_ctr
+			for blk in while_blocks:
 				blk_body_list.append(blk)
 	if c_blk.contents != []:
 		bb_ctr += 1
