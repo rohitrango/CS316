@@ -389,11 +389,13 @@ if __name__ == "__main__":
 	# Catch the syntax error
 	yacc.parse(data)
 
-	for l in cfg_ast:
-		print(l)
+	# for l in cfg_ast:
+	# 	print(l)
 
-	# blk = generateCFG(cfg_ast[0])
-	# for b in blk:
+	blk = generateCFG(cfg_ast[0])
+	for b in blk:
+		print(b)
+		print("")
 	# 	if b:
 	# 		# Print the statement in printable format
 	# 		print(b.printable())
