@@ -6,7 +6,7 @@ Team members:
 '''
 import ply.lex as lex
 import ply.yacc as yacc
-import sys
+import sys, os
 from utils import *
 
 tokens = ['ID', 'STAR', 'AND', 'NUM', 'LPAREN', 'RPAREN', 'COMMA', 'LCURL', 'RCURL', 'SEMICOLON', 'EQUALS', 
@@ -108,11 +108,10 @@ def p_def_prog(p):
 			 | VOID MAIN LPAREN RPAREN LCURL RCURL
 	'''
 	if len(p) == 7:
-		p[0] = AbstractSyntaxTreeNode("PROG", [])
+		p[0] = AbstractSyntaxTreeNode("PROG", [AbstractBodyTreeNode("BODY", [])])
 	else:
 		p[0] = AbstractSyntaxTreeNode("PROG", [p[6]])
-		cfg_ast.append(p[6])
-
+	cfg_ast.append(p[6])
 
 
 def p_def_body(p):
@@ -212,20 +211,16 @@ def p_def_decl_list(p):
 def p_def_ptr_assgn(p):
 	''' ptr_assgn : ptr EQUALS ptr_expr '''
 
-	p[0] = AbstractSyntaxTreeNode("ASGN", [p[1], p[3]])
+	p[0] = AbstractSyntaxTreeNode("ASGN", [p[1], p[3]], lineno=p.lineno(1))
 	ast_list.append(p[0])
 
 def p_def_num_assgn(p):
 	''' num_assgn : ID EQUALS ptr_expr
 	'''
 	# Allow any expression after a num assignment, except assignments directly to constants
-	# if p[3].isConst():
-	# 	print("Syntax error: Static assignments to constants not allowed, line no. {0}".format(p.lineno(1)))
-	# 	raise Exception
+	# Edit: We do this in type-checking
 	p[1] = AbstractSyntaxTreeNode("VAR", [], p[1])
-	# if isinstance(p[3], str):
-	# 	p[3] = AbstractSyntaxTreeNode("VAR", p[3])
-	p[0] = AbstractSyntaxTreeNode("ASGN", [p[1], p[3]])
+	p[0] = AbstractSyntaxTreeNode("ASGN", [p[1], p[3]], lineno=p.lineno(1))
 	ast_list.append(p[0])
 
 
@@ -385,22 +380,24 @@ if __name__ == "__main__":
 		data = f.read()
 
 	lex.input(data)
-
-	# Catch the syntax error
 	yacc.parse(data)
 
-	# for l in cfg_ast:
-	# 	print(l)
+	ast_file = open(filename + '.ast', 'w')
+	cfg_file = open(filename + '.cfg', 'w')
 
-	blk = generateCFG(cfg_ast[0])
-	for b in blk:
-		print(b)
-		print("")
-	# 	if b:
-	# 		# Print the statement in printable format
-	# 		print(b.printable())
-	# output_file = 'Parser_ast_' + filename + '.txt'	
-	# with open(output_file, 'w+') as file:
-	# 	for l in ast_list:
-	# 		file.write(repr(l) + "\n")
-	# 		file.write("\n")
+	# Here, we check for errors first. If there are no errors, then we are good to go
+	# Print the CFG and ast on 2 different files now
+	error_assignments, messages = check_error_in_assignments(ast_list)
+	if not error_assignments:
+		cfg = generateCFG(cfg_ast[0])
+		# Write the AST file
+		ast_file.write(repr(cfg_ast[0]))
+		# Write the CFG file
+		cfg_file.write("\n".join([repr(x) for x in cfg]))
+
+	else:
+		for message in messages:
+			print(message)
+
+	ast_file.close()
+	cfg_file.close()

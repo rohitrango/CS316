@@ -26,10 +26,11 @@ bool_to_name_mapping = {
 
 class AbstractSyntaxTreeNode(object):
 
-	def __init__(self, operator, operands=[], name=None):
+	def __init__(self, operator, operands=[], name=None, lineno=None):
 		self.operator = operator
 		self.name = name
 		self.operands = operands
+		self.lineno = lineno
 
 	def addChild(self, child):
 		self.operands.append(child)
@@ -41,8 +42,8 @@ class AbstractSyntaxTreeNode(object):
 		else:
 			return depth*"\t" + self.operator + "\n" + depth*"\t" + "(\n" \
 					+ ("\n" + (depth+1)*"\t" + ",\n").join(map(lambda x: x.__repr__(depth+1), self.operands)) + "\n" + depth*"\t" + ")" 
-		# return generateTreeFormat(self)
 
+	# Check if the expression is a constant or not
 	def isConst(self):
 		if len(self.operands) == 0:
 			return self.operator == "CONST"
@@ -92,6 +93,21 @@ class AbstractBodyTreeNode(AbstractSyntaxTreeNode):
 		return res
 
 
+# This function will help to check for errors in the assignments of the AST
+# This will be extended to type-checking later
+def check_error_in_assignments(ast_list):
+	flag = False
+	messages = []
+	# For every assignment, check if LHS is var, and RHS is const
+	for asgn in ast_list:
+		if (asgn.operands[0].operator=="VAR" and asgn.operands[1].isConst()):
+			flag = True
+			messages.append("Syntax error: Static assignments to constants not allowed, line no. {0}".format(asgn.lineno))
+			break
+
+	return flag, messages
+
+
 #########################################
 ## Block class
 #########################################
@@ -125,7 +141,7 @@ class Block(object):
 			else:
 				string += ("\nif(" + self.contents[-1].printable().split(" ")[0] + ") goto <bb " + str(self.goto) + ">")
 				string += ("\nelse goto <bb " + str(self.goto2) + ">")
-		return string
+		return string + "\n"
 
 
 # generate the CFG given a node
@@ -175,14 +191,13 @@ def update_block_list(cfg):
 		else:
 			# This is a real block, it may be a sequential block, or a conditional block
 			if cfg[idx].goto2 is not None:
-				# This is a sequential one
+				# This is a conditional one
 				if cfg[idx].goto2 < 0:
 					next_block_idx = indexmap[cfg[idx].goto2]
 					g2_list[idx]   = g1_list[next_block_idx]
 					cfg[idx].goto2 = g1_list[next_block_idx]
 
 			if cfg[idx].goto < 0:
-				print(cfg[idx].number, cfg[idx].goto, indexmap)
 				next_block_idx = indexmap[cfg[idx].goto]
 				g1_list[idx]   = g1_list[next_block_idx]
 				cfg[idx].goto  = g1_list[next_block_idx]
@@ -193,9 +208,6 @@ def update_block_list(cfg):
 			new_cfg.append(b)
 
 	return new_cfg
-
-
-
 
 
 # This is for assignment statement list. If the next statement is an assignment, call the 
