@@ -248,11 +248,14 @@ def p_def_a_bool_expr(p):
 def p_def_n_bool_expr(p):
 	'''	n_bool_expr : NOT n_bool_expr 
 				 | sub_bool_expr
+				 | LPAREN bool_expr RPAREN
 	'''
 	if len(p) == 2:
 		p[0] = p[1]
-	else:
+	elif len(p) == 3:
 		p[0] = AbstractSyntaxTreeNode("NOT", [p[2]])
+	else:
+		p[0] = p[2]
 
 
 # Sub expression that we have
