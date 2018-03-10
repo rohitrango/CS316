@@ -87,9 +87,8 @@ class AbstractBodyTreeNode(AbstractSyntaxTreeNode):
 
 	def __repr__(self, depth=0):
 		res = ""
-		for child in self.operands:
-			if child.operator!="DECL":
-				res += child.__repr__(depth=depth)+"\n"
+		children = [child for child in self.operands if child.operator!="DECL"]
+		res += "\n".join([child.__repr__(depth=depth) for child in children])
 		return res
 
 
