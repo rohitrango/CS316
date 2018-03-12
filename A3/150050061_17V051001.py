@@ -71,7 +71,7 @@ cfg_ast = []
 
 def t_newline(t):
 	r'\n|\r\n'
-	t.lexer.lineno += len(t.value)
+	t.lexer.lineno += 1
 
 def t_COMMENT(t):
 	r'\/\/.*'
