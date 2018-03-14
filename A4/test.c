@@ -1,6 +1,13 @@
 int a;
 float b, *c, **d;
 
+
+void foo() {
+	a = b;
+	aaa();
+}
+
+
 void main(int argc, int a, float c)
 {
 	int *a; 

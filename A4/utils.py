@@ -38,7 +38,11 @@ class AbstractSyntaxTreeNode(object):
 	def __repr__(self, depth=0):
 		# print(self.operator, len(self.operands))
 		if len(self.operands) == 0:
-			return depth*"\t" + self.operator + "(" + self.name + ")"
+			if self.operator in ["VAR", "CONST"]:
+				return depth*"\t" + self.operator + "(" + self.name + ")"
+			else:
+				return depth*"\t" + ""
+
 		else:
 			return depth*"\t" + self.operator + "\n" + depth*"\t" + "(\n" \
 					+ ("\n" + (depth+1)*"\t" + ",\n").join(map(lambda x: x.__repr__(depth+1), self.operands)) + "\n" + depth*"\t" + ")" 

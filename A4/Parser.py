@@ -86,6 +86,7 @@ def t_error(t):
 	print("Illegal character '%s'" % t.value[0])
 	t.lexer.skip(1)
 
+
 '''
 -----------------------------------------------------------------------
 Parser
@@ -131,8 +132,8 @@ def p_def_procedures(p):
 	if len(p) == 2:
 		p[0] = AbstractSyntaxTreeNode("PROCEDURES", [p[1]])
 	else:
-		p[0] = p[2]
-		p[0].addChild(p[1])
+		p[0] = p[1]
+		p[0].addChild(p[2])
 
 def p_def_type(p):
 	'''
@@ -140,18 +141,8 @@ def p_def_type(p):
 			 | INT
 			 | FLOAT
 	'''
-	if isinstance(p[1], str):
-		p[1] = AbstractSyntaxTreeNode("TYPE", [], [p[1]])
+	p[1] = AbstractSyntaxTreeNode("TYPE", [], p[1])
 	p[0] = p[1]
-
-# def p_def_type_nonvoid(p):
-# 	'''
-# 		type_nonvoid : 	  INT
-# 						| FLOAT
-# 	'''
-# 	p[0] = AbstractSyntaxTreeNode("TYPE", [], p[0])
-
-
 
 
 # Single procedure
