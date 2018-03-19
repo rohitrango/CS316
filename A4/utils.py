@@ -3,7 +3,6 @@
 Data Structure for Abstract Syntax Tree
 -----------------------------------------------------------------------
 '''
-
 sym_to_name_mapping = {
 	'PLUS'	: '+',
 	'MINUS'	: '-',
@@ -220,7 +219,6 @@ def update_block_list(cfg):
 			new_cfg.append(b)
 
 	return new_cfg
-
 
 # This is for assignment statement list. If the next statement is an assignment, call the 
 # assignment_statement_list on the node.

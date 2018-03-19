@@ -8,6 +8,8 @@ import ply.lex as lex
 import ply.yacc as yacc
 import sys, os
 from utils import *
+from semantics import *
+import json
 
 tokens = ['ID', 'STAR', 'AND', 'NUM', 'LPAREN', 'RPAREN', 'COMMA', 'LCURL', 'RCURL', 'SEMICOLON', 'EQUALS', 
 			# Symbols 
@@ -109,6 +111,16 @@ def p_def_prog(p):
 	p[0] = AbstractSyntaxTreeNode("PROG", [p[1], p[2]])
 	cfg_ast.append(p[0])
 
+	global_table, messages = generateSymbolTable(p[1])
+	# local_tables, local_messages = generateLocalTables(p[2], global_table)
+
+	if messages != []:
+		for message in messages:
+			print(message)
+	else:
+		print(json.dumps(global_table, indent=4, sort_keys=True))
+
+
 # This takes care of any number of declarations first
 def p_def_declaration(p):
 	''' 
@@ -141,6 +153,7 @@ def p_def_type(p):
 	'''
 	p[1] = AbstractSyntaxTreeNode("TYPE", [], p[1])
 	p[0] = p[1]
+	p[0].lineno = p.lineno(1)
 
 
 # Single procedure
@@ -507,8 +520,8 @@ if __name__ == "__main__":
 	lex.input(data)
 	yacc.parse(data)
 
-	for c in cfg_ast:
-		print(c)
+	# for c in cfg_ast:
+	# 	print(c)
 
 	# Here, we check for errors first. If there are no errors, then we are good to go
 	# Print the CFG and ast on 2 different files now

@@ -1,6 +1,5 @@
 int a;
-float b, *c, **d;
-
+float b, *c, **d, **fg;
 
 void foo() {
 	a = b;
