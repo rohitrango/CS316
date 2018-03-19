@@ -26,11 +26,19 @@ bool_to_name_mapping = {
 
 class AbstractSyntaxTreeNode(object):
 
-	def __init__(self, operator, operands=[], name=None, lineno=None):
+	def __init__(self, operator, operands=[], name=None, lineno=None, vartype=None):
+		'''
+		operator : It's the operator of the AST node e.g. PLUS, VAR, DECL
+		operands : The list of operands to apply the operator on. 
+		name  	 : Specific name in case of variables, constants, etc.
+		lineno 	 : The lineno. of the piece of code taken while parsing.
+		vartype  : Default : None. Only applicable for arguments inside the parameter.
+		'''
 		self.operator = operator
 		self.name = name
 		self.operands = operands
 		self.lineno = lineno
+		self.vartype = vartype 
 
 	def addChild(self, child):
 		self.operands.append(child)
@@ -38,10 +46,11 @@ class AbstractSyntaxTreeNode(object):
 	def __repr__(self, depth=0):
 		# print(self.operator, len(self.operands))
 		if len(self.operands) == 0:
-			if self.operator in ["VAR", "CONST"]:
-				return depth*"\t" + self.operator + "(" + self.name + ")"
-			else:
-				return depth*"\t" + ""
+			return depth*"\t" + self.operator + "(" + str(self.name) + ")"
+			# if self.operator in ["VAR", "CONST", "TYPE"]:
+			# 	return depth*"\t" + self.operator + "(" + str(self.name) + ")"
+			# else:
+			# 	return depth*"\t" + ""
 
 		else:
 			return depth*"\t" + self.operator + "\n" + depth*"\t" + "(\n" \

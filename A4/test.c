@@ -4,7 +4,7 @@ float b, *c, **d;
 
 void foo() {
 	a = b;
-	aaa();
+	aaa(a);
 }
 
 
@@ -14,6 +14,7 @@ void main(int argc, int a, float c)
 	*a = 2;
 	if(a < b) { 
 		c = a;
+		b = b;
 	}
 	foo(a, *b, &c);
 }

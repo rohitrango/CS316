@@ -1,5 +1,5 @@
 '''
-Assignment A3
+Assignment A4
 Team members: 
 1. Rohit Kumar Jena (150050061)
 2. Walter Berggren  (17V051001)
@@ -92,7 +92,6 @@ def t_error(t):
 Parser
 -----------------------------------------------------------------------
 '''
-
 precedence = (
 
 	('left', 'THEN'),
@@ -102,7 +101,6 @@ precedence = (
 	('left', 'STAR', 'SLASH'),
 	('right', 'UMINUS'),
 )
-
 
 # This defines our program
 def p_def_prog(p):
@@ -169,7 +167,9 @@ def p_def_parameters(p):
 		# Check for identifiers
 		if isinstance(p[2], str):
 			p[2] = AbstractSyntaxTreeNode("VAR", [], p[2])
-	
+
+		# Add the variable type.
+		p[2].vartype = p[1]
 		# p[3] gives a params list, simply add the new parameter to the list in the beginning
 		p[0] = p[3]
 		p[0].operands.insert(0, p[2])
@@ -188,9 +188,11 @@ def p_def_paramslist(p):
 		if isinstance(p[3], str):
 			p[3] = AbstractSyntaxTreeNode("VAR", [], p[3])
 		
+
 		# p[4] gives a params list, 
 		# simply add the new parameter to the list in the beginning
 		p[0] = p[4]
+		p[3].vartype = p[2]
 		p[0].operands.insert(0, p[3])
 
 
@@ -303,7 +305,7 @@ def p_def_assgn(p):
 def p_def_decl(p):
 	''' decl : type decl_list
 	'''
-	p[0] = AbstractSyntaxTreeNode("DECL", [p[2]])
+	p[0] = AbstractSyntaxTreeNode("DECL", [p[1], p[2]])
 
 
 
