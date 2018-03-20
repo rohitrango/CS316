@@ -112,14 +112,18 @@ def p_def_prog(p):
 	cfg_ast.append(p[0])
 
 	global_table, messages = generateSymbolTable(p[1])
-	# local_tables, local_messages = generateLocalTables(p[2], global_table)
+	global_table['__name__'] = '__global__'
+	global_table['__parent__'] = None
+	local_tables, global_table, local_messages = generateLocalTables(p[2], global_table)
 
+	messages.extend(local_messages)
 	if messages != []:
 		for message in messages:
 			print(message)
 	else:
 		print(json.dumps(global_table, indent=4, sort_keys=True))
-
+		for table in local_tables:
+			print(json.dumps(table, indent=4, sort_keys=True))
 
 # This takes care of any number of declarations first
 def p_def_declaration(p):
@@ -164,6 +168,8 @@ def p_def_procedure(p):
 	# Give it the name as that of the ID
 	# It's children are params, declarations, statements
 	p[0] = AbstractSyntaxTreeNode("PROCEDURE", [p[4], p[7], p[8]], p[2])
+	p[0].vartype = p[1]
+	p[0].lineno = p.lineno(1)
 
 
 # Define parameters
@@ -183,6 +189,7 @@ def p_def_parameters(p):
 
 		# Add the variable type.
 		p[2].vartype = p[1]
+		p[2].lineno = p.lineno(1)
 		# p[3] gives a params list, simply add the new parameter to the list in the beginning
 		p[0] = p[3]
 		p[0].operands.insert(0, p[2])
@@ -206,6 +213,7 @@ def p_def_paramslist(p):
 		# simply add the new parameter to the list in the beginning
 		p[0] = p[4]
 		p[3].vartype = p[2]
+		p[3].lineno = p.lineno(1)
 		p[0].operands.insert(0, p[3])
 
 
@@ -486,7 +494,6 @@ def p_def_ptr(p):
 def p_def_addr(p):
 	''' addr : AND ID
 			 | AND ptr
-			 | AND addr
 	'''
 	if isinstance(p[2], str):
 		p[2] = AbstractSyntaxTreeNode("VAR", [],  p[2])
