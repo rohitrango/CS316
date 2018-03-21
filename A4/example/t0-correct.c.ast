@@ -1,0 +1,170 @@
+
+FUNCTION func1
+PARAMS {'b': 'int', 'a': 'int'}
+RETURNS int
+	ASGN
+	(
+		DEREF
+		(
+			VAR(g3)
+		)
+		,
+		CONST(4)
+	)
+
+
+FUNCTION func2
+PARAMS {'b2': 'float', 'b1': 'int'}
+RETURNS int
+	IF
+	(
+		EQ
+		(
+			DEREF
+			(
+				VAR(b1)
+			)
+			,
+			CONST(32)
+		)
+		,
+		ASGN
+		(
+			DEREF
+			(
+				VAR(var1)
+			)
+			,
+			CONST(3.0)
+		)
+		,
+		WHILE
+		(
+			NE
+			(
+				DEREF
+				(
+					VAR(b2)
+				)
+				,
+				DEREF
+				(
+					VAR(var1)
+				)
+			)
+			,
+			ASGN
+			(
+				DEREF
+				(
+					VAR(b2)
+				)
+				,
+				MINUS
+				(
+					DEREF
+					(
+						VAR(b2)
+					)
+					,
+					CONST(1.0)
+				)
+			)
+
+		)
+
+	)
+
+
+
+
+
+Main
+	ASGN
+	(
+		DEREF
+		(
+			VAR(g)
+		)
+		,
+		CONST(4)
+	)
+	IF
+	(
+		EQ
+		(
+			DEREF
+			(
+				VAR(g)
+			)
+			,
+			CONST(4)
+		)
+		,
+		WHILE
+		(
+			NE
+			(
+				DEREF
+				(
+					VAR(g)
+				)
+				,
+				CONST(0)
+			)
+			,
+			ASGN
+			(
+				DEREF
+				(
+					VAR(g)
+				)
+				,
+				MINUS
+				(
+					DEREF
+					(
+						VAR(g)
+					)
+					,
+					CONST(1)
+				)
+			)
+
+		)
+		ASGN
+		(
+			DEREF
+			(
+				DEREF
+				(
+					VAR(f)
+				)
+			)
+			,
+			CONST(3.0)
+		)
+		,
+		ASGN
+		(
+			DEREF
+			(
+				DEREF
+				(
+					VAR(f)
+				)
+			)
+			,
+			CONST(2.0)
+		)
+
+	)
+	ASGN
+	(
+		DEREF
+		(
+			VAR(g)
+		)
+		,
+		call func1( int x, int y )
+	)

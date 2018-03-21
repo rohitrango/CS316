@@ -26,6 +26,7 @@ reserved = {
 	'void' 	: 'VOID',
 	'int'	: 'INT',
 	'float'	: 'FLOAT',
+	'return': 'RETURN',
 }
 
 tokens += list(reserved.values())
@@ -185,6 +186,15 @@ def p_def_procedure(p):
 	p[0].vartype = p[1]
 	p[0].lineno = p.lineno(1)
 
+# Grammar for return statement 
+def p_def_return_stmt(p):
+	'''
+		return_stmt : RETURN ptr_expr SEMICOLON
+	'''
+	p[0] = AbstractSyntaxTreeNode("RETURN", [p[2]])
+	p[0].lineno = p.lineno(1)
+
+
 def p_def_fname(p):
 	'''
 		fname : STAR fname
@@ -192,6 +202,7 @@ def p_def_fname(p):
 	'''
 	if len(p) == 2:
 		p[0] = AbstractSyntaxTreeNode("FNAME", [], p[1])
+		p[0].lvl = 0
 		p[0].lineno = p.lineno(1)
 	else:
 		p[0] = p[2]
@@ -259,6 +270,7 @@ def p_def_stmt(p):
 			 | if_stmt 
 			 | while_stmt
 			 | function_call
+			 | return_stmt
 	'''
 	p[0] = p[1]
 
