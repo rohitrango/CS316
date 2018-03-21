@@ -32,6 +32,7 @@ class AbstractSyntaxTreeNode(object):
 		name  	 : Specific name in case of variables, constants, etc.
 		lineno 	 : The lineno. of the piece of code taken while parsing.
 		vartype  : Default : None. Only applicable for arguments inside the parameter.
+					Also, set it to 'int' or 'float' for CONST types
 		'''
 		self.operator = operator
 		self.name = name

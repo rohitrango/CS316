@@ -91,7 +91,8 @@ def generateLocalTables(proceduresAst, globalTable):
 		localSymbolTable['__name__'] = func.name
 		symbolTableList.append(localSymbolTable)
 
-		# Check for the same name in the global table, else add it to the global symbol table
+		# Check for the same name in the global table, and append a message accordingly.
+		# Add it to the global symbol table
 		name = func.name
 		if name in globalTable:
 			messages.append("Function {0} is already declared. Error at line no. {1}".format(name, func.lineno))

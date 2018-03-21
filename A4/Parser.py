@@ -11,7 +11,7 @@ from utils import *
 from semantics import *
 import json
 
-tokens = ['ID', 'STAR', 'AND', 'NUM', 'LPAREN', 'RPAREN', 'COMMA', 'LCURL', 'RCURL', 'SEMICOLON', 'EQUALS', 
+tokens = ['ID', 'STAR', 'AND', 'NUM', 'NUMFLOAT', 'LPAREN', 'RPAREN', 'COMMA', 'LCURL', 'RCURL', 'SEMICOLON', 'EQUALS', 
 			# Symbols 
 			'PLUS', 'MINUS', 'SLASH',
 			# For A3
@@ -30,8 +30,13 @@ reserved = {
 
 tokens += list(reserved.values())
 
+def t_NUMFLOAT(t):
+	r'\d+\.\d+'
+	t.value = float(t.value)
+	return t
+
 def t_NUM(t):
-	r'[0-9]+'
+	r'\d+'
 	t.value = int(t.value)
 	return t
 
@@ -87,7 +92,6 @@ def t_error(t):
 	print(t)
 	print("Illegal character '%s'" % t.value[0])
 	t.lexer.skip(1)
-
 
 '''
 -----------------------------------------------------------------------
@@ -463,6 +467,7 @@ def p_def_ptr_term(p):
 def p_def_ptr_expr_base(p):
 	''' ptr_expr_base : ID
 				| NUM
+				| NUMFLOAT
 				| ptr
 				| addr
 				| LPAREN ptr_expr RPAREN
@@ -472,6 +477,10 @@ def p_def_ptr_expr_base(p):
 			p[1] = AbstractSyntaxTreeNode("VAR", [], p[1])
 		elif isinstance(p[1], int):
 			p[1] = AbstractSyntaxTreeNode("CONST", [], str(p[1]))
+			p[1].vartype = "int"
+		elif isinstance(p[1], float):
+			p[1] = AbstractSyntaxTreeNode("CONST", [], str(p[1]))
+			p[1].vartype = "float"
 
 		p[0] = p[1]
 
@@ -527,8 +536,8 @@ if __name__ == "__main__":
 	lex.input(data)
 	yacc.parse(data)
 
-	# for c in cfg_ast:
-	# 	print(c)
+	for c in cfg_ast:
+		print(c)
 
 	# Here, we check for errors first. If there are no errors, then we are good to go
 	# Print the CFG and ast on 2 different files now
