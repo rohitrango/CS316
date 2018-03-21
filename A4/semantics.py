@@ -13,26 +13,56 @@ def generateSymbolTable(declarations):
 
 	decl_stmts = declarations.operands
 	for stmt in decl_stmts:
-		vartype, decl_list = stmt.operands
-		# Check for void type declarations here
-		if vartype.name == "void":
-			messages.append("Declaration cannot be of type : {0} at line no. {1}".format(vartype.name, vartype.lineno))
-		
-		# Resolve all variables
-		for var in decl_list.operands:
-			name, lvl, err = resolveDeclVar(var)
-			if err:
-				messages.append("Declaration of {0} cannot contain symbol '&' at line no. {1}".format(name, vartype.lineno))
-			if name in symbol_table:
-				messages.append("Declaration of {0} is done more than once. Error at line no. {1}".format(name, vartype.lineno))
+		if stmt.operator == "DECL":
+
+			# This is for a declaration statement
+			vartype, decl_list = stmt.operands
+			# Check for void type declarations here
+			if vartype.name == "void":
+				messages.append("Declaration cannot be of type : {0} at line no. {1}".format(vartype.name, vartype.lineno))
 			
-			# Update the level of indirection of the variable in the symbol table
-			# TODO : Change it to a more complex form as and when needed.
-			symbol_table[name] = {'type': vartype.name, 'lvl': lvl, 'scope': 'decl'}
+			# Resolve all variables
+			for var in decl_list.operands:
+				name, lvl, err = resolveDeclVar(var)
+				if err:
+					messages.append("Declaration of {0} cannot contain symbol '&' at line no. {1}".format(name, vartype.lineno))
+				if name in symbol_table:
+					messages.append("Declaration of {0} is done more than once. Error at line no. {1}".format(name, vartype.lineno))
+				
+				# Update the level of indirection of the variable in the symbol table
+				# TODO : Change it to a more complex form as and when needed.
+				symbol_table[name] = {'type': vartype.name, 'lvl': lvl, 'scope': 'decl'}
+		else:
+			# This is for function prototype
+			# stmt is of type "F_PROTO", operands contains the parameters, name contains fname
+			vartype = stmt.operands[0]
+			params = stmt.operands[1]
+			paramsTable, messages = generateParamsTable(params, dict())
+			name = stmt.name.name
+			lvl  = stmt.name.lvl
+
+			# Check if the definition is in the symbol table already, if not, then add it 
+			if name in symbol_table:
+				messages.append("Declaration of {0} is done more than once. Error at line no. {1}".format(name, stmt.lineno))
+
+			# Entry for function prototype
+			symbol_table[name] = {
+				'type': vartype.name,
+				'lvl': lvl, 
+				'scope': 'local', 
+				'func': True, 
+				'proto': True,
+				'params': paramsTable	
+			}
+
 
 	return symbol_table, messages
 
 def resolveDeclVar(v):
+	'''
+	Given a variable of type DEREF or INT, resolve the level of indirection 
+	For the variable and return the name, lvl, and a list of errors that may have occured
+	'''
 	# Returns the level of indirection of the variable
 	op = v.operator
 	if op == "VAR":
@@ -47,8 +77,12 @@ def resolveDeclVar(v):
 		return name, lvl, err
 
 def generateParamsTable(params, symbolTable):
+	'''
+	This takes a params object, and a symbol table, and returns a new symbol table with the parameters
+	entered with some error messages that may have occured.
+	'''
 	messages = []
-	for param in params.operands:
+	for idx, param in enumerate(params.operands):
 		name, lvl, err = resolveDeclVar(param)
 		if err:
 			messages.append("Declaration of {0} cannot contain symbol '&' at line no. {1}".format(name, param.lineno))
@@ -62,7 +96,7 @@ def generateParamsTable(params, symbolTable):
 			else:
 				messages.append("Declaration of name {0} is used as a parameter. Error at line no. {1}".format(name, param.lineno))
 
-		symbolTable[name] = { "type": param.vartype.name , "lvl": lvl, 'scope': 'param' }
+		symbolTable[name] = { "type": param.vartype.name , "lvl": lvl, 'scope': 'param', 'pos': idx}
 	return symbolTable, messages
 
 def generateLocalTables(proceduresAst, globalTable):
@@ -83,21 +117,36 @@ def generateLocalTables(proceduresAst, globalTable):
 
 		messages.extend(localMessages)
 		messages.extend(declsMessages)
-		# Check that the variables declared in the procedure don't occur as parameters
-		# for name, content in declsSymbolTable.items():
-		# 	if name in paramsSymbolTable: # TODO: Introduce line number
-		# 		messages.append("Redefinition of {0}, already used as parameter. Error at line no. {1}".format(name, ))
+
+		# At this point, localSymbolTable contains all declarations and parameters
 		localSymbolTable['__parent__'] = globalTable
-		localSymbolTable['__name__'] = func.name
+		localSymbolTable['__name__'] = func.name.name
+		localSymbolTable['__lvl__'] = func.name.lvl
 		symbolTableList.append(localSymbolTable)
 
-		# Check for the same name in the global table, and append a message accordingly.
-		# Add it to the global symbol table
-		name = func.name
-		if name in globalTable:
-			messages.append("Function {0} is already declared. Error at line no. {1}".format(name, func.lineno))
+		# Check for the same name in the global table.
+		# If the name is present and it's not a prototype, append a message accordingly.
+		# If its a prototype, check for lvl and type of variables
+		lineno = func.name.lineno
+		name = func.name.name
 
-		globalTable[name] = {'type': func.vartype.name, 'lvl': 0, 'scope': 'local', 'func': True}
+		if name in globalTable:
+			if not globalTable[name].get('proto', False):
+				messages.append("Function {0} is already declared. Error at line no. {1}".format(name, lineno))
+			else:
+				protoParams = sorted(globalTable[name]['params'].values(), key=lambda x: x['pos'])
+				defParams   = filter(lambda x: isinstance(x, dict) and x.get('scope', '') == "param", localSymbolTable.values())
+				defParams   = sorted(defParams, key=lambda x: x['pos'])
+				if len(defParams) == len(protoParams):
+					for idx, (defParam, protoParam) in enumerate(zip(defParams, protoParams)):
+						# Check for inconsistent types
+						if (defParam['lvl'] != protoParam['lvl']) or (defParam['type'] != protoParam['type']):
+							messages.append("Function {0} has inconsistent type of parameter, at param. index: {1}. Error at line no. {2}".format(name, idx, lineno))
+
+				else:
+					messages.append("Function {0} has inconsistent number of parameters. Error at line no. {1}".format(name, lineno))
+
+		globalTable[name] = {'type': func.vartype.name, 'lvl': func.name.lvl, 'scope': 'local', 'func': True, 'proto': False}
 
 	return symbolTableList, globalTable, messages
 

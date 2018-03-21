@@ -133,13 +133,23 @@ def p_def_prog(p):
 def p_def_declaration(p):
 	''' 
 		declarations : declarations decl SEMICOLON
-				     | 
+				     | declarations func_call
+				     |
 	'''
 	if len(p) == 1:
 		p[0] = AbstractSyntaxTreeNode("DECLARATIONS", [])
 	else:
 		p[0] = p[1]
 		p[0].addChild(p[2])
+
+# This grammar is for function calls
+def p_def_func_call(p):
+	'''
+		func_call : type fname LPAREN params RPAREN SEMICOLON
+	'''
+	p[0] = AbstractSyntaxTreeNode("F_PROTO", [p[1], p[4]], p[2])
+	p[0].lineno = p.lineno(1)
+
 
 # Contain one or more procedures
 def p_def_procedures(p):
@@ -167,7 +177,7 @@ def p_def_type(p):
 # Single procedure
 def p_def_procedure(p):
 	'''
-		procedure : type ID LPAREN params RPAREN LCURL declarations body RCURL
+		procedure : type fname LPAREN params RPAREN LCURL declarations body RCURL
 	'''
 	# Give it the name as that of the ID
 	# It's children are params, declarations, statements
@@ -175,6 +185,17 @@ def p_def_procedure(p):
 	p[0].vartype = p[1]
 	p[0].lineno = p.lineno(1)
 
+def p_def_fname(p):
+	'''
+		fname : STAR fname
+			  | ID
+	'''
+	if len(p) == 2:
+		p[0] = AbstractSyntaxTreeNode("FNAME", [], p[1])
+		p[0].lineno = p.lineno(1)
+	else:
+		p[0] = p[2]
+		p[0].lvl = p[0].lvl + 1
 
 # Define parameters
 def p_def_parameters(p):

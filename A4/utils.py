@@ -25,7 +25,7 @@ bool_to_name_mapping = {
 
 class AbstractSyntaxTreeNode(object):
 
-	def __init__(self, operator, operands=[], name=None, lineno=None, vartype=None):
+	def __init__(self, operator, operands=[], name=None, lineno=None, vartype=None, lvl=0):
 		'''
 		operator : It's the operator of the AST node e.g. PLUS, VAR, DECL
 		operands : The list of operands to apply the operator on. 
@@ -38,7 +38,8 @@ class AbstractSyntaxTreeNode(object):
 		self.name = name
 		self.operands = operands
 		self.lineno = lineno
-		self.vartype = vartype 
+		self.vartype = vartype
+		self.lvl = lvl
 
 	def addChild(self, child):
 		self.operands.append(child)
