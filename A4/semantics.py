@@ -110,10 +110,28 @@ def generateLocalTables(proceduresAst, globalTable):
 
 	# Do this for all procedures
 	for func in procedures:
+
+		# Use name and lineno for errors.
+		lineno = func.name.lineno
+		name = func.name.name
+
 		localSymbolTable = dict()
 		params, decls, body = func.operands
 		localSymbolTable, declsMessages = generateSymbolTable(decls)
 		localSymbolTable, localMessages = generateParamsTable(params, localSymbolTable)
+
+		# Add the self reference to the local symbol table
+		# So that we cannot define variables having the same name as the function inside.
+		# Then, we add a self reference to make things easy when we check for the function name itself.
+		if name in localSymbolTable:
+			messages.append("Parameter or declaration cannot be function name {0}, error at line no. {1}".format(name, lineno))
+		localSymbolTable[name] = {
+			'type': func.vartype.name,
+			'lvl': func.name.lvl,
+			'scope': 'local', 
+			'func': True, 
+			'proto': False,
+		}
 
 		messages.extend(localMessages)
 		messages.extend(declsMessages)
@@ -127,13 +145,14 @@ def generateLocalTables(proceduresAst, globalTable):
 		# Check for the same name in the global table.
 		# If the name is present and it's not a prototype, append a message accordingly.
 		# If its a prototype, check for lvl and type of variables
-		lineno = func.name.lineno
-		name = func.name.name
 
 		if name in globalTable:
 			if not globalTable[name].get('proto', False):
 				messages.append("Function {0} is already declared. Error at line no. {1}".format(name, lineno))
 			else:
+				# Prototype is defined, check for consistency of positions and types of parameters
+				# Take dictionaries for both the prototype, and definition
+				# Compare them, and add error messages accordingly
 				protoParams = sorted(globalTable[name]['params'].values(), key=lambda x: x['pos'])
 				defParams   = filter(lambda x: isinstance(x, dict) and x.get('scope', '') == "param", localSymbolTable.values())
 				defParams   = sorted(defParams, key=lambda x: x['pos'])
@@ -142,11 +161,57 @@ def generateLocalTables(proceduresAst, globalTable):
 						# Check for inconsistent types
 						if (defParam['lvl'] != protoParam['lvl']) or (defParam['type'] != protoParam['type']):
 							messages.append("Function {0} has inconsistent type of parameter, at param. index: {1}. Error at line no. {2}".format(name, idx, lineno))
-
 				else:
 					messages.append("Function {0} has inconsistent number of parameters. Error at line no. {1}".format(name, lineno))
 
-		globalTable[name] = {'type': func.vartype.name, 'lvl': func.name.lvl, 'scope': 'local', 'func': True, 'proto': False}
+
+		# Here, if all declarations are correct, do type checking for the function
+		# if len(messages) == 0:
+		# 	err_messages = typeCheckBody(body, localSymbolTable)
+		# 	messages.extend(err_messages)
+
+		# Add a reference to the function, since another function defined later
+		# Should be able to refer to this function via the global table
+		globalTable[name] = {
+					'type': func.vartype.name,
+					'lvl': func.name.lvl,
+					'scope': 'local', 
+					'func': True, 
+					'proto': False
+		}
 
 	return symbolTableList, globalTable, messages
 
+
+# Do type checking. Call some recursive functions depending upon the type of node
+def typeCheckBody(body, localSymbolTable):
+	'''
+	Takes in a body (from function body, if or while statements)
+	Uses local symbol table to check for types
+	'''
+	errorMessages = []
+	stmts = body.operands
+	for stmt in stmts:
+		# Check for what type of statement it is.
+		op = stmt.operator
+		if op == "ASGN":
+			 errorMessages.extend(typeCheckExpr(stmt.operands, localSymbolTable))
+		elif op == "IF" or op == "WHILE":
+			errorMessages.extend(typeCheckExpr(stmt.operands[0], localSymbolTable))
+			for ifbody in stmt.operands[1:]:
+				errorMessages.extend(typeCheckBody(ifbody, localSymbolTable))
+		elif op == "FN_CALL":
+			errorMessages.extend(typeCheckFunctionCall(stmt.name, stmt.operands[0], localSymbolTable))
+		else:
+			errorMessages.extend(typeCheckReturn(stmt.operands[0], localSymbolTable))
+
+	return errorMessages
+
+def typeCheckExpr(expr, symbolTable):
+	return []
+
+def typeCheckFunctionCall(name, params, symbolTable):
+	return []
+
+def typeCheckReturn(expr, symbolTable):
+	return []

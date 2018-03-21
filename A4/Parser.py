@@ -134,7 +134,7 @@ def p_def_prog(p):
 def p_def_declaration(p):
 	''' 
 		declarations : declarations decl SEMICOLON
-				     | declarations func_call
+				     | declarations func_proto
 				     |
 	'''
 	if len(p) == 1:
@@ -144,9 +144,9 @@ def p_def_declaration(p):
 		p[0].addChild(p[2])
 
 # This grammar is for function calls
-def p_def_func_call(p):
+def p_def_func_proto(p):
 	'''
-		func_call : type fname LPAREN params RPAREN SEMICOLON
+		func_proto : type fname LPAREN params RPAREN SEMICOLON
 	'''
 	p[0] = AbstractSyntaxTreeNode("F_PROTO", [p[1], p[4]], p[2])
 	p[0].lineno = p.lineno(1)
@@ -178,13 +178,25 @@ def p_def_type(p):
 # Single procedure
 def p_def_procedure(p):
 	'''
-		procedure : type fname LPAREN params RPAREN LCURL declarations body RCURL
+		procedure : type fname LPAREN params RPAREN LCURL declarations_func body RCURL
 	'''
 	# Give it the name as that of the ID
 	# It's children are params, declarations, statements
 	p[0] = AbstractSyntaxTreeNode("PROCEDURE", [p[4], p[7], p[8]], p[2])
 	p[0].vartype = p[1]
 	p[0].lineno = p.lineno(1)
+
+def p_def_declarations_func(p):
+	''' 
+		declarations_func : declarations_func decl SEMICOLON
+				     	  |
+	'''
+	if len(p) == 1:
+		p[0] = AbstractSyntaxTreeNode("DECLARATIONS", [])
+	else:
+		p[0] = p[1]
+		p[0].addChild(p[2])
+
 
 # Grammar for return statement 
 def p_def_return_stmt(p):
@@ -269,14 +281,14 @@ def p_def_stmt(p):
 	''' stmt : assgn SEMICOLON
 			 | if_stmt 
 			 | while_stmt
-			 | function_call
+			 | function_call SEMICOLON
 			 | return_stmt
 	'''
 	p[0] = p[1]
 
 
 def p_def_function_call(p):
-	''' function_call : ID LPAREN opt_params RPAREN SEMICOLON
+	''' function_call : ID LPAREN opt_params RPAREN
 	'''
 	p[0] = AbstractSyntaxTreeNode("FN_CALL", [p[3]] , p[1])
 
@@ -502,6 +514,7 @@ def p_def_ptr_expr_base(p):
 				| NUM
 				| NUMFLOAT
 				| ptr
+				| function_call
 				| addr
 				| LPAREN ptr_expr RPAREN
 	'''
