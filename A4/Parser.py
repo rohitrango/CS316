@@ -582,8 +582,8 @@ if __name__ == "__main__":
 	lex.input(data)
 	yacc.parse(data)
 
-	for c in cfg_ast:
-		print(c)
+	#for c in cfg_ast:
+		# print(c)
 
 	# Here, we check for errors first. If there are no errors, then we are good to go
 	# Print the CFG and ast on 2 different files now

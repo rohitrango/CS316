@@ -1,6 +1,6 @@
 int *g3, l3;
 int *func1(int *x, int *y);
-int *func2(int *a, float *b);
+int *func2(int *b1, float *b2);
 float *var1, var2;
 int *func1(int *a, int *b)
 {
@@ -33,6 +33,7 @@ void main()
     int *g, **a1, *a2, a;
     float **f;
     *g = 4;
+    func1(g3, a2);
     if(*g == 4)
     {
         while(*g != 0)

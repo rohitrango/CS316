@@ -76,6 +76,19 @@ def resolveDeclVar(v):
 		err = True
 		return name, lvl, err
 
+def resolveType(name, symbolTable):
+	'''
+	Returns the type and the level of indirection for a variable in a symbol table
+	Returns None, None if the variable is not specified
+	'''
+	if name in symbolTable:
+		return symbolTable[name]['type'], symbolTable[name]['lvl']
+	elif '__parent__' in symbolTable and name in symbolTable['__parent__']:
+		entry = symbolTable['__parent__'][name]
+		return entry['type'], entry['lvl']
+	else:
+		return None, None
+
 def generateParamsTable(params, symbolTable):
 	'''
 	This takes a params object, and a symbol table, and returns a new symbol table with the parameters
@@ -164,21 +177,15 @@ def generateLocalTables(proceduresAst, globalTable):
 				else:
 					messages.append("Function {0} has inconsistent number of parameters. Error at line no. {1}".format(name, lineno))
 
-
-		# Here, if all declarations are correct, do type checking for the function
-		# if len(messages) == 0:
-		# 	err_messages = typeCheckBody(body, localSymbolTable)
-		# 	messages.extend(err_messages)
-
 		# Add a reference to the function, since another function defined later
-		# Should be able to refer to this function via the global table
-		globalTable[name] = {
-					'type': func.vartype.name,
-					'lvl': func.name.lvl,
-					'scope': 'local', 
-					'func': True, 
-					'proto': False
-		}
+		# should be able to refer to this function via the global table
+		# !!! Should this really be done? We're discarding parameter information above
+		# globalTable[name] = localSymbolTable[name]
+		
+		# Here, if all declarations are correct, do type checking for the function
+		if len(messages) == 0:
+			bodyErrorMesages = typeCheckBody(body, localSymbolTable)
+			messages.extend(bodyErrorMesages)
 
 	return symbolTableList, globalTable, messages
 
@@ -201,7 +208,7 @@ def typeCheckBody(body, localSymbolTable):
 			for ifbody in stmt.operands[1:]:
 				errorMessages.extend(typeCheckBody(ifbody, localSymbolTable))
 		elif op == "FN_CALL":
-			errorMessages.extend(typeCheckFunctionCall(stmt.name, stmt.operands[0], localSymbolTable))
+			errorMessages.extend(typeCheckFunctionCall(stmt, localSymbolTable))
 		else:
 			errorMessages.extend(typeCheckReturn(stmt.operands[0], localSymbolTable))
 
@@ -210,8 +217,40 @@ def typeCheckBody(body, localSymbolTable):
 def typeCheckExpr(expr, symbolTable):
 	return []
 
-def typeCheckFunctionCall(name, params, symbolTable):
-	return []
+def typeCheckFunctionCall(stmt, symbolTable):
+	'''
+	Checks that a function with the given name and parameters exists in a symbol table
+	Returns a list of errors messages as strings (empty if no errors were found)
+	'''
+	errorMessages = []
+	name = stmt.name
+
+	# Check that the name exists in the global symbol table
+	if name not in symbolTable['__parent__']:
+		# !!! Line no. is not printed correctly
+		errorMessages.append("Function {0} is not defined. Error on line no. {1}".format(name, stmt.lineno))
+		return errorMessages
+
+	# Check that the correct parameters have been provided
+	providedParams = list(resolveDeclVar(x) for x in stmt.operands[0].operands)
+	requiredParams = list(sorted(symbolTable['__parent__'][name]['params'].values(), key=lambda x: x['pos']))
+	if len(providedParams) != len(requiredParams):
+		errorMessages.append("Wrong number of arguments provided for function {0}. {1} provided, should be {2}. Error on line no. {3}" \
+			.format(name, len(providedParams), len(requiredParams), stmt.lineno))
+		return errorMessages
+	
+	# For each provided parameter, check that its type matches the type defined in the function declaration
+	for idx, ((providedName, providedLvl, _), required) in enumerate(zip(providedParams, requiredParams)):
+		varType, varLvl = resolveType(providedName, symbolTable)
+		if varType != required['type']:
+			errorMessages.append("Wrong type for parameter {0} in function call {1}. Received {2}, expected {3}. Error on line no. {4}" \
+				.format(str(idx), name, varType, required['type'], stmt.lineno))
+		calledLvl = varLvl - providedLvl
+		if calledLvl != required['lvl']:
+			errorMessages.append("Wrong level of indiretion for parameter {0} in function call {1}. Error on line no. {2}" \
+				.format(str(idx), name, stmt.lineno))
+
+	return errorMessages
 
 def typeCheckReturn(expr, symbolTable):
 	return []

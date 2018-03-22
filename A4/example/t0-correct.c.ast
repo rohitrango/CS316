@@ -1,6 +1,6 @@
 
 FUNCTION func1
-PARAMS {'b': 'int', 'a': 'int'}
+PARAMS {'a': 'int', 'b': 'int'}
 RETURNS int
 	ASGN
 	(
@@ -14,7 +14,7 @@ RETURNS int
 
 
 FUNCTION func2
-PARAMS {'b2': 'float', 'b1': 'int'}
+PARAMS {'b1': 'int', 'b2': 'float'}
 RETURNS int
 	IF
 	(
@@ -166,5 +166,5 @@ Main
 			VAR(g)
 		)
 		,
-		call func1( int x, int y )
+		call func1( int y, int x )
 	)
