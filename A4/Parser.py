@@ -550,7 +550,6 @@ def p_def_ptr(p):
 
 def p_def_addr(p):
 	''' addr : AND ID
-			 | AND ptr
 	'''
 	if isinstance(p[2], str):
 		p[2] = AbstractSyntaxTreeNode("VAR", [],  p[2])
