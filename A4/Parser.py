@@ -546,6 +546,7 @@ def p_def_ptr(p):
 		p[2] = AbstractSyntaxTreeNode("VAR", [], p[2])
 
 	p[0] = AbstractSyntaxTreeNode("DEREF", [p[2]])
+	p[0].lineno = p.lineno(1)
 
 
 def p_def_addr(p):
