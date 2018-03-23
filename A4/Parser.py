@@ -126,9 +126,10 @@ def p_def_prog(p):
 		for message in messages:
 			print(message)
 	else:
-		print(json.dumps(global_table, indent=4, sort_keys=True))
-		for table in local_tables:
-			print(json.dumps(table, indent=4, sort_keys=True))
+		print(global_table)
+		# print(json.dumps(global_table, indent=4, sort_keys=True))
+		# for table in local_tables:
+		# 	print(json.dumps(table, indent=4, sort_keys=True))
 
 # This takes care of any number of declarations first
 def p_def_declaration(p):
@@ -291,6 +292,7 @@ def p_def_function_call(p):
 	''' function_call : ID LPAREN opt_params RPAREN
 	'''
 	p[0] = AbstractSyntaxTreeNode("FN_CALL", [p[3]] , p[1])
+	p[0].lineno = p.lineno(1)
 
 # Optional params to function list
 def p_def_opt_params(p):

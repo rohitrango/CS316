@@ -31,7 +31,7 @@ def generateSymbolTable(declarations):
 				
 				# Update the level of indirection of the variable in the symbol table
 				# TODO : Change it to a more complex form as and when needed.
-				symbol_table[name] = {'type': vartype.name, 'lvl': lvl, 'scope': 'decl'}
+				symbol_table[name] = {'type': vartype.name, 'lvl': lvl, 'func': False}
 		else:
 			# This is for function prototype
 			# stmt is of type "F_PROTO", operands contains the parameters, name contains fname
@@ -47,14 +47,13 @@ def generateSymbolTable(declarations):
 
 			# Entry for function prototype
 			symbol_table[name] = {
+				'name': name,
 				'type': vartype.name,
 				'lvl': lvl, 
-				'scope': 'local', 
 				'func': True, 
 				'proto': True,
 				'params': paramsTable	
 			}
-
 
 	return symbol_table, messages
 
@@ -81,19 +80,24 @@ def resolveType(name, symbolTable):
 	Returns the type and the level of indirection for a variable in a symbol table
 	Returns None, None if the variable is not specified
 	'''
-	if name in symbolTable:
-		return symbolTable[name]['type'], symbolTable[name]['lvl']
-	elif '__parent__' in symbolTable and name in symbolTable['__parent__']:
+	for form in ['params', 'decls']:
+		if form in symbolTable and name in symbolTable[form]:
+			return symbolTable[form][name]['type'], symbolTable[form][name]['lvl']
+		
+	# if name in symbolTable:
+	# 	return symbolTable[name]['type'], symbolTable[name]['lvl']
+	if symbolTable['__parent__'] is not None and name in symbolTable['__parent__']:
 		entry = symbolTable['__parent__'][name]
 		return entry['type'], entry['lvl']
 	else:
 		return None, None
 
-def generateParamsTable(params, symbolTable):
+def generateParamsTable(params, decls):
 	'''
 	This takes a params object, and a symbol table, and returns a new symbol table with the parameters
 	entered with some error messages that may have occured.
 	'''
+	paramsdict = dict()
 	messages = []
 	for idx, param in enumerate(params.operands):
 		name, lvl, err = resolveDeclVar(param)
@@ -103,14 +107,14 @@ def generateParamsTable(params, symbolTable):
 		if param.vartype.name == "void":
 			messages.append("Declaration of parameter {0} cannot be void, at line no. {1}".format(name, param.lineno))
 
-		if name in symbolTable:
-			if symbolTable[name]['scope'] == 'param':
-				messages.append("Parameter of name {0} is used more than once. Error at line no. {1}".format(name, param.lineno))
-			else:
-				messages.append("Declaration of name {0} is used as a parameter. Error at line no. {1}".format(name, param.lineno))
+		# Check for the name in either parameters or declarations
+		if name in paramsdict:
+			messages.append("Parameter of name {0} is used more than once. Error at line no. {1}".format(name, param.lineno))
+		elif name in decls:
+			messages.append("Declaration of name {0} is used as a parameter. Error at line no. {1}".format(name, param.lineno))
 
-		symbolTable[name] = { "type": param.vartype.name , "lvl": lvl, 'scope': 'param', 'pos': idx}
-	return symbolTable, messages
+		paramsdict[name] = { "type": param.vartype.name , "lvl": lvl, 'pos': idx}
+	return paramsdict, messages
 
 def generateLocalTables(proceduresAst, globalTable):
 	'''
@@ -128,47 +132,59 @@ def generateLocalTables(proceduresAst, globalTable):
 		lineno = func.name.lineno
 		name = func.name.name
 
-		localSymbolTable = dict()
+		# Generate params and declarations
 		params, decls, body = func.operands
-		localSymbolTable, declsMessages = generateSymbolTable(decls)
-		localSymbolTable, localMessages = generateParamsTable(params, localSymbolTable)
+		# First, generate the symbol table for the function
+		# Then, we generate the parameters table for the function
+		# Check if any parameter is defined as a declaration before
+		declsTable, declsMessages = generateSymbolTable(decls)
+		paramsTable, localMessages = generateParamsTable(params, declsTable)
 
 		# Add the self reference to the local symbol table
 		# So that we cannot define variables having the same name as the function inside.
 		# Then, we add a self reference to make things easy when we check for the function name itself.
-		if name in localSymbolTable:
+		if name in paramsTable or name in declsTable:
 			messages.append("Parameter or declaration cannot be function name {0}, error at line no. {1}".format(name, lineno))
-		localSymbolTable[name] = {
+		
+		# This is the local symbol table. Contains the following:
+		#  	- It's own name
+		# 	- type
+		# 	- level of indirection
+		# 	- func: If it's a function or not. 
+		#	- Proto: If it's a proto or not.
+		#	- params: Dictionary of parameters 
+		# 	- decls : Dictionary of declarations
+		localSymbolTable = {
+			'name': name,
 			'type': func.vartype.name,
 			'lvl': func.name.lvl,
-			'scope': 'local', 
 			'func': True, 
 			'proto': False,
+			'params': paramsTable,
+			'decls' : declsTable,
+			'__parent__': globalTable,
 		}
+
 
 		messages.extend(localMessages)
 		messages.extend(declsMessages)
 
 		# At this point, localSymbolTable contains all declarations and parameters
-		localSymbolTable['__parent__'] = globalTable
-		localSymbolTable['__name__'] = func.name.name
-		localSymbolTable['__lvl__'] = func.name.lvl
 		symbolTableList.append(localSymbolTable)
 
 		# Check for the same name in the global table.
 		# If the name is present and it's not a prototype, append a message accordingly.
 		# If its a prototype, check for lvl and type of variables
-
 		if name in globalTable:
 			if not globalTable[name].get('proto', False):
-				messages.append("Function {0} is already declared. Error at line no. {1}".format(name, lineno))
+				messages.append("Function {0} is already declared / named as variable. Error at line no. {1}".format(name, lineno))
 			else:
 				# Prototype is defined, check for consistency of positions and types of parameters
 				# Take dictionaries for both the prototype, and definition
 				# Compare them, and add error messages accordingly
 				protoParams = sorted(globalTable[name]['params'].values(), key=lambda x: x['pos'])
-				defParams   = filter(lambda x: isinstance(x, dict) and x.get('scope', '') == "param", localSymbolTable.values())
-				defParams   = sorted(defParams, key=lambda x: x['pos'])
+				defParams   = sorted(localSymbolTable['params'].values(), key=lambda x: x['pos'])
+
 				if len(defParams) == len(protoParams):
 					for idx, (defParam, protoParam) in enumerate(zip(defParams, protoParams)):
 						# Check for inconsistent types
@@ -180,7 +196,7 @@ def generateLocalTables(proceduresAst, globalTable):
 		# Add a reference to the function, since another function defined later
 		# should be able to refer to this function via the global table
 		# !!! Should this really be done? We're discarding parameter information above
-		# globalTable[name] = localSymbolTable[name]
+		globalTable[name] = localSymbolTable
 		
 		# Here, if all declarations are correct, do type checking for the function
 		if len(messages) == 0:
@@ -228,12 +244,15 @@ def typeCheckFunctionCall(stmt, symbolTable):
 	# Check that the name exists in the global symbol table
 	if name not in symbolTable['__parent__']:
 		# !!! Line no. is not printed correctly
+		print(name, symbolTable['__parent__'])
 		errorMessages.append("Function {0} is not defined. Error on line no. {1}".format(name, stmt.lineno))
 		return errorMessages
 
 	# Check that the correct parameters have been provided
+	# TODO: Change the parameters to expressions later
+	# Change the providedParams, and then do the checks accordingly
 	providedParams = list(resolveDeclVar(x) for x in stmt.operands[0].operands)
-	requiredParams = list(sorted(symbolTable['__parent__'][name]['params'].values(), key=lambda x: x['pos']))
+	requiredParams = list(sorted(symbolTable['params'].values(), key=lambda x: x['pos']))
 	if len(providedParams) != len(requiredParams):
 		errorMessages.append("Wrong number of arguments provided for function {0}. {1} provided, should be {2}. Error on line no. {3}" \
 			.format(name, len(providedParams), len(requiredParams), stmt.lineno))
