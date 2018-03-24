@@ -7,6 +7,11 @@ def generateSymbolTable(declarations):
 	'''
 	Generates a symbols table from a list of declarations (AST Node).
 	The symbol table is in the form of a dict object. 
+	params : declarations - AST of declarations
+	
+	returns: symbolTable  - A dictionary of ID names and their attributes.
+							For a var, the attrs are `type`, `lvl`, `func`: False
+							For a func, the attrs are `type`, `lvl`, `name`, `func`: True, `proto`: True, `params`: dict{...}
 	'''
 	messages = []
 	symbol_table = dict()
@@ -61,6 +66,12 @@ def resolveDeclVar(v, allowAddr = False):
 	'''
 	Given a variable of type DEREF or INT, resolve the level of indirection 
 	For the variable and return the name, lvl, and a list of errors that may have occured
+	params : v 		    - a AST node which can be `DEREF`, `ID`, or `ADDR`
+			 allowAddr  - Allow addresses in expressions? Useful for checking type of function, or LHS in an assignment.
+
+	returns: name - name of the variable
+			 lvl  - level of indirection of the variable
+			 err  - Boolean saying if its an error or not
 	'''
 	# Returns the level of indirection of the variable
 	op = v.operator
@@ -81,13 +92,23 @@ def resolveType(name, symbolTable):
 	'''
 	Returns the type and the level of indirection for a variable in a symbol table
 	Returns None, None, error messages as an array of strings if the variable is not specified
+
+	Assertions: Assume that name is the name of a variable, otherwise check `typeCheckFunctionCall`.
+
+	params: name 		- The `name` of the variable or function
+			symbolTable - A symbolTable from where to search the name.
+	
+	returns: type - The type of the variable (could be 'int', 'float', or 'void')
+			 lvl  - level of indirection as defined in the symbol table
+			 err  - list of error messages
 	'''
+
+	# Search in the local symbol table
 	for form in ['params', 'decls']:
 		if form in symbolTable and name in symbolTable[form]:
 			return symbolTable[form][name]['type'], symbolTable[form][name]['lvl'], []
 		
-	# if name in symbolTable:
-	# 	return symbolTable[name]['type'], symbolTable[name]['lvl']
+	# Search in the global table
 	if symbolTable['__parent__'] is not None and name in symbolTable['__parent__']:
 		entry = symbolTable['__parent__'][name]
 		if entry['func']:
@@ -104,6 +125,14 @@ def generateParamsTable(params, decls):
 	'''
 	This takes a params object, and a symbol table, and returns a new symbol table with the parameters
 	entered with some error messages that may have occured.
+
+	params : params - A AST node containing a list of parameters
+			 decls  - dictionary of declarations to be checked with the parameters.
+
+	returns: paramsdict : A dictionary containing parameters and their types. The attributes are as follows: 
+							- type : type of the variable,
+							- lvl  : level of indirection as in the resolution from the declaration
+							- pos  : position in the params
 	'''
 	paramsdict = dict()
 	messages = []
@@ -128,6 +157,15 @@ def generateLocalTables(proceduresAst, globalTable):
 	'''
 	Takes in a list of procedures, and the global table to generate a list of local tables, for each function
 	And also check the type for the statements
+	
+	Performs type checking along with the creation of the local symbol tables
+
+	params:  proceduresAst - The list of procedures right after the declarations in the global scope
+			 globalTable   - The global table passed
+
+	returns: symbolTableList - List of local symbol tables
+			 globalTable     - Modified global table
+			 messages   	 - List of messages
 	'''
 	procedures = proceduresAst.operands
 	symbolTableList = []
@@ -173,7 +211,6 @@ def generateLocalTables(proceduresAst, globalTable):
 			'__parent__': globalTable,
 		}
 
-
 		messages.extend(localMessages)
 		messages.extend(declsMessages)
 
@@ -201,9 +238,8 @@ def generateLocalTables(proceduresAst, globalTable):
 				else:
 					messages.append("Function {0} has inconsistent number of parameters. Error at line no. {1}".format(name, lineno))
 
-		# Add a reference to the function, since another function defined later
-		# should be able to refer to this function via the global table
-		# !!! Should this really be done? We're discarding parameter information above
+
+		# At this point, add the local Symbol table entry to the global symbol table
 		globalTable[name] = localSymbolTable
 		
 		# Here, if all declarations are correct, do type checking for the function
@@ -219,6 +255,12 @@ def typeCheckBody(body, localSymbolTable):
 	'''
 	Takes in a body (from function body, if or while statements)
 	Uses local symbol table to check for types
+
+	params : body 				- an AST of type body. Contains a list of statements
+			 localSymbolTable 	- The local symbol table of the procedure
+
+	returns: errorMessages - List of error messages.
+
 	'''
 	errorMessages = []
 	stmts = body.operands
@@ -241,39 +283,59 @@ def typeCheckBody(body, localSymbolTable):
 def typeCheckExpr(expr, symbolTable):
 	'''
 	Returns the type, the level of indirection, and list of all semantic errors in this expression for the given symbol table
+	
+	params:  expr - 	The expression to evaluate. This could be a simple VAR, ADDR, or something like PLUS, LT, etc.
+			    		If the expression is a function call, then use the typeCheckFunctionCall() function.
+			 symbolTable - The local symbol table of the procedure in which the expression is present.
+
+	returns: type 			- The resulting type of the expression. Can be `int` or `float`. If the expression is invalid, return None.
+			 lvl 			- The level of indirection of the resulting expression. If the expression is invalid, return None.
+			 errorMessages  - The list of error messages.
+
 	'''
 	errorMessages = []
 	if len(expr.operands) == 0 or len(expr.operands) == 1:
 		operand = expr
 		if operand.operator in ["VAR", "DEREF", "ADDR"]:
+			# For variable, expr, deref, simply resolve the operand.
 			name, derefLvl, err = resolveDeclVar(operand, True)
 			vartype, declLvl, resolveTypeErrors = resolveType(name, symbolTable)
+			errorMessages.extend(resolveTypeErrors)
+
 			if vartype is None:
-				errorMessages.extend(resolveTypeErrors)
 				return None, None, errorMessages
+
+			# Check effective level and check if lvl >= 0
 			lvl = declLvl - derefLvl
 			if lvl < 0:
 				errorMessages.append("Too much indirection in variable {0}. Error on lineno. {1}" \
 					.format(name, expr.lineno))
 				return None, None, errorMessages
-
 			return vartype, lvl, errorMessages
 		elif operand.operator == "CONST":
+			# Separately for constant
 			return operand.vartype, 0, errorMessages
+		elif operand.operator == "FN_CALL":
+			# For function call
+			return typeCheckFunctionCall(operand, symbolTable)
 		else:
 			# Unary operator case
 			return typeCheckExpr(operand.operands[0], symbolTable)
 	else:
+		assert(len(expr.operands) == 2)
 		if expr.operator == "ASGN":
 			# Check the LHS
 			lhsName, lhsDerefLvl, err = resolveDeclVar(expr.operands[0])
 			if err:
 				errorMessages.append("LHS cannot contain &. Error on lineno. {0}".format(expr.lineno))
 				return None, None, errorMessages
+
 			lhsVartype, lhsDeclLvl, lhsResolveTypeErrors = resolveType(lhsName, symbolTable)
+			errorMessages.extend(lhsResolveTypeErrors)
+
 			if lhsVartype is None:
-				errorMessages.extend(lhsResolveTypeErrors)
 				return None, None, errorMessages
+
 			lhsLvl = lhsDeclLvl - lhsDerefLvl
 			if lhsLvl < 0:
 				errorMessages.append("Too much indirection in variable {0}. Error on lineno. {1}" \
@@ -281,26 +343,39 @@ def typeCheckExpr(expr, symbolTable):
 				return None, None, errorMessages
 		else:
 			# Check the LHS
-			lhsVartype, lhsLvl, lhsErrorMessages = typeCheckExpr(expr.operands[1], symbolTable)
+			lhsVartype, lhsLvl, lhsErrorMessages = typeCheckExpr(expr.operands[0], symbolTable)
 			errorMessages.extend(lhsErrorMessages)
 			if lhsVartype is None:
 				return None, None, errorMessages
+
 		# Check the RHS
 		rhsVartype, rhsLvl, rhsErrorMessages = typeCheckExpr(expr.operands[1], symbolTable)
 		errorMessages.extend(rhsErrorMessages)
 		if rhsVartype is None:
 			return None, None, errorMessages
+
 		if lhsVartype != rhsVartype or lhsLvl != rhsLvl:
 			errorMessages.append("Left-hand side type and level of indirection must match right-hand side. Error on line no. {0}" \
 				.format(expr.lineno))
 			return None, None, errorMessages
+
 		return lhsVartype, lhsLvl, errorMessages
+
+	# WARNING: You shouldn't hit this point, you are missing out on something.
+	assert(False)
 	return None, None, errorMessages
 
 def typeCheckFunctionCall(stmt, symbolTable):
 	'''
 	Checks that a function with the given name and parameters exists in a symbol table
 	Returns a list of errors messages as strings (empty if no errors were found)
+
+	params:  stmt 			- Function call AST node  
+			 symbolTable 	- local symbol table 
+
+	returns: type 			- return type of the function call. Check from the symbol table.
+			 lvl  			- level of indirection of the returned variable. Check from symbol table.
+			 errorMessages 	- list of error messages
 	'''
 	errorMessages = []
 	name = stmt.name
@@ -309,18 +384,21 @@ def typeCheckFunctionCall(stmt, symbolTable):
 	if name not in symbolTable['__parent__']:
 		# !!! Line no. is not printed correctly
 		errorMessages.append("Function {0} is not defined. Error on line no. {1}".format(name, stmt.lineno))
-		return errorMessages
+		return None, None, errorMessages
 
 	# Check that the correct parameters have been provided
 	# TODO: Change the parameters to expressions later
 	# Change the providedParams, and then do the checks accordingly
-	providedParams = list(resolveDeclVar(x) for x in stmt.operands[0].operands)
 	functionSymbolTable = symbolTable['__parent__'][name]
+	
+	providedParams = list(resolveDeclVar(x) for x in stmt.operands[0].operands)
 	requiredParams = list(sorted(functionSymbolTable['params'].values(), key=lambda x: x['pos']))
+
+	# Arguments count
 	if len(providedParams) != len(requiredParams):
 		errorMessages.append("Wrong number of arguments provided for function {0}. {1} provided, should be {2}. Error on line no. {3}" \
 			.format(name, len(providedParams), len(requiredParams), stmt.lineno))
-		return errorMessages
+		return None, None, errorMessages
 	
 	# For each provided parameter, check that its type matches the type defined in the function declaration
 	for idx, ((providedName, providedLvl, _), required) in enumerate(zip(providedParams, requiredParams)):
@@ -328,16 +406,20 @@ def typeCheckFunctionCall(stmt, symbolTable):
 		if varType is None:
 			# The variable did not exist in the symbol table
 			errorMessages.extend(resolveTypeErrors)
-			return errorMessages
+			return None, None, errorMessages
+
 		if varType != required['type']:
 			errorMessages.append("Wrong type for parameter {0} in function call {1}. Received {2}, expected {3}. Error on line no. {4}" \
 				.format(str(idx), name, varType, required['type'], stmt.lineno))
+			return None, None, errorMessages
+
 		calledLvl = varLvl - providedLvl
 		if calledLvl != required['lvl']:
 			errorMessages.append("Wrong level of indiretion for parameter {0} in function call {1}. Error on line no. {2}" \
 				.format(str(idx), name, stmt.lineno))
+			return None, None, errorMessages
 
-	return errorMessages
+	return functionSymbolTable['type'], functionSymbolTable['lvl'], errorMessages
 
 def typeCheckReturn(expr, symbolTable):
 	return []
