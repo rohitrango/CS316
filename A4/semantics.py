@@ -404,11 +404,10 @@ def typeCheckFunctionCall(stmt, symbolTable):
 		return None, None, errorMessages
 
 	# Check that the correct parameters have been provided
-	# TODO: Change the parameters to expressions later
-	# Change the providedParams, and then do the checks accordingly
 	functionSymbolTable = symbolTable['__parent__'][name]
 	
-	providedParams = list(resolveDeclVar(x) for x in stmt.operands[0].operands)
+	# Provided params is now a tuple (type, lvl, messages) for all statements passed
+	providedParams = list(typeCheckExpr(x, symbolTable) for x in stmt.operands[0].operands)
 	requiredParams = list(sorted(functionSymbolTable['params'].values(), key=lambda x: x['pos']))
 
 	# Arguments count
@@ -418,20 +417,22 @@ def typeCheckFunctionCall(stmt, symbolTable):
 		return None, None, errorMessages
 	
 	# For each provided parameter, check that its type matches the type defined in the function declaration
-	for idx, ((providedName, providedLvl, _), required) in enumerate(zip(providedParams, requiredParams)):
-		varType, varLvl, resolveTypeErrors = resolveType(providedName, symbolTable)
+	# varType, varLvl, resolveErrors from the type check of expression in the param
+
+	for idx, ((varType, varLvl, resolveTypeErrors), required) in enumerate(zip(providedParams, requiredParams)):
 		if varType is None:
 			# The variable did not exist in the symbol table
 			errorMessages.extend(resolveTypeErrors)
 			return None, None, errorMessages
 
+		# The type does not match the required type of the function parameter
 		if varType != required['type']:
 			errorMessages.append("Wrong type for parameter {0} in function call {1}. Received {2}, expected {3}. Error on line no. {4}" \
 				.format(str(idx), name, varType, required['type'], stmt.lineno))
 			return None, None, errorMessages
 
-		calledLvl = varLvl - providedLvl
-		if calledLvl != required['lvl']:
+		# The level of indirection of the variable doesn't match the level of indirection of the parameter
+		if varLvl != required['lvl']:
 			errorMessages.append("Wrong level of indirection for parameter {0} in function call {1}. Error on line no. {2}" \
 				.format(str(idx), name, stmt.lineno))
 			return None, None, errorMessages

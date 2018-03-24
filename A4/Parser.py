@@ -305,30 +305,23 @@ def p_def_function_call(p):
 
 # Optional params to function list
 def p_def_opt_params(p):
-	''' opt_params  : ID opt_params_list
-					| ptr opt_params_list
-					| addr opt_params_list
+	''' opt_params  : ptr_expr opt_params_list
 					| 
 
-		opt_params_list : COMMA ID opt_params_list
-						| COMMA ptr opt_params_list
-						| COMMA addr opt_params_list
+		opt_params_list : COMMA ptr_expr opt_params_list
 						|
 	'''
 	if len(p) == 1:
 		# Base case
 		p[0] = AbstractSyntaxTreeNode("OPT_PARAMS", [])
 	elif len(p) == 3:
-		# opt_params recursion
-		if isinstance(p[1], str):
-			p[1] = AbstractSyntaxTreeNode("VAR", [], p[1])
 		p[0] = p[2]
+		p[0].lineno = p[1].lineno
 		p[0].operands.insert(0, p[1])
 	else:
 		# This is for opt_params_list
-		if isinstance(p[2], str):
-			p[2] = AbstractSyntaxTreeNode("VAR", [], p[2])
 		p[0] = p[3]
+		p[0].lineno = p[2].lineno
 		p[0].operands.insert(0, p[2])
 
 
@@ -593,8 +586,8 @@ if __name__ == "__main__":
 	lex.input(data)
 	yacc.parse(data)
 
-	#for c in cfg_ast:
-		# print(c)
+	# for c in cfg_ast:
+	# 	print(c)
 
 	# Here, we check for errors first. If there are no errors, then we are good to go
 	# Print the CFG and ast on 2 different files now
