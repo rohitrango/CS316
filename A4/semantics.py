@@ -50,6 +50,10 @@ def generateSymbolTable(declarations):
 			if name in symbol_table:
 				messages.append("Declaration of {0} is done more than once. Error at line no. {1}".format(name, stmt.lineno))
 
+			# Check if the function type is void with non-zero level of indirection
+			if vartype.name == "void" and lvl != 0:
+				messages.append("Function {0} cannot have return type as pointer to void. Error at line no. {1}".format(name, stmt.lineno))
+
 			# Entry for function prototype
 			symbol_table[name] = {
 				'name': name,
@@ -192,6 +196,10 @@ def generateLocalTables(proceduresAst, globalTable):
 		if name in paramsTable or name in declsTable:
 			messages.append("Parameter or declaration cannot be function name {0}, error at line no. {1}".format(name, lineno))
 		
+		# Check if the function type is void with non-zero level of indirection
+		if func.vartype.name == "void" and func.name.lvl != 0:
+			messages.append("Function {0} cannot have return type as pointer to void. Error at line no. {1}".format(name, lineno))
+
 		# This is the local symbol table. Contains the following:
 		#  	- It's own name
 		# 	- type
