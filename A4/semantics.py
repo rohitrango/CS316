@@ -224,6 +224,13 @@ def generateLocalTables(proceduresAst, globalTable):
 			if not globalTable[name].get('proto', False):
 				messages.append("Function {0} is already declared / named as variable. Error at line no. {1}".format(name, lineno))
 			else:
+
+				# Here, check for consistency of type and level of indirection
+				if globalTable[name]['type'] != localSymbolTable['type']:
+					messages.append("Function {0} has inconsistent type in definition and prototypes. Error at line no. {1}".format(name, lineno))
+				if globalTable[name]['lvl'] != localSymbolTable['lvl']:
+					messages.append("Function {0} has inconsistent level of indirection in definition and prototypes. Error at line no. {1}".format(name, lineno))
+
 				# Prototype is defined, check for consistency of positions and types of parameters
 				# Take dictionaries for both the prototype, and definition
 				# Compare them, and add error messages accordingly
