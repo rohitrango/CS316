@@ -118,7 +118,7 @@ def resolveType(name, symbolTable):
 		if entry['func']:
 			# Can only happen in the global symbol table because functions cannot
 			# be declared inside other functions
-			return None, None, ["Cannot pass function {0} as a parameter".format(name)]
+			return None, None, ["Cannot use function `{0}` in an expression".format(name)]
 		else:
 			return entry['type'], entry['lvl'], []
 	else:
@@ -290,8 +290,10 @@ def typeCheckBody(body, localSymbolTable):
 				errorMessages.extend(typeCheckBody(ifbody, localSymbolTable))
 		elif op == "FN_CALL":
 			errorMessages.extend(typeCheckFunctionCall(stmt, localSymbolTable)[2])
+		elif op == "RETURN":
+			errorMessages.extend(typeCheckReturn(stmt, localSymbolTable))
 		else:
-			errorMessages.extend(typeCheckReturn(stmt.operands[0], localSymbolTable))
+			assert(False)
 
 	return errorMessages
 
@@ -370,7 +372,7 @@ def typeCheckExpr(expr, symbolTable):
 			return None, None, errorMessages
 
 		if lhsVartype != rhsVartype or lhsLvl != rhsLvl:
-			errorMessages.append("Left-hand side type and level of indirection must match right-hand side. Error on line no. {0}" \
+			errorMessages.append("Inconsistent types of operands. Error on line no. {0}" \
 				.format(expr.lineno))
 			return None, None, errorMessages
 
@@ -442,5 +444,37 @@ def typeCheckFunctionCall(stmt, symbolTable):
 
 	return functionSymbolTable['type'], lvl, errorMessages
 
-def typeCheckReturn(expr, symbolTable):
-	return []
+def typeCheckReturn(return_stmt, symbolTable):
+	'''
+	Gets a return statement and checks if it matches with the type and level of indirection of the expression.
+
+	params:  return_stmt - The AST node of type RETURN and optionally containing a return value.
+			 symbolTable - Symbol table of the local function
+
+	returns: errorMessages - List of error messages
+	'''
+	errorMessages = []
+	assert(return_stmt.operator == "RETURN")
+	op = return_stmt.operands
+	if len(op) == 0:
+		# No parameters
+		lvl = 0
+		vartype = "void"
+	elif len(op) == 1:
+		# One parameter, check if its a void function
+		vartype, lvl, errorMessages = typeCheckExpr(op[0], symbolTable)
+		if symbolTable['type'] == "void":
+			errorMessages.append("void function `{0}` can't return anything in line no. {1}".format(symbolTable['name'], return_stmt.lineno))
+			return errorMessages
+	else:
+		print("ASSERTION ERROR: Check typeCheckReturn")
+		assert(False)
+
+	# Check for the type of function
+	if vartype != symbolTable['type'] and vartype is not None:
+		errorMessages.append("Incorrect return type in function `{0}` at line no. {1}".format(symbolTable['name'], return_stmt.lineno))
+
+	if lvl != symbolTable['lvl'] and lvl is not None:
+		errorMessages.append("Incorrect type of indirection in function `{0}` in line no. {1}".format(symbolTable['name'], return_stmt.lineno))
+
+	return errorMessages

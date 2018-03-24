@@ -203,8 +203,10 @@ def p_def_declarations_func(p):
 def p_def_return_stmt(p):
 	'''
 		return_stmt : RETURN ptr_expr SEMICOLON
+					| RETURN SEMICOLON
 	'''
-	p[0] = AbstractSyntaxTreeNode("RETURN", [p[2]])
+	item = [p[2]] if len(p) == 4 else []
+	p[0] = AbstractSyntaxTreeNode("RETURN", item)
 	p[0].lineno = p.lineno(1)
 
 
