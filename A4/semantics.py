@@ -281,7 +281,7 @@ def typeCheckBody(body, localSymbolTable):
 			for ifbody in stmt.operands[1:]:
 				errorMessages.extend(typeCheckBody(ifbody, localSymbolTable))
 		elif op == "FN_CALL":
-			errorMessages.extend(typeCheckFunctionCall(stmt, localSymbolTable))
+			errorMessages.extend(typeCheckFunctionCall(stmt, localSymbolTable)[2])
 		else:
 			errorMessages.extend(typeCheckReturn(stmt.operands[0], localSymbolTable))
 
@@ -422,11 +422,17 @@ def typeCheckFunctionCall(stmt, symbolTable):
 
 		calledLvl = varLvl - providedLvl
 		if calledLvl != required['lvl']:
-			errorMessages.append("Wrong level of indiretion for parameter {0} in function call {1}. Error on line no. {2}" \
+			errorMessages.append("Wrong level of indirection for parameter {0} in function call {1}. Error on line no. {2}" \
 				.format(str(idx), name, stmt.lineno))
 			return None, None, errorMessages
 
-	return functionSymbolTable['type'], functionSymbolTable['lvl'], errorMessages
+	# Check for too much indirection
+	lvl = functionSymbolTable['lvl'] - stmt.lvl
+	if lvl < 0:
+		errorMessages.append("Too much indirection for function call {0}. Error on line no. {1}".format(name, stmt.lineno))
+		return None, None, errorMessages
+
+	return functionSymbolTable['type'], lvl, errorMessages
 
 def typeCheckReturn(expr, symbolTable):
 	return []

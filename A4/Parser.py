@@ -290,8 +290,15 @@ def p_def_stmt(p):
 
 def p_def_function_call(p):
 	''' function_call : ID LPAREN opt_params RPAREN
+					  | STAR function_call
 	'''
-	p[0] = AbstractSyntaxTreeNode("FN_CALL", [p[3]] , p[1])
+	if len(p) == 3:
+		p[0] = p[2]
+		p[0].lvl += 1
+	else:
+		p[0] = AbstractSyntaxTreeNode("FN_CALL", [p[3]] , p[1])
+		p[0].lvl = 0
+
 	p[0].lineno = p.lineno(1)
 
 # Optional params to function list
