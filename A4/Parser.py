@@ -11,6 +11,12 @@ from utils import *
 from semantics import *
 import json
 
+# Global variables
+local_tables = None
+global_table = None
+messages = None
+prog = None
+
 tokens = ['ID', 'STAR', 'AND', 'NUM', 'NUMFLOAT', 'LPAREN', 'RPAREN', 'COMMA', 'LCURL', 'RCURL', 'SEMICOLON', 'EQUALS', 
 			# Symbols 
 			'PLUS', 'MINUS', 'SLASH',
@@ -113,9 +119,14 @@ precedence = (
 def p_def_prog(p):
 	''' prog : declarations procedures
 	'''
+	global local_tables, global_table, messages, prog
+
 	p[0] = AbstractSyntaxTreeNode("PROG", [p[1], p[2]])
+	prog = p[0]
 	cfg_ast.append(p[0])
 
+	# At this point, we are going to do the semantic checks, and return the list of messages
+	# And the symbol tables
 	global_table, messages = generateSymbolTable(p[1])
 	global_table['__name__'] = '__global__'
 	global_table['__parent__'] = None
@@ -126,7 +137,8 @@ def p_def_prog(p):
 		for message in messages:
 			print(message)
 	else:
-		print(global_table)
+		pass
+		# print(global_table)
 		# print(json.dumps(global_table, indent=4, sort_keys=True))
 		# for table in local_tables:
 		# 	print(json.dumps(table, indent=4, sort_keys=True))
@@ -313,7 +325,7 @@ def p_def_opt_params(p):
 	'''
 	if len(p) == 1:
 		# Base case
-		p[0] = AbstractSyntaxTreeNode("OPT_PARAMS", [])
+		p[0] = AbstractBodyTreeNode("OPT_PARAMS", [])
 	elif len(p) == 3:
 		p[0] = p[2]
 		p[0].lineno = p[1].lineno
@@ -580,14 +592,16 @@ if __name__ == "__main__":
 	with open(filename, 'r') as f:
 		data = f.read()
 
-	# ast_file = open(filename + '.ast', 'w')
-	# cfg_file = open(filename + '.cfg', 'w')
-
 	lex.input(data)
 	yacc.parse(data)
 
-	# for c in cfg_ast:
-	# 	print(c)
+	# If error messages, then exit
+	if messages:
+		sys.exit(0)
+
+	# At this point, print the AST first
+	print(getASTPrintable(prog))
+
 
 	# Here, we check for errors first. If there are no errors, then we are good to go
 	# Print the CFG and ast on 2 different files now

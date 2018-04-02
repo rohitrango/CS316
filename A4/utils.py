@@ -3,6 +3,8 @@
 Data Structure for Abstract Syntax Tree
 -----------------------------------------------------------------------
 '''
+from copy import deepcopy
+
 sym_to_name_mapping = {
 	'PLUS'	: '+',
 	'MINUS'	: '-',
@@ -45,9 +47,18 @@ class AbstractSyntaxTreeNode(object):
 		self.operands.append(child)
 
 	def __repr__(self, depth=0):
-		# print(self.operator, len(self.operands))
+		# Do something special for function call
+		if self.operator == "FN_CALL":
+			return depth*"\t" + "CALL " + self.name + "(\n" \
+					+ ("\n" + (depth+1)*"\t" + ",\n").join(map(lambda x: x.__repr__(depth+1), self.operands)) + "\n" + depth*"\t" + ")"
+
+
 		if len(self.operands) == 0:
-			return depth*"\t" + self.operator + "(" + str(self.name) + ")"
+			if self.operator == "RETURN":
+				return depth*"\t" + self.operator + "\n" + depth*"\t" + "(\n" + depth*"\t" + ")"
+			else:
+				return depth*"\t" + self.operator + "(" + str(self.name) + ")"
+
 			# if self.operator in ["VAR", "CONST", "TYPE"]:
 			# 	return depth*"\t" + self.operator + "(" + str(self.name) + ")"
 			# else:
@@ -102,23 +113,25 @@ class AbstractBodyTreeNode(AbstractSyntaxTreeNode):
 	def __repr__(self, depth=0):
 		res = ""
 		children = [child for child in self.operands if child.operator!="DECL"]
-		res += "\n".join([child.__repr__(depth=depth) for child in children])
+		if self.operator == "BODY":
+			res += "\n".join([child.__repr__(depth=depth) for child in children])
+		else:
+			res += ("\n"+"\t"*depth+",\n").join([child.__repr__(depth=depth) for child in children])
 		return res
-
 
 # This function will help to check for errors in the assignments of the AST
 # This will be extended to type-checking later
-def check_error_in_assignments(ast_list):
-	flag = False
-	messages = []
-	# For every assignment, check if LHS is var, and RHS is const
-	for asgn in ast_list:
-		if (asgn.operands[0].operator=="VAR" and asgn.operands[1].isConst()):
-			flag = True
-			messages.append("Syntax error: Static assignments to constants not allowed, line no. {0}".format(asgn.lineno))
-			break
+# def check_error_in_assignments(ast_list):
+# 	flag = False
+# 	messages = []
+# 	# For every assignment, check if LHS is var, and RHS is const
+# 	for asgn in ast_list:
+# 		if (asgn.operands[0].operator=="VAR" and asgn.operands[1].isConst()):
+# 			flag = True
+# 			messages.append("Syntax error: Static assignments to constants not allowed, line no. {0}".format(asgn.lineno))
+# 			break
 
-	return flag, messages
+# 	return flag, messages
 
 
 #########################################
@@ -429,3 +442,73 @@ def body_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 
 
 	return blk_body_list, bb_ctr, t_ctr, neg_ctr
+
+
+#######################################################################################
+## Some more functions to print AST in assignment-friendly form
+#######################################################################################
+def getASTPrintable(prog):
+	'''
+	Takes the AST data structure for the AST of the prog, and returns a string containing the 
+	ASTs of the functions. 
+
+	params:   prog - The AST for the entire program.
+	returns:  stmt - The string containing the AST in printable form. To be dumped directly to the .ast file.
+	'''
+	def resolveParamName(p):
+		'''
+		params  : address or variable
+		returns : lvl  - level of indirection
+				  name - name of var
+		'''
+		if p.operator == "VAR":
+			return 0, p.name
+		elif p.operator == "DEREF":
+			lvl, name = resolveParamName(p.operands[0])
+			return lvl+1, name
+		else:
+			assert False
+			return None, None
+
+
+	def getParamsHeader(params):
+		paramsStmt = ""
+		for p in params.operands:
+			vartype = p.vartype.name
+			lvl, name = resolveParamName(p) 
+			paramsStmt += "{0} {1}{2}, ".format(p.vartype.name, "*"*lvl, name)
+		paramsStmt = paramsStmt[:-2]
+		return paramsStmt
+
+
+	decls, procedures = prog.operands
+	stmt = ""
+	
+	# All functions
+	for func in procedures.operands:
+		part = ""
+		# Get everything related to the func
+		fname = func.name.name
+		lvl   = func.name.lvl
+		vartype = func.vartype.name
+		params, _, body = func.operands
+
+		part += "FUNCTION {0}\nPARAMS ({1})\nRETURNS {2}{3}\n".format(fname, getParamsHeader(params), "*"*lvl, vartype)
+		# body is an AST node
+		if len(body.operands) > 0:
+			if body.operands[-1].operator == "RETURN":
+				ret_stmt = body.operands[-1]
+				l_stmts  = deepcopy(body)
+				l_stmts.operands = l_stmts.operands[:-1]
+
+				part+=l_stmts.__repr__(depth=1) 
+				part+="\n"
+				part+=ret_stmt.__repr__()
+				part+="\n\n"
+			else:
+				part+=body.__repr__(depth=1)
+				part+="\n\n"
+
+			stmt+=part
+
+	return stmt[:-2]

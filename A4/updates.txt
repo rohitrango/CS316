@@ -1,0 +1,5 @@
+Changes : 
+1. Return statement at the very end only.
+2. Cannot dereference a function call directly. e.g. g = *f();
+3. Prototypes before function.
+

@@ -12,6 +12,8 @@ def generateSymbolTable(declarations):
 	returns: symbolTable  - A dictionary of ID names and their attributes.
 							For a var, the attrs are `type`, `lvl`, `func`: False
 							For a func, the attrs are `type`, `lvl`, `name`, `func`: True, `proto`: True, `params`: dict{...}
+
+			 messages     - List of messages
 	'''
 	messages = []
 	symbol_table = dict()
