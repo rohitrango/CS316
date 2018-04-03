@@ -599,12 +599,19 @@ if __name__ == "__main__":
 	if messages:
 		sys.exit(0)
 
-	# At this point, print the AST first
-	print(getASTPrintable(prog))
-	CFGS = getProcedureCFGs(prog.operands[1])
-	for cfg in CFGS:
-		print(cfg)
-	print(getSYMPrintable(global_table))
+	# Write the AST to filename.c.ast
+	with open("{}.ast".format(filename), "w") as fAst:
+		fAst.write(getASTPrintable(prog))
+
+	# Write the CFGs to filename.c.cfg
+	with open("{}.cfg".format(filename), "w") as fCfg:
+		CFGS = getProcedureCFGs(prog.operands[1])
+		for cfg in CFGS:
+			fCfg.write(str(cfg))
+
+	# Write the symbol table to filename.c.sym
+	with open("{}.sym".format(filename), "w") as fSym:
+		fSym.write(getSYMPrintable(global_table))
 	
 	# Here, we check for errors first. If there are no errors, then we are good to go
 	# Print the CFG and ast on 2 different files now
