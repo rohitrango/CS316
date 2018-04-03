@@ -331,24 +331,36 @@ def typeCheckExpr(expr, symbolTable):
 					.format(name, expr.lineno))
 				return None, None, errorMessages
 			return vartype, lvl, errorMessages
+
 		elif operand.operator == "CONST":
 			# Separately for constant
 			return operand.vartype, 0, errorMessages
+
 		elif operand.operator == "FN_CALL":
 			# For function call
 			return typeCheckFunctionCall(operand, symbolTable)
 		else:
 			# Unary operator case
-			return typeCheckExpr(operand.operands[0], symbolTable)
+			# Check for pointer type here
+			vartype, lvl, errorMessages = typeCheckExpr(operand.operands[0], symbolTable)
+			if lvl is not None and lvl != 0:
+				errorMessages.append("Pointer arithmetic is not allowed. Error on lineno. {0}".format(expr.lineno))
+				return None, None, errorMessages
+
+			return vartype, lvl, errorMessages
+
 	else:
 		assert(len(expr.operands) == 2)
 		if expr.operator == "ASGN":
 			# Check the LHS
 			lhsName, lhsDerefLvl, err = resolveDeclVar(expr.operands[0])
+
+			# If LHS contains '&' symbol
 			if err:
 				errorMessages.append("LHS cannot contain &. Error on lineno. {0}".format(expr.lineno))
 				return None, None, errorMessages
 
+			# resolve the type of the LHS
 			lhsVartype, lhsDeclLvl, lhsResolveTypeErrors = resolveType(lhsName, symbolTable)
 			errorMessages.extend(lhsResolveTypeErrors)
 
@@ -356,10 +368,19 @@ def typeCheckExpr(expr, symbolTable):
 				return None, None, errorMessages
 
 			lhsLvl = lhsDeclLvl - lhsDerefLvl
+
+			# Too much indirection
 			if lhsLvl < 0:
 				errorMessages.append("Too much indirection in variable {0}. Error on lineno. {1}" \
 					.format(lhsName, expr.lineno))
 				return None, None, errorMessages
+
+			# Check if the lhsDeclLvl is 0 -> This means that the type of the variable is a base type.
+			# This is invalid since we allow only pointer assignments.
+			if lhsDeclLvl == 0:
+				errorMessages.append("Only pointer assignments allowed. Error on lineno. {0}".format(expr.lineno))
+				return None, None, errorMessages
+
 		else:
 			# Check the LHS
 			lhsVartype, lhsLvl, lhsErrorMessages = typeCheckExpr(expr.operands[0], symbolTable)
@@ -367,12 +388,17 @@ def typeCheckExpr(expr, symbolTable):
 			if lhsVartype is None:
 				return None, None, errorMessages
 
+			# Check for pointer arithmetic here.
+			if lhsLvl != 0:
+				errorMessages.append("Only pointer arithmetic allowed. Error on line no. {0}".format(expr.lineno))
+
 		# Check the RHS
 		rhsVartype, rhsLvl, rhsErrorMessages = typeCheckExpr(expr.operands[1], symbolTable)
 		errorMessages.extend(rhsErrorMessages)
 		if rhsVartype is None:
 			return None, None, errorMessages
 
+		# Same type expression for LHS and RHS
 		if lhsVartype != rhsVartype or lhsLvl != rhsLvl:
 			errorMessages.append("Inconsistent types of operands. Error on line no. {0}" \
 				.format(expr.lineno))
