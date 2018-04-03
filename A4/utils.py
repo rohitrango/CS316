@@ -50,8 +50,12 @@ class AbstractSyntaxTreeNode(object):
 	def __repr__(self, depth=0):
 		# Do something special for function call
 		if self.operator == "FN_CALL":
+			paramsStr = ("\n" + (depth+1)*"\t" + ",\n").join(map(lambda x: x.__repr__(depth+1), self.operands)) + "\n"
+			if len(paramsStr) == 1:
+				paramsStr = ""
+
 			return depth*"\t" + "CALL " + self.name + "(\n" \
-					+ ("\n" + (depth+1)*"\t" + ",\n").join(map(lambda x: x.__repr__(depth+1), self.operands)) + "\n" + depth*"\t" + ")"
+					+ paramsStr + depth*"\t" + ")"
 
 
 		if len(self.operands) == 0:
@@ -85,6 +89,8 @@ class AbstractSyntaxTreeNode(object):
 			return self.name
 		elif self.operator == "ADDR":
 			return "&" + self.operands[0].printable()
+		elif self.operator == "RETURN":
+			return "return " + "".join(map(lambda x: x.printable(), self.operands))
 		elif self.operator == "DEREF":
 			return "*" + self.operands[0].printable()
 		elif self.operator in sym_to_name_mapping.keys():
@@ -95,12 +101,16 @@ class AbstractSyntaxTreeNode(object):
 			else:
 				return self.operands[0].printable() + " " + sym_to_name_mapping[self.operator] + " " + self.operands[1].printable()
 
-
 		elif self.operator in bool_to_name_mapping.keys():
 			if self.operator == "NOT":
 				return "!" + self.operands[0].printable()
 			else:
 				return self.operands[0].printable() + " " + bool_to_name_mapping[self.operator] + " " + self.operands[1].printable()
+		# Function calls
+		elif self.operator == "FN_CALL":
+			stmt = "*"*self.lvl + self.name + "(" + ", ".join(map(lambda x: x.printable(), self.operands[0].operands)) + ")"
+			return stmt
+
 		else:
 			print(self)
 			raise Exception
@@ -158,11 +168,9 @@ class Block(object):
 	def __repr__(self):
 		string = "<bb " + str(self.number) + ">"
 		# Check if it's the end block
-		if self.end:
-			string += "\nEnd"
-		else:
-			for op in self.contents:
-				string += ("\n" + op.printable())
+		for op in self.contents:
+			string += ("\n" + op.printable())
+		if not self.end:
 			if self.goto2 is None:
 				string += ("\ngoto <bb " + str(self.goto) + ">")
 			else:
@@ -170,10 +178,47 @@ class Block(object):
 				string += ("\nelse goto <bb " + str(self.goto2) + ">")
 		return string + "\n"
 
+'''
+Class for FunctionBlockContainer
+This contains a neat (not-so-neat) format for printing the blocks corresponding to a function and its params
+'''
+class FunctionBlockContainer(object):
+	def __init__(self, package):
+		self.name   = package['name']
+		self.blocks = package['blocks']
+		self.params = package['params']
+
+	def __repr__(self):
+		stmt = "function {0}({1})\n".format(self.name, self.params)
+		for blk in self.blocks:
+			stmt += blk.__repr__() + "\n"
+		return stmt
+
+
+
+def getProcedureCFGs(proceduresAST):
+	'''
+	Take a list of procedures and return a list of blocks for each CFG
+	params : proceduresAST   - the list of procedures 
+	returns: procedureCFGs   - list of CFGs for each procedure in order of defintion
+	'''
+	bb_ctr, t_ctr = 1, 0
+	procedureCFGs = []
+	for func in proceduresAST.operands:
+		params, decl, body = func.operands
+		blkList, bb_ctr, t_ctr = generateFunctionCFG(body, bb_ctr, t_ctr)
+		procedureCFGs.append(FunctionBlockContainer({
+			'blocks' : blkList,
+			'name'   : func.name.name,
+			'params' : getParamsHeader(params),
+			}))
+	return procedureCFGs
 
 # generate the CFG given a node
 def generateFunctionCFG(node, bb_ctr=1, t_ctr=0):
 	'''
+	generate CFG for a particular function
+
 	params : node   - AST for the body of the function
 			 bb_ctr - First usable Block number
 			 t_ctr  - First usable tmp variable number
@@ -190,6 +235,14 @@ def generateFunctionCFG(node, bb_ctr=1, t_ctr=0):
 	# goto. In the end just add an end block.
 	block_list, bb_ctr, t_ctr, neg_ctr = body_statement_list(node, bb_ctr, t_ctr, neg_ctr)
 	endblock = Block(bb_ctr, [], end=True)
+
+	if len(node.operands) > 0 and node.operands[-1].operator == "RETURN" and len(node.operands[-1].operands) > 0:
+		n, stmt_list, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[-1].operands[0], bb_ctr, t_ctr, neg_ctr)
+		stmt_list.append(AbstractSyntaxTreeNode("RETURN", [n]))
+		endblock.addStmts(stmt_list)
+	else:
+		endblock.addStmts([AbstractSyntaxTreeNode("RETURN", [])])
+
 	block_list.append(endblock)
 	bb_ctr+=1
 
@@ -245,45 +298,69 @@ def update_block_list(cfg):
 
 	return new_cfg
 
+
+# util function for assignment statement
+# Comes in handy to evaluate the list of statements corresponding to an expression
+def assignment_stmt_util(node, bb_ctr, t_ctr, neg_ctr):
+	# Assert that this is either a ptr_expr or a terminal
+	# Input : A node which can contain any expr
+	# Output: The first output is an RHS token (as an AST node)
+	#		, the second one is the list of statements formed so far
+	if node.operator in ["VAR", "CONST", "DEREF", "ADDR"]:
+		return node, [], bb_ctr, t_ctr, neg_ctr
+	elif node.operator == "FN_CALL":
+		# Check out for params first
+		stmt_list = []
+		params = node.operands[0].operands
+		n_fncall = deepcopy(node)
+		n_fncall.operands[0].operands = []
+
+		# Solve for every parameter
+		for p in params:
+			n, stm, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(p, bb_ctr, t_ctr, neg_ctr)
+			stmt_list.extend(stm)
+			n_fncall.operands[0].operands.append(n)
+		return n_fncall, stmt_list, bb_ctr, t_ctr, neg_ctr
+
+	else:
+		if len(node.operands) == 2:
+			# Check for left and right parts of the expression, solve them recursively
+			n1, stmt1, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[0], bb_ctr, t_ctr, neg_ctr)
+			n2, stmt2, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[1], bb_ctr, t_ctr, neg_ctr)
+			n = AbstractSyntaxTreeNode(node.operator, [n1, n2])
+			t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr))
+			t_ctr += 1
+			asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
+			stmt = stmt1 + stmt2 + [asgn]
+			return t0, stmt, bb_ctr, t_ctr, neg_ctr
+		elif len(node.operands) == 1:
+			# UMINUS
+			n1, stmt1, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[0], bb_ctr, t_ctr, neg_ctr)
+			n = AbstractSyntaxTreeNode(node.operator, [n1])
+			t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr))
+			t_ctr += 1
+			asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
+			stmt = stmt1 + [asgn]
+			return t0, stmt, bb_ctr, t_ctr, neg_ctr
+		else:
+			raise Exception
+
+
 # This is for assignment statement list. If the next statement is an assignment, call the 
 # assignment_statement_list on the node.
 def assignment_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 
-	def assignment_stmt_util(node, bb_ctr, t_ctr, neg_ctr):
-		# Assert that this is either a ptr_expr or a terminal
-		# Input : A node which can contain any expr
-		# Output: The first output is an RHS token (as an AST node)
-		#		, the second one is the list of statements formed so far
-		if node.operator in ["VAR", "CONST", "DEREF", "ADDR"]:
-			return node, [], bb_ctr, t_ctr, neg_ctr
-		else:
-			if len(node.operands) == 2:
-				# Check for left and right parts of the expression, solve them recursively
-				n1, stmt1, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[0], bb_ctr, t_ctr, neg_ctr)
-				n2, stmt2, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[1], bb_ctr, t_ctr, neg_ctr)
-				n = AbstractSyntaxTreeNode(node.operator, [n1, n2])
-				t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr))
-				t_ctr += 1
-				asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
-				stmt = stmt1 + stmt2 + [asgn]
-				return t0, stmt, bb_ctr, t_ctr, neg_ctr
-			elif len(node.operands) == 1:
-				# UMINUS
-				n1, stmt1, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[0], bb_ctr, t_ctr, neg_ctr)
-				n = AbstractSyntaxTreeNode(node.operator, [n1])
-				t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr))
-				t_ctr += 1
-				asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
-				stmt = stmt1 + [asgn]
-				return t0, stmt, bb_ctr, t_ctr, neg_ctr
-			else:
-				raise Exception
+	# This can either be an assignment or a function call. Check first.
+	if node.operator == "ASGN":
+		lhs = node.operands[0]
+		rhs, stmt_list, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[1], bb_ctr, t_ctr, neg_ctr)
+		stmt_list.append(AbstractSyntaxTreeNode("ASGN", [lhs, rhs]))
+		return stmt_list, bb_ctr, t_ctr, neg_ctr
+	elif node.operator == "FN_CALL":
+		N, stmt_list, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node, bb_ctr, t_ctr, neg_ctr)
+		stmt_list.append(N)
+		return stmt_list, bb_ctr, t_ctr, neg_ctr
 
-	# Assert that this is an assignment node
-	lhs = node.operands[0]
-	rhs, stmt_list, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[1], bb_ctr, t_ctr, neg_ctr)
-	stmt_list.append(AbstractSyntaxTreeNode("ASGN", [lhs, rhs]))
-	return stmt_list, bb_ctr, t_ctr, neg_ctr
 
 
 def condition_stmt_list(node, bb_ctr, t_ctr, neg_ctr):
@@ -445,6 +522,10 @@ def body_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 			for blk in while_blocks:
 				blk_body_list.append(blk)
 
+		elif op.operator == "FN_CALL":
+			C, bb_ctr, t_ctr, neg_ctr = assignment_statement_list(op, bb_ctr, t_ctr, neg_ctr)
+			c_blk.addStmts(C)
+
 	if c_blk.contents != []:
 		bb_ctr += 1
 		c_blk.goto = bb_ctr
@@ -460,6 +541,7 @@ def body_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 
 def getParamsHeader(params):
 	'''
+	getParamsHeader gives a human-readable parameters list.
 	params : params     - AST for params of function declaration
 	returns: paramsStmt - string containing the params
 	'''
@@ -494,6 +576,7 @@ def getProcedureTuple(name, symbolTable):
 
 def resolveParamName(p):
 	'''
+	resolveParamName resolves the `ptr_expr_base` into level of indirection, and name
 	params  : address or variable
 	returns : lvl  - level of indirection
 			  name - name of var

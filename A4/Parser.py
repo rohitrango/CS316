@@ -601,11 +601,11 @@ if __name__ == "__main__":
 
 	# At this point, print the AST first
 	print(getASTPrintable(prog))
-
+	CFGS = getProcedureCFGs(prog.operands[1])
+	for cfg in CFGS:
+		print(cfg)
 	print(getSYMPrintable(global_table))
 	
-
-
 	# Here, we check for errors first. If there are no errors, then we are good to go
 	# Print the CFG and ast on 2 different files now
 	# error_assignments, messages = check_error_in_assignments(ast_list)

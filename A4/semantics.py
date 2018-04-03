@@ -202,6 +202,11 @@ def generateLocalTables(proceduresAst, globalTable):
 		if func.vartype.name == "void" and func.name.lvl != 0:
 			messages.append("Function {0} cannot have return type as pointer to void. Error at line no. {1}".format(name, lineno))
 
+		# Do some checks for main function
+		if name == "main":
+			if func.vartype.name != "void":
+				messages.append("main function can only be of type `void`.")
+
 		# This is the local symbol table. Contains the following:
 		#  	- It's own name
 		# 	- type
@@ -261,27 +266,31 @@ def generateLocalTables(proceduresAst, globalTable):
 		
 		# Here, if all declarations are correct, do type checking for the function
 		if len(messages) == 0:
-			bodyErrorMesages = typeCheckBody(body, localSymbolTable)
+			bodyErrorMesages = typeCheckBody(body, localSymbolTable, allowReturn=True)
 			messages.extend(bodyErrorMesages)
 
 	return symbolTableList, globalTable, messages
 
 
 # Do type checking. Call some recursive functions depending upon the type of node
-def typeCheckBody(body, localSymbolTable):
+def typeCheckBody(body, localSymbolTable, allowReturn=False):
 	'''
 	Takes in a body (from function body, if or while statements)
 	Uses local symbol table to check for types
 
 	params : body 				- an AST of type body. Contains a list of statements
 			 localSymbolTable 	- The local symbol table of the procedure
+			 allowReturn		- Do not allow return functions by default. Allow it only in the outermost layer of statements.
+			 					  i.e. do not allow return statements inside if-else, or while statements.
 
 	returns: errorMessages - List of error messages.
 
 	'''
 	errorMessages = []
 	stmts = body.operands
-	for stmt in stmts:
+	ret_present = False
+
+	for idx, stmt in enumerate(stmts):
 		# Check for what type of statement it is.
 		op = stmt.operator
 		if op == "ASGN":
@@ -293,9 +302,24 @@ def typeCheckBody(body, localSymbolTable):
 		elif op == "FN_CALL":
 			errorMessages.extend(typeCheckFunctionCall(stmt, localSymbolTable)[2])
 		elif op == "RETURN":
-			errorMessages.extend(typeCheckReturn(stmt, localSymbolTable))
+			ret_present = True
+			if allowReturn:
+				# Check if its the last statement in the list.
+				if idx == len(stmts)-1:
+					errorMessages.extend(typeCheckReturn(stmt, localSymbolTable))
+				else:
+					errorMessages.append("Return statement allowed only at the end of function.")
+			else:
+				errorMessages.append("Return statement allowed only at the end of function.")
 		else:
 			assert(False)
+
+	# Check the last statement, if its NOT a return statement, then the function better be `void`
+	if allowReturn and localSymbolTable['type'] != "void":
+		if len(stmts) == 0 or stmts[-1].operator != "RETURN":
+			if not ret_present:
+				errorMessages.append("Non-void function {0} must have a return statement.".format(localSymbolTable['name']))
+
 
 	return errorMessages
 
@@ -331,24 +355,36 @@ def typeCheckExpr(expr, symbolTable):
 					.format(name, expr.lineno))
 				return None, None, errorMessages
 			return vartype, lvl, errorMessages
+
 		elif operand.operator == "CONST":
 			# Separately for constant
 			return operand.vartype, 0, errorMessages
+
 		elif operand.operator == "FN_CALL":
 			# For function call
 			return typeCheckFunctionCall(operand, symbolTable)
 		else:
 			# Unary operator case
-			return typeCheckExpr(operand.operands[0], symbolTable)
+			# Check for pointer type here
+			vartype, lvl, errorMessages = typeCheckExpr(operand.operands[0], symbolTable)
+			if lvl is not None and lvl != 0:
+				errorMessages.append("Pointer arithmetic is not allowed. Error on lineno. {0}".format(expr.lineno))
+				return None, None, errorMessages
+
+			return vartype, lvl, errorMessages
+
 	else:
 		assert(len(expr.operands) == 2)
 		if expr.operator == "ASGN":
 			# Check the LHS
 			lhsName, lhsDerefLvl, err = resolveDeclVar(expr.operands[0])
+
+			# If LHS contains '&' symbol
 			if err:
 				errorMessages.append("LHS cannot contain &. Error on lineno. {0}".format(expr.lineno))
 				return None, None, errorMessages
 
+			# resolve the type of the LHS
 			lhsVartype, lhsDeclLvl, lhsResolveTypeErrors = resolveType(lhsName, symbolTable)
 			errorMessages.extend(lhsResolveTypeErrors)
 
@@ -356,10 +392,19 @@ def typeCheckExpr(expr, symbolTable):
 				return None, None, errorMessages
 
 			lhsLvl = lhsDeclLvl - lhsDerefLvl
+
+			# Too much indirection
 			if lhsLvl < 0:
 				errorMessages.append("Too much indirection in variable {0}. Error on lineno. {1}" \
 					.format(lhsName, expr.lineno))
 				return None, None, errorMessages
+
+			# Check if the lhsDeclLvl is 0 -> This means that the type of the variable is a base type.
+			# This is invalid since we allow only pointer assignments.
+			if lhsDeclLvl == 0:
+				errorMessages.append("Only pointer assignments allowed. Error on lineno. {0}".format(expr.lineno))
+				return None, None, errorMessages
+
 		else:
 			# Check the LHS
 			lhsVartype, lhsLvl, lhsErrorMessages = typeCheckExpr(expr.operands[0], symbolTable)
@@ -367,12 +412,17 @@ def typeCheckExpr(expr, symbolTable):
 			if lhsVartype is None:
 				return None, None, errorMessages
 
+			# Check for pointer arithmetic here.
+			if lhsLvl != 0:
+				errorMessages.append("Only pointer arithmetic allowed. Error on line no. {0}".format(expr.lineno))
+
 		# Check the RHS
 		rhsVartype, rhsLvl, rhsErrorMessages = typeCheckExpr(expr.operands[1], symbolTable)
 		errorMessages.extend(rhsErrorMessages)
 		if rhsVartype is None:
 			return None, None, errorMessages
 
+		# Same type expression for LHS and RHS
 		if lhsVartype != rhsVartype or lhsLvl != rhsLvl:
 			errorMessages.append("Inconsistent types of operands. Error on line no. {0}" \
 				.format(expr.lineno))
@@ -458,6 +508,11 @@ def typeCheckReturn(return_stmt, symbolTable):
 	'''
 	errorMessages = []
 	assert(return_stmt.operator == "RETURN")
+
+	if symbolTable['name'] == "main":
+		errorMessages.append("`main` function cannot have a return statement.")
+
+
 	op = return_stmt.operands
 	if len(op) == 0:
 		# No parameters
