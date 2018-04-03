@@ -515,6 +515,21 @@ def proceduresInSymTable(globalTable):
 	procedures = { funcName:symbolTable for funcName,symbolTable in globalTable.items() if funcName != "main" and isinstance(symbolTable, dict) and symbolTable.get('func', False) }
 	return [getProcedureTuple(name, symbolTable) for name, symbolTable in procedures.items()]
 
+def variablesInSymbolTable(symbolTable, scope):
+	''' Returns all the variables in a symbol table as tuples (name, scope, type, lvl) '''
+	return [(name, scope, typeData['type'], typeData['lvl'] * "*") for name, typeData in symbolTable.items() if isinstance(typeData, dict) and typeData.get('func', False) == False]
+
+def variablesOfGlobalTable(globalTable):
+	''' Returns an array of all the variables declared in a global symbol table (including variables declared in functions)
+	The result is returned as an array of tuples [(name, scope, base, derived type), ...]
+	'''
+	procedures = { funcName:symbolTable for funcName,symbolTable in globalTable.items() if isinstance(symbolTable, dict) and symbolTable.get('func', False)}
+	variables = variablesInSymbolTable(globalTable, "global")
+	for name, symbolTable in procedures.items():
+		variables.extend(variablesInSymbolTable(symbolTable['decls'], "procedure {}".format(name)))
+		variables.extend(variablesInSymbolTable(symbolTable['params'], "procedure {}".format(name)))
+	return variables
+
 def getASTPrintable(prog):
 	'''
 	Takes the AST data structure for the AST of the prog, and returns a string containing the 
@@ -559,10 +574,17 @@ def getSYMPrintable(globalTable):
 	''' Returns a string representation of the symbol table
 		params: The global symbol table with the local symbol tables as children
 	'''
+	# Format procedure strings
 	procedureTuples = proceduresInSymTable(globalTable)
-	procedureStrings = ["{name}		|	{vartype}		|	{params}" \
-		.format(name=name, vartype=vartype, params=params) for name, vartype, params in procedureTuples]
+	procedureStrings = ["{0}		|	{1}		|	{2}" \
+		.format(*procedureTuple) for procedureTuple in procedureTuples]
 	procedures = "\n".join(procedureStrings)
+
+	# Format declaration strings
+	variableTuples = variablesOfGlobalTable(globalTable)
+	variableStrings = ["{0}		|	{1}		|	{2}		|	{3}" \
+		.format(*variableTuple) for variableTuple in variableTuples]
+	variables = "\n".join(variableStrings)
 	output = """
 Procedure table :-
 -----------------------------------------------------------------
@@ -573,5 +595,8 @@ Variable table :-
 -----------------------------------------------------------------
 Name	|	Scope		|	Base Type  |  Derived Type
 -----------------------------------------------------------------
-""".format(procedures=procedures)
+{variables}
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+""".format(procedures=procedures, variables=variables)
 	return output # Cleandoc cleans up indentation
