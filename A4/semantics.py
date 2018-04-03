@@ -202,6 +202,11 @@ def generateLocalTables(proceduresAst, globalTable):
 		if func.vartype.name == "void" and func.name.lvl != 0:
 			messages.append("Function {0} cannot have return type as pointer to void. Error at line no. {1}".format(name, lineno))
 
+		# Do some checks for main function
+		if name == "main":
+			if func.vartype.name != "void":
+				messages.append("main function can only be of type `void`.")
+
 		# This is the local symbol table. Contains the following:
 		#  	- It's own name
 		# 	- type

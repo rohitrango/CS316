@@ -459,6 +459,7 @@ def body_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 
 def getParamsHeader(params):
 	'''
+	getParamsHeader gives a human-readable parameters list.
 	params : params     - AST for params of function declaration
 	returns: paramsStmt - string containing the params
 	'''
@@ -473,6 +474,7 @@ def getParamsHeader(params):
 
 def resolveParamName(p):
 	'''
+	resolveParamName resolves the `ptr_expr_base` into level of indirection, and name
 	params  : address or variable
 	returns : lvl  - level of indirection
 			  name - name of var
