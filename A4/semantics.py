@@ -266,27 +266,31 @@ def generateLocalTables(proceduresAst, globalTable):
 		
 		# Here, if all declarations are correct, do type checking for the function
 		if len(messages) == 0:
-			bodyErrorMesages = typeCheckBody(body, localSymbolTable)
+			bodyErrorMesages = typeCheckBody(body, localSymbolTable, allowReturn=True)
 			messages.extend(bodyErrorMesages)
 
 	return symbolTableList, globalTable, messages
 
 
 # Do type checking. Call some recursive functions depending upon the type of node
-def typeCheckBody(body, localSymbolTable):
+def typeCheckBody(body, localSymbolTable, allowReturn=False):
 	'''
 	Takes in a body (from function body, if or while statements)
 	Uses local symbol table to check for types
 
 	params : body 				- an AST of type body. Contains a list of statements
 			 localSymbolTable 	- The local symbol table of the procedure
+			 allowReturn		- Do not allow return functions by default. Allow it only in the outermost layer of statements.
+			 					  i.e. do not allow return statements inside if-else, or while statements.
 
 	returns: errorMessages - List of error messages.
 
 	'''
 	errorMessages = []
 	stmts = body.operands
-	for stmt in stmts:
+	ret_present = False
+
+	for idx, stmt in enumerate(stmts):
 		# Check for what type of statement it is.
 		op = stmt.operator
 		if op == "ASGN":
@@ -298,9 +302,24 @@ def typeCheckBody(body, localSymbolTable):
 		elif op == "FN_CALL":
 			errorMessages.extend(typeCheckFunctionCall(stmt, localSymbolTable)[2])
 		elif op == "RETURN":
-			errorMessages.extend(typeCheckReturn(stmt, localSymbolTable))
+			ret_present = True
+			if allowReturn:
+				# Check if its the last statement in the list.
+				if idx == len(stmts)-1:
+					errorMessages.extend(typeCheckReturn(stmt, localSymbolTable))
+				else:
+					errorMessages.append("Return statement allowed only at the end of function.")
+			else:
+				errorMessages.append("Return statement allowed only at the end of function.")
 		else:
 			assert(False)
+
+	# Check the last statement, if its NOT a return statement, then the function better be `void`
+	if allowReturn and localSymbolTable['type'] != "void":
+		if len(stmts) == 0 or stmts[-1].operator != "RETURN":
+			if not ret_present:
+				errorMessages.append("Non-void function {0} must have a return statement.".format(localSymbolTable['name']))
+
 
 	return errorMessages
 
@@ -489,6 +508,11 @@ def typeCheckReturn(return_stmt, symbolTable):
 	'''
 	errorMessages = []
 	assert(return_stmt.operator == "RETURN")
+
+	if symbolTable['name'] == "main":
+		errorMessages.append("`main` function cannot have a return statement.")
+
+
 	op = return_stmt.operands
 	if len(op) == 0:
 		# No parameters
