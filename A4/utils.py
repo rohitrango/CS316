@@ -171,23 +171,32 @@ class Block(object):
 
 
 # generate the CFG given a node
-def generateCFG(node):
-	bb_ctr = 1
-	t_ctr  = 0
+def generateFunctionCFG(node, bb_ctr=1, t_ctr=0):
+	'''
+	params : node   - AST for the body of the function
+			 bb_ctr - First usable Block number
+			 t_ctr  - First usable tmp variable number
+
+	returns: block_list - get the block list
+			 bb_ctr     - Next usable block number
+			 t_ctr   	- Next usable tmp number
+
+	'''
 	neg_ctr = -1
 
-	# Master code. Keep a list of block iterms along with the current block. As you keep getting more statements,
+	# Sub-Master code. Keep a list of block iterms along with the current block. As you keep getting more statements,
 	# Keep adding it to the block. When you get an if or while statement, you have to close this block, and update its 
 	# goto. In the end just add an end block.
 	block_list, bb_ctr, t_ctr, neg_ctr = body_statement_list(node, bb_ctr, t_ctr, neg_ctr)
 	endblock = Block(bb_ctr, [], end=True)
 	block_list.append(endblock)
+	bb_ctr+=1
 
 	# Here, we update the CFG to remove negative blocks
 	# and append the actual values
 	block_list = update_block_list(block_list) 
 
-	return block_list
+	return block_list, bb_ctr, t_ctr
 
 
 def update_block_list(cfg):
@@ -447,6 +456,37 @@ def body_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 #######################################################################################
 ## Some more functions to print AST in assignment-friendly form
 #######################################################################################
+
+def getParamsHeader(params):
+	'''
+	params : params     - AST for params of function declaration
+	returns: paramsStmt - string containing the params
+	'''
+	paramsStmt = ""
+	for p in params.operands:
+		vartype = p.vartype.name
+		lvl, name = resolveParamName(p) 
+		paramsStmt += "{0} {1}{2}, ".format(p.vartype.name, "*"*lvl, name)
+	paramsStmt = paramsStmt[:-2]
+	return paramsStmt
+
+
+def resolveParamName(p):
+	'''
+	params  : address or variable
+	returns : lvl  - level of indirection
+			  name - name of var
+	'''
+	if p.operator == "VAR":
+		return 0, p.name
+	elif p.operator == "DEREF":
+		lvl, name = resolveParamName(p.operands[0])
+		return lvl+1, name
+	else:
+		assert False
+		return None, None
+
+
 def getASTPrintable(prog):
 	'''
 	Takes the AST data structure for the AST of the prog, and returns a string containing the 
@@ -455,32 +495,6 @@ def getASTPrintable(prog):
 	params:   prog - The AST for the entire program.
 	returns:  stmt - The string containing the AST in printable form. To be dumped directly to the .ast file.
 	'''
-	def resolveParamName(p):
-		'''
-		params  : address or variable
-		returns : lvl  - level of indirection
-				  name - name of var
-		'''
-		if p.operator == "VAR":
-			return 0, p.name
-		elif p.operator == "DEREF":
-			lvl, name = resolveParamName(p.operands[0])
-			return lvl+1, name
-		else:
-			assert False
-			return None, None
-
-
-	def getParamsHeader(params):
-		paramsStmt = ""
-		for p in params.operands:
-			vartype = p.vartype.name
-			lvl, name = resolveParamName(p) 
-			paramsStmt += "{0} {1}{2}, ".format(p.vartype.name, "*"*lvl, name)
-		paramsStmt = paramsStmt[:-2]
-		return paramsStmt
-
-
 	decls, procedures = prog.operands
 	stmt = ""
 	
