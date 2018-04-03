@@ -600,8 +600,10 @@ if __name__ == "__main__":
 		sys.exit(0)
 
 	# At this point, print the AST first
-	print(getASTPrintable(prog))
-
+	# print(getASTPrintable(prog))
+	CFGS = getProcedureCFGs(prog.operands[1])
+	for cfg in CFGS:
+		print(cfg)
 	# print(getPrintableSymbolTable(global_table, local_tables))
 	
 
