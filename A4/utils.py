@@ -4,6 +4,7 @@ Data Structure for Abstract Syntax Tree
 -----------------------------------------------------------------------
 '''
 from copy import deepcopy
+import inspect
 
 sym_to_name_mapping = {
 	'PLUS'	: '+',
@@ -553,6 +554,26 @@ def getParamsHeader(params):
 	return paramsStmt
 
 
+def getParamPrintable(vartype, lvl, name=""):
+	'''
+	Returns a string representation of a variable name, type, and level of indirection
+	E.g. calling (int, 2, foo) return "int **foo" and calling (int, 3) returns "int***"
+	'''
+	derefs = lvl * "*"
+	if name == "":
+		return "{type}{derefs}".format(type=vartype, derefs=derefs)
+	else:
+		return "{type} {derefs}{name}".format(type=vartype, derefs=derefs, name=name)
+
+def getProcedureTuple(name, symbolTable):
+	''' Takes a function name and its symbol table, returns a tuple representing the procedure
+	E.g. calling (func1, { ... }) returns ("func1", "int*", "int *x, int *y")
+	'''
+	params = symbolTable['params']
+	paramsSorted = sorted(params.items(), key=lambda x: x[1]['pos'])
+	paramsString = ", ".join([getParamPrintable(typeData['type'], typeData['lvl'], name) for name,typeData in paramsSorted])
+	return (name, getParamPrintable(symbolTable['type'], symbolTable['lvl']), paramsString)
+
 def resolveParamName(p):
 	'''
 	resolveParamName resolves the `ptr_expr_base` into level of indirection, and name
@@ -569,6 +590,28 @@ def resolveParamName(p):
 		assert False
 		return None, None
 
+def proceduresInSymTable(globalTable):
+	'''
+	Takes a global symbol table and returns its nested procedures, return types, and parameter list
+	returns: Array of tuples containing the function name, its return type, and parameter list as strings sorted by the function name
+	'''
+	procedures = { funcName:symbolTable for funcName,symbolTable in globalTable.items() if funcName != "main" and isinstance(symbolTable, dict) and symbolTable.get('func', False) }
+	return [getProcedureTuple(name, symbolTable) for name, symbolTable in procedures.items()]
+
+def variablesInSymbolTable(symbolTable, scope):
+	''' Returns all the variables in a symbol table as tuples (name, scope, type, lvl) '''
+	return [(name, scope, typeData['type'], typeData['lvl'] * "*") for name, typeData in symbolTable.items() if isinstance(typeData, dict) and typeData.get('func', False) == False]
+
+def variablesOfGlobalTable(globalTable):
+	''' Returns an array of all the variables declared in a global symbol table (including variables declared in functions)
+	The result is returned as an array of tuples [(name, scope, base, derived type), ...]
+	'''
+	procedures = { funcName:symbolTable for funcName,symbolTable in globalTable.items() if isinstance(symbolTable, dict) and symbolTable.get('func', False)}
+	variables = variablesInSymbolTable(globalTable, "global")
+	for name, symbolTable in procedures.items():
+		variables.extend(variablesInSymbolTable(symbolTable['decls'], "procedure {}".format(name)))
+		variables.extend(variablesInSymbolTable(symbolTable['params'], "procedure {}".format(name)))
+	return variables
 
 def getASTPrintable(prog):
 	'''
@@ -609,3 +652,35 @@ def getASTPrintable(prog):
 			stmt+=part
 
 	return stmt[:-2]
+
+def getSYMPrintable(globalTable):
+	''' Returns a string representation of the symbol table
+		params: The global symbol table with the local symbol tables as children
+	'''
+	# Format procedure strings
+	procedureTuples = proceduresInSymTable(globalTable)
+	procedureStrings = ["{0}	|	{1}		|	{2}" \
+		.format(*procedureTuple) for procedureTuple in procedureTuples]
+	procedures = "\n".join(procedureStrings)
+
+	# Format declaration strings
+	variableTuples = variablesOfGlobalTable(globalTable)
+	scopeWidth = max(map(lambda x: len(x[1]), variableTuples)) + 2
+	variableStrings = ["{name}	|	{scope: <{width}}|	{vartype}		|	{lvl}" \
+		.format(name=name, scope=scope, vartype=vartype, lvl=lvl, width=scopeWidth) for name, scope, vartype, lvl in variableTuples]
+	variables = "\n".join(variableStrings)
+	output = """
+Procedure table :-
+-----------------------------------------------------------------
+Name	|	Return Type	|	Parameter List
+{procedures}
+-----------------------------------------------------------------
+Variable table :- 
+-----------------------------------------------------------------
+Name	|	{scope:<{width}}|	Base Type	|  Derived Type
+-----------------------------------------------------------------
+{variables}
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+""".format(procedures=procedures, variables=variables, scope="Scope", width=scopeWidth)
+	return output # Cleandoc cleans up indentation
