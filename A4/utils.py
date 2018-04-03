@@ -665,9 +665,11 @@ def getSYMPrintable(globalTable):
 
 	# Format declaration strings
 	variableTuples = variablesOfGlobalTable(globalTable)
+	nameWidth = max(map(lambda x: len(x[0]), variableTuples)) + 2
 	scopeWidth = max(map(lambda x: len(x[1]), variableTuples)) + 2
-	variableStrings = ["{name}	|	{scope: <{width}}|	{vartype}		|	{lvl}" \
-		.format(name=name, scope=scope, vartype=vartype, lvl=lvl, width=scopeWidth) for name, scope, vartype, lvl in variableTuples]
+	typeWidth = len("Base Type") + 2
+	variableStrings = ["{name: <{nameWidth}}|	{scope: <{scopeWidth}}|	{vartype: <{typeWidth}}|	{lvl}" \
+		.format(name=name, scope=scope, vartype=vartype, lvl=lvl, nameWidth=nameWidth, scopeWidth=scopeWidth, typeWidth=typeWidth) for name, scope, vartype, lvl in variableTuples]
 	variables = "\n".join(variableStrings)
 	output = """
 Procedure table :-
@@ -677,10 +679,10 @@ Name	|	Return Type	|	Parameter List
 -----------------------------------------------------------------
 Variable table :- 
 -----------------------------------------------------------------
-Name	|	{scope:<{width}}|	Base Type	|  Derived Type
+{name: <{nameWidth}}|	{scope: <{scopeWidth}}|	{type: <{typeWidth}}|  Derived Type
 -----------------------------------------------------------------
 {variables}
 -----------------------------------------------------------------
 -----------------------------------------------------------------
-""".format(procedures=procedures, variables=variables, scope="Scope", width=scopeWidth)
+""".format(procedures=procedures, variables=variables, name="Name", nameWidth=nameWidth, scope="Scope", scopeWidth=scopeWidth, type="Base Type", typeWidth=typeWidth)
 	return output # Cleandoc cleans up indentation
