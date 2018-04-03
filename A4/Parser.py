@@ -602,7 +602,7 @@ if __name__ == "__main__":
 	# At this point, print the AST first
 	print(getASTPrintable(prog))
 
-	print(getPrintableSymbolTable(global_table, local_tables))
+	print(getSYMPrintable(global_table))
 	
 
 

@@ -4,6 +4,7 @@ Data Structure for Abstract Syntax Tree
 -----------------------------------------------------------------------
 '''
 from copy import deepcopy
+import inspect
 
 sym_to_name_mapping = {
 	'PLUS'	: '+',
@@ -471,6 +472,26 @@ def getParamsHeader(params):
 	return paramsStmt
 
 
+def getParamPrintable(vartype, lvl, name=""):
+	'''
+	Returns a string representation of a variable name, type, and level of indirection
+	E.g. calling (int, 2, foo) return "int **foo" and calling (int, 3) returns "int***"
+	'''
+	derefs = lvl * "*"
+	if name == "":
+		return "{type}{derefs}".format(type=vartype, derefs=derefs)
+	else:
+		return "{type} {derefs}{name}".format(type=vartype, derefs=derefs, name=name)
+
+def getProcedureTuple(name, symbolTable):
+	''' Takes a function name and its symbol table, returns a tuple representing the procedure
+	E.g. calling (func1, { ... }) returns ("func1", "int*", "int *x, int *y")
+	'''
+	params = symbolTable['params']
+	paramsSorted = sorted(params.items(), key=lambda x: x[1]['pos'])
+	paramsString = ", ".join([getParamPrintable(typeData['type'], typeData['lvl'], name) for name,typeData in paramsSorted])
+	return (name, getParamPrintable(symbolTable['type'], symbolTable['lvl']), paramsString)
+
 def resolveParamName(p):
 	'''
 	params  : address or variable
@@ -486,6 +507,13 @@ def resolveParamName(p):
 		assert False
 		return None, None
 
+def proceduresInSymTable(globalTable):
+	'''
+	Takes a global symbol table and returns its nested procedures, return types, and parameter list
+	returns: Array of tuples containing the function name, its return type, and parameter list as strings sorted by the function name
+	'''
+	procedures = { funcName:symbolTable for funcName,symbolTable in globalTable.items() if funcName != "main" and isinstance(symbolTable, dict) and symbolTable.get('func', False) }
+	return [getProcedureTuple(name, symbolTable) for name, symbolTable in procedures.items()]
 
 def getASTPrintable(prog):
 	'''
@@ -526,3 +554,24 @@ def getASTPrintable(prog):
 			stmt+=part
 
 	return stmt[:-2]
+
+def getSYMPrintable(globalTable):
+	''' Returns a string representation of the symbol table
+		params: The global symbol table with the local symbol tables as children
+	'''
+	procedureTuples = proceduresInSymTable(globalTable)
+	procedureStrings = ["{name}		|	{vartype}		|	{params}" \
+		.format(name=name, vartype=vartype, params=params) for name, vartype, params in procedureTuples]
+	procedures = "\n".join(procedureStrings)
+	output = """
+Procedure table :-
+-----------------------------------------------------------------
+Name		|	Return Type  |  Parameter List
+{procedures}
+-----------------------------------------------------------------
+Variable table :- 
+-----------------------------------------------------------------
+Name	|	Scope		|	Base Type  |  Derived Type
+-----------------------------------------------------------------
+""".format(procedures=procedures)
+	return output # Cleandoc cleans up indentation
