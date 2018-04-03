@@ -602,6 +602,9 @@ if __name__ == "__main__":
 	# At this point, print the AST first
 	print(getASTPrintable(prog))
 
+	print(getPrintableSymbolTable(global_table, local_tables))
+	
+
 
 	# Here, we check for errors first. If there are no errors, then we are good to go
 	# Print the CFG and ast on 2 different files now
