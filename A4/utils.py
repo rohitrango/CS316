@@ -576,27 +576,28 @@ def getSYMPrintable(globalTable):
 	'''
 	# Format procedure strings
 	procedureTuples = proceduresInSymTable(globalTable)
-	procedureStrings = ["{0}		|	{1}		|	{2}" \
+	procedureStrings = ["{0}	|	{1}		|	{2}" \
 		.format(*procedureTuple) for procedureTuple in procedureTuples]
 	procedures = "\n".join(procedureStrings)
 
 	# Format declaration strings
 	variableTuples = variablesOfGlobalTable(globalTable)
-	variableStrings = ["{0}		|	{1}		|	{2}		|	{3}" \
-		.format(*variableTuple) for variableTuple in variableTuples]
+	scopeWidth = max(map(lambda x: len(x[1]), variableTuples)) + 2
+	variableStrings = ["{name}	|	{scope: <{width}}|	{vartype}		|	{lvl}" \
+		.format(name=name, scope=scope, vartype=vartype, lvl=lvl, width=scopeWidth) for name, scope, vartype, lvl in variableTuples]
 	variables = "\n".join(variableStrings)
 	output = """
 Procedure table :-
 -----------------------------------------------------------------
-Name		|	Return Type  |  Parameter List
+Name	|	Return Type	|	Parameter List
 {procedures}
 -----------------------------------------------------------------
 Variable table :- 
 -----------------------------------------------------------------
-Name	|	Scope		|	Base Type  |  Derived Type
+Name	|	{scope:<{width}}|	Base Type	|  Derived Type
 -----------------------------------------------------------------
 {variables}
 -----------------------------------------------------------------
 -----------------------------------------------------------------
-""".format(procedures=procedures, variables=variables)
+""".format(procedures=procedures, variables=variables, scope="Scope", width=scopeWidth)
 	return output # Cleandoc cleans up indentation
