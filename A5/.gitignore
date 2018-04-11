@@ -1,5 +1,5 @@
 # Folder for custom tests
-test/
+custom/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
