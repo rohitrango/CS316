@@ -1,0 +1,13 @@
+
+Function Main
+PARAMS() 
+RETURNS void
+	ASGN
+	(
+		DEREF
+		(
+			VAR(ptr)
+		)
+		,
+		CONST(5)
+	)
