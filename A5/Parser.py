@@ -10,6 +10,7 @@ import sys, os
 from utils import *
 from semantics import *
 import json
+from asm import *
 
 # Global variables
 local_tables = None
@@ -612,6 +613,9 @@ if __name__ == "__main__":
 	# Write the symbol table to filename.c.sym
 	with open("{}.sym".format(filename), "w") as fSym:
 		fSym.write(getSYMPrintable(global_table))
+
+	with open("{}.s".format(filename), "w") as fAsm:
+		fAsm.write(asAsm(global_table, CFGS))
 	
 	# Here, we check for errors first. If there are no errors, then we are good to go
 	# Print the CFG and ast on 2 different files now
