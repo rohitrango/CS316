@@ -14,8 +14,6 @@ def symbolTableAsAsm(globalTable):
     Returns the global symbol table as an array of strings representing a MIPS .data section
     '''
     out = ["    .data"]
-    import pprint
-
     # Retrieve the global variables and sort them by name
     globalVariables = variablesInSymbolTable(globalTable, "global")
     globalVariables = sorted(globalVariables, key=lambda x: x[0])
