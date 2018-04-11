@@ -7,7 +7,8 @@ def asAsm(globalTable, cfgs):
     Returns the MIPS assembly code for a global symbol table and an array of CFGs
     '''
     symbolTableAsm = symbolTableAsAsm(globalTable)
-    return "\n".join(symbolTableAsm)
+    textAsm = [" 	.text", "	.globl main"]
+    return "\n".join([*symbolTableAsm, *textAsm])
 
 def symbolTableAsAsm(globalTable):
     '''
