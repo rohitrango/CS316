@@ -81,18 +81,93 @@ def prologueAsAsm(globalTable, name):
 #####
 # Helper functions that return the assembly code for a given RHS
 #####
-def unaryAsAsm(node, globalTable, intRegisters, tmpToRegMap, varToStackMap):
+def resolveOffset(name, globalTable, varToStackMap):
+    '''
+    Given the name of a variable and a globalTable, resolve the offset
+    '''
+    if name in varToStackMap:
+        return "{0}($sp)".format(varToStackMap[name]['offset'])
+    else:
+        return "global_{0}".format(name)
+
+
+
+def unaryAsAsm(node, globalTable, intRegisters, tmpToRegMap, varToStackMap, indent=False, lhsMode=False):
     '''
     Takes a node containing a unary operator, and returns list of assembly statements
     '''
+    def indentStmts(out):
+        # Indent only at the last level
+        if indent:
+            out = list(map(lambda x: "\t"+x, out))
+        return out
+
+    # Main loop
     out = []
     if node.operator == "CONST" and node.vartype == "int":
         freeReg = heappop(intRegisters)
         stmt = "li $s{0}, {1}".format(freeReg, node.name)
         out.append(stmt)
+        return indentStmts(out), freeReg
 
-    out = list(map(lambda x: "\t"+x, out))
-    return out
+    # For uminus, solve the expression recursively
+    elif node.operator == "UMINUS":
+        # Solve for the operand inside uminus
+        node = node.operands[0]
+        tmpout, tmpLatestReg = unaryAsAsm(node, globalTable, intRegisters, tmpToRegMap, varToStackMap)
+        out.extend(tmpout)
+
+        stmt = "sub $s{0}, $0, $s{0}".format(tmpLatestReg)
+        out.append(stmt)
+        return indentStmts(out), tmpLatestReg
+
+    # Deal with int variables
+    elif node.operator == "VAR" and node.vartype == "int":
+        if node.tmp:
+            return [], tmpToRegMap[node.name]
+        else:
+            # Do a symbol table check
+            freeReg = heappop(intRegisters)
+            stmt = "lw $s{0}, {1}".format(freeReg, resolveOffset(node.name, globalTable, varToStackMap))
+            out.append(stmt)
+            return indentStmts(out), freeReg
+
+    # Deal with derefs
+    elif node.operator == "DEREF" and node.vartype == "int":
+        derefCount = 0
+
+        while node.operator == "DEREF" or node.operator == "ADDR":
+            derefCount += 1 if node.operator == "DEREF" else -1
+            node = node.operands[0]
+        # This node is now a VAR
+        freeReg = heappop(intRegisters)
+        out.append("lw $s{0}, {1}".format(freeReg, resolveOffset(node.name, globalTable, varToStackMap)))
+
+        minDerefCount = 1 if lhsMode else 0
+
+        while derefCount > minDerefCount:
+            anotherFreeReg = heappop(intRegisters)
+            out.append("lw $s{0}, 0($s{1})".format(anotherFreeReg, freeReg))
+            heappush(intRegisters, freeReg)
+            freeReg = anotherFreeReg
+            derefCount-=1
+        return indentStmts(out), freeReg
+
+    # Deal with address
+    elif node.operator == "ADDR":
+        node = node.operands[0]
+        freeReg = heappop(intRegisters)
+        if node.name in varToStackMap:
+            stmt = "addi $s{0}, $sp, {1}".format(freeReg, varToStackMap[node.name]['offset'])
+        else:
+            stmt = "la $s{0}, global_{1}".format(freeReg, node.name)
+        out.append(stmt)
+        return indentStmts(out), freeReg
+
+
+    print(node.operator, node.name , node.vartype)
+    return out, -1
+
 
 
 
@@ -115,10 +190,31 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                 lhs, rhs = stmt.operands
                 if len(rhs.operands) <= 1:
                     # Unary operator, can be NOT, UMINUS, VAR, DEREF, CONST
-                    outputRHS = unaryAsAsm(rhs, globalTable, intRegisters, tmpToRegMap, varToStackMap)
+                    outputRHS, rhsReg = unaryAsAsm(rhs, globalTable, intRegisters, tmpToRegMap, varToStackMap, indent=True)
                     out.extend(outputRHS)
+
+                    # Check type of LHS and allocate accordingly
+                    if lhs.operator == "VAR" and lhs.tmp and lhs.vartype == "int":
+                        tmpToRegMap[lhs.name] = rhsReg
+
+                    # This could be a deref or var
+                    elif lhs.operator == "VAR" and lhs.vartype == "int":
+                        # Do a symbol table check
+                        stmt = "\tsw $s{0}, {1}".format(rhsReg, resolveOffset(lhs.name, globalTable, varToStackMap))
+                        # Free the RHS reg and add the statement
+                        heappush(intRegisters, rhsReg)
+                        out.append(stmt)
+
+                    # If its a deref, just use unary
+                    elif lhs.operator == "DEREF" and lhs.vartype == "int":
+                        outputLHS, lhsReg = unaryAsAsm(lhs, globalTable, intRegisters, tmpToRegMap, varToStackMap, indent=True, lhsMode=True)
+                        out.extend(outputLHS)
+                        stmt = "\tsw $s{0}, 0($s{1})".format(rhsReg, lhsReg)
+                        heappush(intRegisters, rhsReg)
+                        heappush(intRegisters, lhsReg)
+                        out.append(stmt)
                 else:
-                    pass 
+                    raise NotImplementedError
 
     return out
 

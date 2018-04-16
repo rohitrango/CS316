@@ -5,6 +5,7 @@ Data Structure for Abstract Syntax Tree
 '''
 from copy import deepcopy
 import inspect
+from semantics import resolveType, resolveDeclVar
 
 sym_to_name_mapping = {
 	'PLUS'	: '+',
@@ -197,7 +198,7 @@ class FunctionBlockContainer(object):
 
 
 
-def getProcedureCFGs(proceduresAST):
+def getProcedureCFGs(proceduresAST, globalTable):
 	'''
 	Take a list of procedures and return a list of blocks for each CFG
 	params : proceduresAST   - the list of procedures 
@@ -207,7 +208,7 @@ def getProcedureCFGs(proceduresAST):
 	procedureCFGs = []
 	for func in proceduresAST.operands:
 		params, decl, body = func.operands
-		blkList, bb_ctr, t_ctr = generateFunctionCFG(body, bb_ctr, t_ctr)
+		blkList, bb_ctr, t_ctr = generateFunctionCFG(body, globalTable[func.name.name], bb_ctr, t_ctr)
 		procedureCFGs.append(FunctionBlockContainer({
 			'blocks' : blkList,
 			'name'   : func.name.name,
@@ -216,7 +217,7 @@ def getProcedureCFGs(proceduresAST):
 	return procedureCFGs
 
 # generate the CFG given a node
-def generateFunctionCFG(node, bb_ctr=1, t_ctr=0):
+def generateFunctionCFG(node, localTable, bb_ctr=1, t_ctr=0):
 	'''
 	generate CFG for a particular function
 
@@ -234,11 +235,11 @@ def generateFunctionCFG(node, bb_ctr=1, t_ctr=0):
 	# Sub-Master code. Keep a list of block iterms along with the current block. As you keep getting more statements,
 	# Keep adding it to the block. When you get an if or while statement, you have to close this block, and update its 
 	# goto. In the end just add an end block.
-	block_list, bb_ctr, t_ctr, neg_ctr = body_statement_list(node, bb_ctr, t_ctr, neg_ctr)
+	block_list, bb_ctr, t_ctr, neg_ctr = body_statement_list(node, bb_ctr, t_ctr, neg_ctr, localTable)
 	endblock = Block(bb_ctr, [], end=True)
 
 	if len(node.operands) > 0 and node.operands[-1].operator == "RETURN" and len(node.operands[-1].operands) > 0:
-		n, stmt_list, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[-1].operands[0], bb_ctr, t_ctr, neg_ctr)
+		n, stmt_list, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[-1].operands[0], bb_ctr, t_ctr, neg_ctr, localTable)
 		stmt_list.append(AbstractSyntaxTreeNode("RETURN", [n]))
 		endblock.addStmts(stmt_list)
 	else:
@@ -302,13 +303,22 @@ def update_block_list(cfg):
 
 # util function for assignment statement
 # Comes in handy to evaluate the list of statements corresponding to an expression
-def assignment_stmt_util(node, bb_ctr, t_ctr, neg_ctr):
+def assignment_stmt_util(node, bb_ctr, t_ctr, neg_ctr, localTable):
 	# Assert that this is either a ptr_expr or a terminal
 	# Input : A node which can contain any expr
 	# Output: The first output is an RHS token (as an AST node)
 	#		, the second one is the list of statements formed so far
 	if node.operator in ["VAR", "CONST", "DEREF", "ADDR"]:
+		if node.operator in ["VAR", "DEREF", "ADDR"]:
+			name, _, _ = resolveDeclVar(node)
+			vartype, lvl, _ = resolveType(name, localTable)
+			node.vartype = vartype
+			node.lvl = lvl
+		else:
+			node.lvl = 0
+		assert(node.vartype in ["int", "float"])
 		return node, [], bb_ctr, t_ctr, neg_ctr
+
 	elif node.operator == "FN_CALL":
 		# Check out for params first
 		stmt_list = []
@@ -316,9 +326,13 @@ def assignment_stmt_util(node, bb_ctr, t_ctr, neg_ctr):
 		n_fncall = deepcopy(node)
 		n_fncall.operands[0].operands = []
 
+		# Get the vartype of the function
+		vartype = localTable['__parent__'][n_fncall.name]['type']
+		n_fncall.vartype = vartype
+
 		# Solve for every parameter
 		for p in params:
-			n, stm, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(p, bb_ctr, t_ctr, neg_ctr)
+			n, stm, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(p, bb_ctr, t_ctr, neg_ctr, localTable)
 			stmt_list.extend(stm)
 			n_fncall.operands[0].operands.append(n)
 		return n_fncall, stmt_list, bb_ctr, t_ctr, neg_ctr
@@ -326,19 +340,19 @@ def assignment_stmt_util(node, bb_ctr, t_ctr, neg_ctr):
 	else:
 		if len(node.operands) == 2:
 			# Check for left and right parts of the expression, solve them recursively
-			n1, stmt1, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[0], bb_ctr, t_ctr, neg_ctr)
-			n2, stmt2, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[1], bb_ctr, t_ctr, neg_ctr)
-			n = AbstractSyntaxTreeNode(node.operator, [n1, n2])
-			t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr), tmp=True)
+			n1, stmt1, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[0], bb_ctr, t_ctr, neg_ctr, localTable)
+			n2, stmt2, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[1], bb_ctr, t_ctr, neg_ctr, localTable)
+			n = AbstractSyntaxTreeNode(node.operator, [n1, n2], vartype=n1.vartype, lvl=n1.lvl)
+			t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr), tmp=True, vartype=n1.vartype, lvl=n1.lvl)
 			t_ctr += 1
 			asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
 			stmt = stmt1 + stmt2 + [asgn]
 			return t0, stmt, bb_ctr, t_ctr, neg_ctr
 		elif len(node.operands) == 1:
 			# UMINUS
-			n1, stmt1, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[0], bb_ctr, t_ctr, neg_ctr)
-			n = AbstractSyntaxTreeNode(node.operator, [n1])
-			t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr), tmp=True)
+			n1, stmt1, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[0], bb_ctr, t_ctr, neg_ctr, localTable)
+			n = AbstractSyntaxTreeNode(node.operator, [n1], vartype=n1.vartype, lvl=n1.lvl)
+			t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr), tmp=True, vartype=n1.vartype, lvl=n1.lvl)
 			t_ctr += 1
 			asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
 			stmt = stmt1 + [asgn]
@@ -349,41 +363,44 @@ def assignment_stmt_util(node, bb_ctr, t_ctr, neg_ctr):
 
 # This is for assignment statement list. If the next statement is an assignment, call the 
 # assignment_statement_list on the node.
-def assignment_statement_list(node, bb_ctr, t_ctr, neg_ctr):
+def assignment_statement_list(node, bb_ctr, t_ctr, neg_ctr, localTable):
 
 	# This can either be an assignment or a function call. Check first.
 	if node.operator == "ASGN":
 		lhs = node.operands[0]
-		rhs, stmt_list, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[1], bb_ctr, t_ctr, neg_ctr)
+		rhs, stmt_list, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[1], bb_ctr, t_ctr, neg_ctr, localTable)
+		lhs.vartype = rhs.vartype
+		lhs.lvl = rhs.lvl
+
 		stmt_list.append(AbstractSyntaxTreeNode("ASGN", [lhs, rhs]))
 		return stmt_list, bb_ctr, t_ctr, neg_ctr
 	elif node.operator == "FN_CALL":
-		N, stmt_list, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node, bb_ctr, t_ctr, neg_ctr)
+		N, stmt_list, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node, bb_ctr, t_ctr, neg_ctr, localTable)
 		stmt_list.append(N)
 		return stmt_list, bb_ctr, t_ctr, neg_ctr
 
 
 
-def condition_stmt_list(node, bb_ctr, t_ctr, neg_ctr):
+def condition_stmt_list(node, bb_ctr, t_ctr, neg_ctr, localTable):
 
-	def condition_stmt_list_util(node, bb_ctr, t_ctr, neg_ctr):
+	def condition_stmt_list_util(node, bb_ctr, t_ctr, neg_ctr, localTable):
 		if node.operator in ["VAR", "CONST", "DEREF", "ADDR"]:
 			return node, [], bb_ctr, t_ctr, neg_ctr
 		else:
 			if len(node.operands) == 2:
-				n1, stmt1, bb_ctr, t_ctr, neg_ctr = condition_stmt_list_util(node.operands[0], bb_ctr, t_ctr, neg_ctr)
-				n2, stmt2, bb_ctr, t_ctr, neg_ctr = condition_stmt_list_util(node.operands[1], bb_ctr, t_ctr, neg_ctr)
-				n = AbstractSyntaxTreeNode(node.operator, [n1, n2])
-				t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr), tmp=True)
+				n1, stmt1, bb_ctr, t_ctr, neg_ctr = condition_stmt_list_util(node.operands[0], bb_ctr, t_ctr, neg_ctr, localTable)
+				n2, stmt2, bb_ctr, t_ctr, neg_ctr = condition_stmt_list_util(node.operands[1], bb_ctr, t_ctr, neg_ctr, localTable)
+				n = AbstractSyntaxTreeNode(node.operator, [n1, n2], vartype=n1.vartype, lvl=n1.lvl)
+				t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr), tmp=True, vartype=n1.vartype, lvl=n1.lvl)
 				t_ctr += 1
 				asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
 				stmt = stmt1 + stmt2 + [asgn]
 				return t0, stmt, bb_ctr, t_ctr, neg_ctr
 			elif len(node.operands) == 1:
 				# This is the case of NOT
-				n1, stmt1, bb_ctr, t_ctr, neg_ctr = condition_stmt_list_util(node.operands[0], bb_ctr, t_ctr, neg_ctr)
-				n = AbstractSyntaxTreeNode(node.operator, [n1])
-				t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr), tmp=True)
+				n1, stmt1, bb_ctr, t_ctr, neg_ctr = condition_stmt_list_util(node.operands[0], bb_ctr, t_ctr, neg_ctr, localTable)
+				n = AbstractSyntaxTreeNode(node.operator, [n1], vartype=n1.vartype, lvl=n1.lvl)
+				t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr), tmp=True, vartype=n1.vartype, lvl=n1.lvl)
 				t_ctr += 1
 				asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
 				stmt = stmt1 + [asgn]
@@ -392,12 +409,12 @@ def condition_stmt_list(node, bb_ctr, t_ctr, neg_ctr):
 				raise Exception
 
 	# print(node.operator, len(node.operands))
-	t1, stmt, bb_ctr, t_ctr, neg_ctr = condition_stmt_list_util(node, bb_ctr, t_ctr, neg_ctr)
+	t1, stmt, bb_ctr, t_ctr, neg_ctr = condition_stmt_list_util(node, bb_ctr, t_ctr, neg_ctr, localTable)
 	return stmt, bb_ctr, t_ctr, neg_ctr
 
 
 
-def if_stmt_statement_list(node, bb_ctr, t_ctr, neg_ctr):
+def if_stmt_statement_list(node, bb_ctr, t_ctr, neg_ctr, localTable):
 	# Assuming that the node is of an if-type
 	# First, we check the condition, then recursively call the other two functions as and when necessary
 	if_blk_list = []
@@ -406,14 +423,14 @@ def if_stmt_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 	cond_block = Block(bb_ctr, [])
 	bb_ctr += 1
 
-	C, bb_ctr, t_ctr, neg_ctr = condition_stmt_list(condition, bb_ctr, t_ctr, neg_ctr)
+	C, bb_ctr, t_ctr, neg_ctr = condition_stmt_list(condition, bb_ctr, t_ctr, neg_ctr, localTable)
 	cond_block.addStmts(C)
 	# Add an if statement here for the cond block
 	# TODO
 	# A generic function that returns a list of blocks for the body 
 	# of the function. 
 	# if_body has to contain at least one block, even if its nothing, so that we can specify a goto
-	if_body, bb_ctr, t_ctr, neg_ctr = body_statement_list(node.operands[1], bb_ctr, t_ctr, neg_ctr)
+	if_body, bb_ctr, t_ctr, neg_ctr = body_statement_list(node.operands[1], bb_ctr, t_ctr, neg_ctr, localTable)
 	
 	# If there is an empty body, we add a dummy body with a negative index on it
 	if len(if_body) == 0:
@@ -424,7 +441,7 @@ def if_stmt_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 	# If there is an else part
 	# if there is no else part, or empty else, we add a dummy else with negative index
 	if len(node.operands) == 3:
-		else_body, bb_ctr, t_ctr, neg_ctr = body_statement_list(node.operands[2], bb_ctr, t_ctr, neg_ctr)
+		else_body, bb_ctr, t_ctr, neg_ctr = body_statement_list(node.operands[2], bb_ctr, t_ctr, neg_ctr, localTable)
 		if len(else_body) == 0:
 			else_body = [Block(neg_ctr)]
 			neg_ctr -= 1
@@ -446,17 +463,17 @@ def if_stmt_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 	return if_blk_list, bb_ctr, t_ctr, neg_ctr
 
 
-def while_stmt_statement_list(node, bb_ctr, t_ctr, neg_ctr):
+def while_stmt_statement_list(node, bb_ctr, t_ctr, neg_ctr, localTable):
 	while_blk_list = []
 
 	condition = node.operands[0]
 	cond_block = Block(bb_ctr, [])
 	bb_ctr += 1
 
-	C, bb_ctr, t_ctr, neg_ctr = condition_stmt_list(condition, bb_ctr, t_ctr, neg_ctr)
+	C, bb_ctr, t_ctr, neg_ctr = condition_stmt_list(condition, bb_ctr, t_ctr, neg_ctr, localTable)
 	cond_block.addStmts(C)
 
-	while_body, bb_ctr, t_ctr, neg_ctr = body_statement_list(node.operands[1], bb_ctr, t_ctr, neg_ctr)
+	while_body, bb_ctr, t_ctr, neg_ctr = body_statement_list(node.operands[1], bb_ctr, t_ctr, neg_ctr, localTable)
 	
 	# Check if the while body is empty
 	if len(while_body) == 0:
@@ -477,7 +494,7 @@ def while_stmt_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 
 # This is the caller function for the body.
 # The node will only be of type "body"
-def body_statement_list(node, bb_ctr, t_ctr, neg_ctr):
+def body_statement_list(node, bb_ctr, t_ctr, neg_ctr, localTable):
 	# If there is nothing in the body, return a single stmt containing nothing. Will be useful for goto
 	# of the condition as well as the outside of the if-block
 	blk_body_list = []
@@ -485,7 +502,7 @@ def body_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 	for op in node.operands:
 		if op.operator == "ASGN":
 			# If the statement is an assignment, simply add the statements to the current block
-			C, bb_ctr, t_ctr, neg_ctr = assignment_statement_list(op, bb_ctr, t_ctr, neg_ctr)
+			C, bb_ctr, t_ctr, neg_ctr = assignment_statement_list(op, bb_ctr, t_ctr, neg_ctr, localTable)
 			c_blk.addStmts(C)
 		elif op.operator == "IF":
 			# Check if there is a non-trivial block, if yes, then append it.
@@ -496,7 +513,7 @@ def body_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 				blk_body_list.append(c_blk)
 
 			# Solve for the if-block and add it to the list
-			if_blocks, bb_ctr, t_ctr, neg_ctr = if_stmt_statement_list(op, bb_ctr, t_ctr, neg_ctr)
+			if_blocks, bb_ctr, t_ctr, neg_ctr = if_stmt_statement_list(op, bb_ctr, t_ctr, neg_ctr, localTable)
 			if len(blk_body_list) > 0:
 				blk_body_list[-1].goto = if_blocks[0].number
 			if_blocks[-1].goto = bb_ctr
@@ -513,7 +530,7 @@ def body_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 				c_blk.goto = bb_ctr
 				blk_body_list.append(c_blk)
 
-			while_blocks, bb_ctr, t_ctr, neg_ctr = while_stmt_statement_list(op, bb_ctr, t_ctr, neg_ctr)
+			while_blocks, bb_ctr, t_ctr, neg_ctr = while_stmt_statement_list(op, bb_ctr, t_ctr, neg_ctr, localTable)
 			if len(blk_body_list) > 0:
 				blk_body_list[-1].goto = while_blocks[0].number
 			while_blocks[-1].goto = bb_ctr
@@ -522,7 +539,7 @@ def body_statement_list(node, bb_ctr, t_ctr, neg_ctr):
 				blk_body_list.append(blk)
 
 		elif op.operator == "FN_CALL":
-			C, bb_ctr, t_ctr, neg_ctr = assignment_statement_list(op, bb_ctr, t_ctr, neg_ctr)
+			C, bb_ctr, t_ctr, neg_ctr = assignment_statement_list(op, bb_ctr, t_ctr, neg_ctr, localTable)
 			c_blk.addStmts(C)
 
 	if c_blk.contents != []:
