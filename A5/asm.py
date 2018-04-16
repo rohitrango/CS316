@@ -169,7 +169,12 @@ def unaryAsAsm(node, globalTable, intRegisters, tmpToRegMap, varToStackMap, inde
     return out, -1
 
 
-
+operatorToAsm = {
+    'PLUS': 'add',
+    'MINUS': 'sub',
+    'MUL': 'mul',
+    'DIV': 'div',
+}
 
 def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
     out = []
@@ -217,7 +222,34 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                 # This is the end of unary functions and their corresponding code generator
                 # Now we solve for the second part, which deals with binary ops
                 else:
-                    raise NotImplementedError
+                    # Resolve the two operands of the RHS
+                    op1, op2 = rhs.operands
+                    op1Asm, op1Reg = unaryAsAsm(op1, globalTable, intRegisters, tmpToRegMap, varToStackMap, indent=True)
+                    op2Asm, op2Reg = unaryAsAsm(op2, globalTable, intRegisters, tmpToRegMap, varToStackMap, indent=True)
+                    out.extend(op1Asm)
+                    out.extend(op2Asm)
+
+                    # Get a result registry
+                    resReg = heappop(intRegisters)
+
+                    # Append the operations, handle divs separately because it stores the result differently 
+                    if rhs.operator == "DIV":
+                        out.append("\t{0} $s{1}, $s{2}".format(operatorToAsm[rhs.operator], op1Reg, op2Reg))
+                        out.append("\tmflo $s{0}".format(resReg))
+                    else:
+                        out.append("\t{0} $s{1}, $s{2}, $s{3}".format(operatorToAsm[rhs.operator], resReg, op1Reg, op2Reg))
+
+                    # Free up the registers used for the operations
+                    heappush(intRegisters, op1Reg)
+                    heappush(intRegisters, op2Reg)
+
+                    # Move the result into place and free the result registry (done by the reference implementation)
+                    movReg = heappop(intRegisters)
+                    out.append("\tmove $s{0}, $s{1}".format(movReg, resReg))
+                    heappush(intRegisters, resReg)
+
+                    # Store what registry the LHS temporary "variable" resides in 
+                    tmpToRegMap[lhs.name] = movReg
 
     return out
 
