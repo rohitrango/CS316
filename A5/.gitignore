@@ -1,3 +1,8 @@
+*.ast
+*.s
+*.sym
+*.cfg
+
 parsetab.py
 
 # Folder for custom tests
