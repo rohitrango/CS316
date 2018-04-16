@@ -213,6 +213,9 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                         heappush(intRegisters, rhsReg)
                         heappush(intRegisters, lhsReg)
                         out.append(stmt)
+                
+                # This is the end of unary functions and their corresponding code generator
+                # Now we solve for the second part, which deals with binary ops
                 else:
                     raise NotImplementedError
 

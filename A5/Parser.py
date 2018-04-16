@@ -606,7 +606,7 @@ if __name__ == "__main__":
 
 	# Write the CFGs to filename.c.cfg
 	with open("{}.cfg".format(filename), "w") as fCfg:
-		CFGS = getProcedureCFGs(prog.operands[1])
+		CFGS = getProcedureCFGs(prog.operands[1], global_table)
 		for cfg in CFGS:
 			fCfg.write(str(cfg))
 
