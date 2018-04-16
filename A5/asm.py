@@ -1,5 +1,5 @@
 from utils import variablesInSymbolTable
-
+from heapq import heapify, heappush, heappop
 # Methods for converting symbol tables and CFGs into assembly
 
 def asAsm(globalTable, cfgs):
@@ -80,7 +80,22 @@ def prologueAsAsm(globalTable, name):
 
 
 def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
-    return []
+    out = []
+
+    # Code for heap of free registers and dictionary for tmp variables
+    intRegisters = list(range(8))
+    intRegisters = heapify(intRegisters)
+    tmpToRegMap  = dict()
+
+    for block in blocks:
+        # First the label number
+        out.append("label{0}:".format(block.number))
+
+        # Now loop thru the statements
+        for stmt in block.contents:
+            print(stmt.operator)
+
+    return out
 
 
 def epilougeAsAsm(name, offset):

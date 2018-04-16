@@ -28,7 +28,7 @@ bool_to_name_mapping = {
 
 class AbstractSyntaxTreeNode(object):
 
-	def __init__(self, operator, operands=[], name=None, lineno=None, vartype=None, lvl=0):
+	def __init__(self, operator, operands=[], name=None, lineno=None, vartype=None, lvl=0, tmp=False):
 		'''
 		operator : It's the operator of the AST node e.g. PLUS, VAR, DECL
 		operands : The list of operands to apply the operator on. 
@@ -43,6 +43,7 @@ class AbstractSyntaxTreeNode(object):
 		self.lineno = lineno
 		self.vartype = vartype
 		self.lvl = lvl
+		self.tmp = tmp
 
 	def addChild(self, child):
 		self.operands.append(child)
@@ -328,7 +329,7 @@ def assignment_stmt_util(node, bb_ctr, t_ctr, neg_ctr):
 			n1, stmt1, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[0], bb_ctr, t_ctr, neg_ctr)
 			n2, stmt2, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[1], bb_ctr, t_ctr, neg_ctr)
 			n = AbstractSyntaxTreeNode(node.operator, [n1, n2])
-			t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr))
+			t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr), tmp=True)
 			t_ctr += 1
 			asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
 			stmt = stmt1 + stmt2 + [asgn]
@@ -337,7 +338,7 @@ def assignment_stmt_util(node, bb_ctr, t_ctr, neg_ctr):
 			# UMINUS
 			n1, stmt1, bb_ctr, t_ctr, neg_ctr = assignment_stmt_util(node.operands[0], bb_ctr, t_ctr, neg_ctr)
 			n = AbstractSyntaxTreeNode(node.operator, [n1])
-			t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr))
+			t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr), tmp=True)
 			t_ctr += 1
 			asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
 			stmt = stmt1 + [asgn]
@@ -373,7 +374,7 @@ def condition_stmt_list(node, bb_ctr, t_ctr, neg_ctr):
 				n1, stmt1, bb_ctr, t_ctr, neg_ctr = condition_stmt_list_util(node.operands[0], bb_ctr, t_ctr, neg_ctr)
 				n2, stmt2, bb_ctr, t_ctr, neg_ctr = condition_stmt_list_util(node.operands[1], bb_ctr, t_ctr, neg_ctr)
 				n = AbstractSyntaxTreeNode(node.operator, [n1, n2])
-				t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr))
+				t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr), tmp=True)
 				t_ctr += 1
 				asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
 				stmt = stmt1 + stmt2 + [asgn]
@@ -382,7 +383,7 @@ def condition_stmt_list(node, bb_ctr, t_ctr, neg_ctr):
 				# This is the case of NOT
 				n1, stmt1, bb_ctr, t_ctr, neg_ctr = condition_stmt_list_util(node.operands[0], bb_ctr, t_ctr, neg_ctr)
 				n = AbstractSyntaxTreeNode(node.operator, [n1])
-				t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr))
+				t0 = AbstractSyntaxTreeNode("VAR", [], "t" + str(t_ctr), tmp=True)
 				t_ctr += 1
 				asgn = AbstractSyntaxTreeNode("ASGN", [t0, n])
 				stmt = stmt1 + [asgn]
