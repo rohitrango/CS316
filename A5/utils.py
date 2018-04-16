@@ -606,7 +606,7 @@ def variablesOfGlobalTable(globalTable):
 	''' Returns an array of all the variables declared in a global symbol table (including variables declared in functions)
 	The result is returned as an array of tuples [(name, scope, base, derived type), ...]
 	'''
-	procedures = { funcName:symbolTable for funcName,symbolTable in globalTable.items() if isinstance(symbolTable, dict) and symbolTable.get('func', False)}
+	procedures = { funcName:symbolTable for funcName,symbolTable in globalTable.items() if isinstance(symbolTable, dict) and symbolTable.get('func', False) and symbolTable.get('proto', True)==False}
 	variables = variablesInSymbolTable(globalTable, "global")
 	for name, symbolTable in procedures.items():
 		variables.extend(variablesInSymbolTable(symbolTable['decls'], "procedure {}".format(name)))
