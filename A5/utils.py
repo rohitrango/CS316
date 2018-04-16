@@ -391,9 +391,7 @@ def condition_stmt_list(node, bb_ctr, t_ctr, neg_ctr):
 			else:
 				raise Exception
 
-	# The base case has to contain two operands
 	# print(node.operator, len(node.operands))
-	assert(len(node.operands) == 2)
 	t1, stmt, bb_ctr, t_ctr, neg_ctr = condition_stmt_list_util(node, bb_ctr, t_ctr, neg_ctr)
 	return stmt, bb_ctr, t_ctr, neg_ctr
 

@@ -78,22 +78,47 @@ def prologueAsAsm(globalTable, name):
     out.append("# Prologue ends")
     return out, varToStackMap, offset
 
+#####
+# Helper functions that return the assembly code for a given RHS
+#####
+def unaryAsAsm(node, globalTable, intRegisters, tmpToRegMap, varToStackMap):
+    '''
+    Takes a node containing a unary operator, and returns list of assembly statements
+    '''
+    out = []
+    if node.operator == "CONST" and node.vartype == "int":
+        freeReg = heappop(intRegisters)
+        stmt = "li $s{0}, {1}".format(freeReg, node.name)
+        out.append(stmt)
+
+    out = list(map(lambda x: "\t"+x, out))
+    return out
+
+
 
 def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
     out = []
 
     # Code for heap of free registers and dictionary for tmp variables
     intRegisters = list(range(8))
-    intRegisters = heapify(intRegisters)
+    heapify(intRegisters)
     tmpToRegMap  = dict()
 
     for block in blocks:
         # First the label number
-        out.append("label{0}:".format(block.number))
+        out.append("label{0}:".format(block.number-1))
 
         # Now loop thru the statements
         for stmt in block.contents:
-            print(stmt.operator)
+            # Check for various cases here
+            if stmt.operator == "ASGN":
+                lhs, rhs = stmt.operands
+                if len(rhs.operands) <= 1:
+                    # Unary operator, can be NOT, UMINUS, VAR, DEREF, CONST
+                    outputRHS = unaryAsAsm(rhs, globalTable, intRegisters, tmpToRegMap, varToStackMap)
+                    out.extend(outputRHS)
+                else:
+                    pass 
 
     return out
 
