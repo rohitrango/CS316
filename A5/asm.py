@@ -174,6 +174,61 @@ operatorToAsm = {
     'DIV': 'div',
 }
 
+conditionalOperators = set(["EQ", "NE", "GT", "GE", "LT", "LE"])
+
+def conditionAsAsm(operator, intRegisters, reg1, reg2, goto):
+    '''
+    Takes an operator and two registries and returns an array of statements for performing that comparison
+    Params: operator - One of (EQ, NE, GT, GE, NT, NE) as string
+            intRegisters - The heap of free registers
+            reg1 - Registry of op1 in op1 cmp op2 as int
+            reg2 - Registry of op2 in op1 cmp op2 as int
+            goto - Index of the block to goto if the condition is true
+    '''
+    out = []
+    resReg = heappop(intRegisters)
+    if operator in ["GE", "LE"]:
+        # These require two assembly operations (slt and not)
+        if operator == "GE":
+            # reg1 >= reg2 <==> !(reg1 < reg2) 
+            out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+        elif operator == "LE":
+            # reg1 <= reg2 <===> !(reg > reg1)
+            out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg2, reg1))
+        
+        # Free reg1 & reg2 and do a not operation 
+        heappush(intRegisters, reg1)
+        heappush(intRegisters, reg2)
+        notReg = heappop(intRegisters)
+        out.append("\tnot $s{0}, $s{1}".format(notReg, resReg))
+        heappush(intRegisters, resReg)
+        resReg = notReg
+    else:
+        # These require only one assembly operation (slt)
+        if operator == "EQ":
+            out.append("\tseq $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+        elif operator == "NE":
+            out.append("\tsne $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+        elif operator == "GT":
+            # reg1 > reg2 <==> reg2 < reg1
+            out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg2, reg1))
+        elif operator == "LT":
+            out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+        
+        # Free reg1 & reg2
+        heappush(intRegisters, reg1)
+        heappush(intRegisters, reg2)
+    
+    # Move it ¯\_(ツ)_/¯
+    movReg = heappop(intRegisters)    
+    out.append("\tmove $s{0}, $s{1}".format(movReg, resReg))
+    heappush(intRegisters, resReg)
+
+    # Compare it
+    out.append("\tbne $s{0}, $0, label{1}".format(movReg, goto))
+    heappush(intRegisters, movReg)
+    return out
+
 def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
     out = []
 
@@ -227,27 +282,29 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                     out.extend(op1Asm)
                     out.extend(op2Asm)
 
-                    # Get a result registry
-                    resReg = heappop(intRegisters)
-
                     # Append the operations, handle divs separately because it stores the result differently 
-                    if rhs.operator == "DIV":
-                        out.append("\t{0} $s{1}, $s{2}".format(operatorToAsm[rhs.operator], op1Reg, op2Reg))
-                        out.append("\tmflo $s{0}".format(resReg))
+                    if rhs.operator in conditionalOperators:
+                        out.extend(conditionAsAsm(rhs.operator, intRegisters, op1Reg, op2Reg, block.goto))
                     else:
-                        out.append("\t{0} $s{1}, $s{2}, $s{3}".format(operatorToAsm[rhs.operator], resReg, op1Reg, op2Reg))
+                        # Get a result registry
+                        resReg = heappop(intRegisters)
+                        if rhs.operator == "DIV":
+                            out.append("\t{0} $s{1}, $s{2}".format(operatorToAsm[rhs.operator], op1Reg, op2Reg))
+                            out.append("\tmflo $s{0}".format(resReg))                            
+                        else:
+                            out.append("\t{0} $s{1}, $s{2}, $s{3}".format(operatorToAsm[rhs.operator], resReg, op1Reg, op2Reg))
+                        
+                        # Free up the registers used for the operations
+                        heappush(intRegisters, op1Reg)
+                        heappush(intRegisters, op2Reg)
+                        
+                        # Move the result into place (done by the reference implementation)
+                        movReg = heappop(intRegisters)
+                        heappush(intRegisters, resReg)
+                        out.append("\tmove $s{0}, $s{1}".format(movReg, resReg))
 
-                    # Free up the registers used for the operations
-                    heappush(intRegisters, op1Reg)
-                    heappush(intRegisters, op2Reg)
-
-                    # Move the result into place and free the result registry (done by the reference implementation)
-                    movReg = heappop(intRegisters)
-                    out.append("\tmove $s{0}, $s{1}".format(movReg, resReg))
-                    heappush(intRegisters, resReg)
-
-                    # Store what registry the LHS temporary "variable" resides in 
-                    tmpToRegMap[lhs.name] = movReg
+                        # Store what registry the LHS temporary "variable" resides in 
+                        tmpToRegMap[lhs.name] = movReg
 
     return out
 
