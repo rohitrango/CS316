@@ -282,16 +282,28 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
             # epilogue part
             return_stmt = block.contents[-1]
             if len(return_stmt.operands) > 0:
-                ret_value = return_stmt.operands[0]
-                # Check for the type of return
-                if ret_value.operator == "CONST" and ret_value.vartype == "int":
-                    # return only an int constant
-                    freeReg = heappop(intRegisters)
-                    stmt = "\tli $s{0}, {1}".format(freeReg, ret_value.name)
-                    stmt2 = "\tmove $v1, $s{0} # move return value to $v1".format(freeReg)
+                retValue = return_stmt.operands[0]
+                # Just call unaryAsm to do the rest
+                retStmts, freeReg = unaryAsAsm(retValue, globalTable, intRegisters, tmpToRegMap, varToStackMap, indent=True)
+                out.extend(retStmts)
+
+                # If its a variable or address or deref, move it to another register 
+
+                if retValue.operator == "DEREF" and not retValue.tmp:
+                    # Move to a tmp register
+                    newFreeReg = heappop(intRegisters)
+                    stmt = "\tmove $s{0}, $s{1}".format(newFreeReg, freeReg)
                     heappush(intRegisters, freeReg)
-                    out.extend([stmt, stmt2])
-                # Else, it could be a parameter
+                    out.append(stmt)
+                else:
+                    newFreeReg = freeReg
+
+
+                # Final move
+                stmt = "\tmove $v1, $s{0} # move return value to $v1".format(newFreeReg)
+                heappush(intRegisters, newFreeReg)
+                out.append(stmt)
+
             out.append("\tj epilogue_{0}\n".format(name))
         
         # This is the other part, where it jumps to a next block or two
