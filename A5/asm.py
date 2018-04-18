@@ -98,7 +98,6 @@ def prologueAsAsm(globalTable, name):
             'decl'  : False,
         }
 
-    # print(varToStackMap)
     out.append("\tsub $sp, $sp, {0}\t# Make space for the locals".format(declsOffset+8))
     out.append("# Prologue ends")
     return out, varToStackMap, declsOffset
@@ -259,6 +258,7 @@ def conditionAsAsm(operator, intRegisters, reg1, reg2, goto):
             reg1 - Registry of op1 in op1 cmp op2 as int
             reg2 - Registry of op2 in op1 cmp op2 as int
             goto - Index of the block to goto if the condition is true
+    Return: ASM statements, registry where the result was stored
     '''
     out = []
     resReg = heappop(intRegisters)
@@ -300,9 +300,7 @@ def conditionAsAsm(operator, intRegisters, reg1, reg2, goto):
     heappush(intRegisters, resReg)
 
     # Compare it
-    out.append("\tbne $s{0}, $0, label{1}".format(movReg, goto-1))
-    heappush(intRegisters, movReg)
-    return out
+    return out, movReg
 
 def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
     out = []
@@ -359,7 +357,9 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
 
                     # Append the operations, handle divs separately because it stores the result differently 
                     if rhs.operator in conditionalOperators:
-                        out.extend(conditionAsAsm(rhs.operator, intRegisters, op1Reg, op2Reg, block.goto))
+                        cAsm, cReg = conditionAsAsm(rhs.operator, intRegisters, op1Reg, op2Reg, block.goto)
+                        out.extend(cAsm)
+                        tmpToRegMap[lhs.name] = cReg
                     else:
                         # Get a result registry
                         resReg = heappop(intRegisters)
@@ -419,8 +419,14 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
         else:
             if block.goto2 is None:
                 out.append("\tj label{0}".format(block.goto-1))
-
-
+            else:
+                # if/while statement
+                # Check what the name of the temporary variable that stored the result is
+                resultVar = block.contents[-1].operands[0].name
+                movReg = tmpToRegMap[resultVar]
+                out.append("\tbne $s{0}, $0, label{1}".format(movReg, block.goto-1))
+                out.append("\tj label{0}".format(block.goto2-1))
+                heappush(intRegisters, movReg)
 
 
     return out
