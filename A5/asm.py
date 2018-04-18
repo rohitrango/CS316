@@ -62,21 +62,46 @@ def prologueAsAsm(globalTable, name):
     out.extend(["# Prologue begins", "\tsw $ra, 0($sp)  # Save the return address", "\tsw $fp, -4($sp) # Save the frame pointer", "\tsub $fp, $sp, 8 # Update the frame pointer"])
 
     decls = globalTable[name]['decls']
+
+    # Params will be a list of 2-tuples, for key and values
+    params = globalTable[name]['params']
+    params = sorted(params.items(), key=lambda x: x[1]['pos'])
+
     varToStackMap = dict()
     offset = 0
     for idx, varname in enumerate(sorted(decls.keys())):
         vartype = decls[varname]['type']
         lvl = decls[varname]['lvl']
+        # Take care of int and float pointers here
         offset += 4 if lvl != 0 or vartype == 'int' else 8
         varToStackMap[varname] = {
             'offset': offset,
             'type': vartype,
             'lvl': lvl,
             'stackPos': idx,
+            'decl':True,
         }
-    out.append("\tsub $sp, $sp, {0}    # Make space for the locals".format(offset+8))
+
+    declsOffset = offset
+    # In the interest of $ra and $fp
+    offset += 8
+    # Fill in the key value pairs now
+    for varname, attr in params:
+        vartype = attr['type']
+        lvl     = attr['lvl']
+        offset += 4 if lvl != 0 or vartype == 'int' else 8
+        varToStackMap[varname] = {
+            'offset': offset,
+            'type'  : vartype,
+            'lvl'   : lvl,
+            'stackPos': attr['pos'],
+            'decl'  : False,
+        }
+
+    # print(varToStackMap)
+    out.append("\tsub $sp, $sp, {0}    # Make space for the locals".format(declsOffset+8))
     out.append("# Prologue ends")
-    return out, varToStackMap, offset
+    return out, varToStackMap, declsOffset
 
 #####
 # Helper functions that return the assembly code for a given RHS
@@ -250,6 +275,11 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
 
                     # Store what registry the LHS temporary "variable" resides in 
                     tmpToRegMap[lhs.name] = movReg
+
+        ### End of the block statements
+        if block.end:
+            out.append("\tj epilouge_{0}".format(name))
+
 
     return out
 
