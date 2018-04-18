@@ -246,6 +246,8 @@ operatorToAsm = {
     'MINUS': 'sub',
     'MUL': 'mul',
     'DIV': 'div',
+    'AND': 'and',
+    'OR': 'or'
 }
 
 conditionalOperators = set(["EQ", "NE", "GT", "GE", "LT", "LE"])
