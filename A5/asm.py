@@ -59,7 +59,7 @@ def prologueAsAsm(globalTable, name):
     Given the name of the function, create an activation record
     '''
     out = []
-    out.extend(["# Prologue begins", "\tsw $ra, 0($sp)  # Save the return address", "\tsw $fp, -4($sp) # Save the frame pointer", "\tsub $fp, $sp, 8 # Update the frame pointer"])
+    out.extend(["# Prologue begins", "\tsw $ra, 0($sp)\t# Save the return address", "\tsw $fp, -4($sp)\t# Save the frame pointer", "\tsub $fp, $sp, 8\t# Update the frame pointer"])
 
     decls = globalTable[name]['decls']
 
@@ -99,7 +99,7 @@ def prologueAsAsm(globalTable, name):
         }
 
     # print(varToStackMap)
-    out.append("\tsub $sp, $sp, {0}    # Make space for the locals".format(declsOffset+8))
+    out.append("\tsub $sp, $sp, {0}\t# Make space for the locals".format(declsOffset+8))
     out.append("# Prologue ends")
     return out, varToStackMap, declsOffset
 
@@ -276,9 +276,30 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                     # Store what registry the LHS temporary "variable" resides in 
                     tmpToRegMap[lhs.name] = movReg
 
-        ### End of the block statements
+        ### End of the block statements, check goto and assign statements here
         if block.end:
-            out.append("\tj epilouge_{0}".format(name))
+            # This is the return block. This just needs a return value and it will jump straight to the 
+            # epilogue part
+            return_stmt = block.contents[-1]
+            if len(return_stmt.operands) > 0:
+                ret_value = return_stmt.operands[0]
+                # Check for the type of return
+                if ret_value.operator == "CONST" and ret_value.vartype == "int":
+                    # return only an int constant
+                    freeReg = heappop(intRegisters)
+                    stmt = "\tli $s{0}, {1}".format(freeReg, ret_value.name)
+                    stmt2 = "\tmove $v1, $s{0} # move return value to $v1".format(freeReg)
+                    heappush(intRegisters, freeReg)
+                    out.extend([stmt, stmt2])
+                # Else, it could be a parameter
+            out.append("\tj epilogue_{0}\n".format(name))
+        
+        # This is the other part, where it jumps to a next block or two
+        else:
+            if block.goto2 is None:
+                out.append("\tj label{0}".format(block.goto-1))
+
+
 
 
     return out
@@ -293,7 +314,7 @@ def epilougeAsAsm(name, offset):
                 "\tadd $sp, $sp, {0}".format(8+offset),
                 "\tlw $fp, -4($sp)",
                 "\tlw $ra, 0($sp)",
-                "\tjr $ra  # Jump back to the called procedure",
+                "\tjr $ra\t# Jump back to the called procedure",
                 "# Epilogue ends",
         ]
     return out
