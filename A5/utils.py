@@ -385,6 +385,14 @@ def condition_stmt_list(node, bb_ctr, t_ctr, neg_ctr, localTable):
 
 	def condition_stmt_list_util(node, bb_ctr, t_ctr, neg_ctr, localTable):
 		if node.operator in ["VAR", "CONST", "DEREF", "ADDR"]:
+			if node.operator in ["VAR", "DEREF", "ADDR"]:
+				name, _, _ = resolveDeclVar(node)
+				vartype, lvl, _ = resolveType(name, localTable)
+				node.vartype = vartype
+				node.lvl = lvl
+			else:
+				node.lvl = 0
+			assert(node.vartype in ["int", "float"])
 			return node, [], bb_ctr, t_ctr, neg_ctr
 		else:
 			if len(node.operands) == 2:
