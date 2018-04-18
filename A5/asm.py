@@ -164,8 +164,6 @@ def unaryAsAsm(node, globalTable, intRegisters, tmpToRegMap, varToStackMap, inde
         out.append(stmt)
         return indentStmts(out), freeReg
 
-
-    print(node.operator, node.name , node.vartype)
     return out, -1
 
 
