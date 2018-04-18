@@ -225,7 +225,7 @@ def conditionAsAsm(operator, intRegisters, reg1, reg2, goto):
     heappush(intRegisters, resReg)
 
     # Compare it
-    out.append("\tbne $s{0}, $0, label{1}".format(movReg, goto))
+    out.append("\tbne $s{0}, $0, label{1}".format(movReg, goto-1))
     heappush(intRegisters, movReg)
     return out
 
