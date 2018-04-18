@@ -41,7 +41,7 @@ def functionAsAsm(globalTable, cfgs):
         blocks = funcBlock.blocks
 
         # Use textAsm to compile all the required code
-        textAsm = ["\t.text", "\t.global {0}".format(name), "{0}:".format(name)]
+        textAsm = ["\t.text\t# The .text assembler directive indicates", "\t.globl {0}\t# The following is the code".format(name), "{0}:".format(name)]
         prolouge, varToStackMap, offset = prologueAsAsm(globalTable, name)
         body = functionBodyAsAsm(globalTable, blocks, name, varToStackMap)
         epilouge = epilougeAsAsm(name, offset)
@@ -59,24 +59,49 @@ def prologueAsAsm(globalTable, name):
     Given the name of the function, create an activation record
     '''
     out = []
-    out.extend(["# Prologue begins", "\tsw $ra, 0($sp)  # Save the return address", "\tsw $fp, -4($sp) # Save the frame pointer", "\tsub $fp, $sp, 8 # Update the frame pointer"])
+    out.extend(["# Prologue begins", "\tsw $ra, 0($sp)\t# Save the return address", "\tsw $fp, -4($sp)\t# Save the frame pointer", "\tsub $fp, $sp, 8\t# Update the frame pointer"])
 
     decls = globalTable[name]['decls']
+
+    # Params will be a list of 2-tuples, for key and values
+    params = globalTable[name]['params']
+    params = sorted(params.items(), key=lambda x: x[1]['pos'])
+
     varToStackMap = dict()
     offset = 0
     for idx, varname in enumerate(sorted(decls.keys())):
         vartype = decls[varname]['type']
         lvl = decls[varname]['lvl']
+        # Take care of int and float pointers here
         offset += 4 if lvl != 0 or vartype == 'int' else 8
         varToStackMap[varname] = {
             'offset': offset,
             'type': vartype,
             'lvl': lvl,
             'stackPos': idx,
+            'decl':True,
         }
-    out.append("\tsub $sp, $sp, {0}    # Make space for the locals".format(offset+8))
+
+    declsOffset = offset
+    # In the interest of $ra and $fp
+    offset += 8
+    # Fill in the key value pairs now
+    for varname, attr in params:
+        vartype = attr['type']
+        lvl     = attr['lvl']
+        offset += 4 if lvl != 0 or vartype == 'int' else 8
+        varToStackMap[varname] = {
+            'offset': offset,
+            'type'  : vartype,
+            'lvl'   : lvl,
+            'stackPos': attr['pos'],
+            'decl'  : False,
+        }
+
+    # print(varToStackMap)
+    out.append("\tsub $sp, $sp, {0}\t# Make space for the locals".format(declsOffset+8))
     out.append("# Prologue ends")
-    return out, varToStackMap, offset
+    return out, varToStackMap, declsOffset
 
 #####
 # Helper functions that return the assembly code for a given RHS
@@ -92,9 +117,13 @@ def resolveOffset(name, globalTable, varToStackMap):
 
 
 
-def unaryAsAsm(node, globalTable, intRegisters, tmpToRegMap, varToStackMap, indent=False, lhsMode=False):
+def unaryAsAsm(node, globalTable, intRegisters, tmpToRegMap, varToStackMap, indent=False, lhsMode=False, funcRet=True):
     '''
     Takes a node containing a unary operator, and returns list of assembly statements
+    indent: Indent the statements
+    lhsMode : If the expression is part of lhs, in which case special attention to DEREFs has to be given
+    funcRet : If true, the function call expects a return value
+              Else not
     '''
     def indentStmts(out):
         # Indent only at the last level
@@ -163,6 +192,52 @@ def unaryAsAsm(node, globalTable, intRegisters, tmpToRegMap, varToStackMap, inde
             stmt = "la $s{0}, global_{1}".format(freeReg, node.name)
         out.append(stmt)
         return indentStmts(out), freeReg
+
+    # Deal with functions here
+    # Can get a little tricky here
+    elif node.operator == "FN_CALL":
+        params = node.operands[0].operands
+        paramOffset = 0
+        for param in params[::-1]:
+            if param.vartype == "int":
+                # Solve for the individual record
+                stmts, freeReg = unaryAsAsm(param, globalTable, intRegisters, tmpToRegMap, varToStackMap)
+                stmt = "sw $s{0}, {1}($sp)".format(freeReg, -paramOffset)
+                stmts.append(stmt)
+
+                # Take the previous lists, and add the new param statements
+                out = stmts + out
+                heappush(intRegisters, freeReg)
+                paramOffset+=4
+            else:
+                print(param.operator)
+                raise NotImplementedError
+
+        out.insert(0, "# setting up activation record for called function")
+        # ParamsStmts contains all the statements, now time to change the stack pointer and 
+        # Call the function
+        stmts = ["sub $sp, $sp, {0}".format(paramOffset), "jal {0} # function call".format(node.name), \
+        "add $sp, $sp, {0} # destroying activation record of called function".format(paramOffset)]
+        out.extend(stmts)
+
+        # If it returns, put the value in a free register
+        if funcRet:
+            freeReg = heappop(intRegisters)
+            stmt  = "move $s{0}, $v1\t# using the return value of called function".format(freeReg)
+            out.append(stmt)
+
+            # Dereference the function until required
+            # TODO: Add float functionality to it.
+            count = 0
+            while node.lvl > count:
+                anotherFreeReg = heappop(intRegisters)
+                out.append("lw $s{0}, 0($s{1})".format(anotherFreeReg, freeReg))
+                heappush(intRegisters, freeReg)
+                freeReg = anotherFreeReg
+                count+=1
+            return indentStmts(out), freeReg
+        else:
+            return indentStmts(out), -1
 
     return out, -1
 
@@ -306,6 +381,48 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                         # Store what registry the LHS temporary "variable" resides in 
                         tmpToRegMap[lhs.name] = movReg
 
+        ### Time to think about function calls
+
+
+
+        ### End of the block statements, check goto and assign statements here
+        if block.end:
+            # This is the return block. This just needs a return value and it will jump straight to the 
+            # epilogue part
+            return_stmt = block.contents[-1]
+            if len(return_stmt.operands) > 0:
+                retValue = return_stmt.operands[0]
+                # Just call unaryAsm to do the rest
+                retStmts, freeReg = unaryAsAsm(retValue, globalTable, intRegisters, tmpToRegMap, varToStackMap, indent=True)
+                out.extend(retStmts)
+
+                # If its a variable or address or deref, move it to another register 
+
+                if retValue.operator == "DEREF" and not retValue.tmp:
+                    # Move to a tmp register
+                    newFreeReg = heappop(intRegisters)
+                    stmt = "\tmove $s{0}, $s{1}".format(newFreeReg, freeReg)
+                    heappush(intRegisters, freeReg)
+                    out.append(stmt)
+                else:
+                    newFreeReg = freeReg
+
+
+                # Final move
+                stmt = "\tmove $v1, $s{0} # move return value to $v1".format(newFreeReg)
+                heappush(intRegisters, newFreeReg)
+                out.append(stmt)
+
+            out.append("\tj epilogue_{0}\n".format(name))
+        
+        # This is the other part, where it jumps to a next block or two
+        else:
+            if block.goto2 is None:
+                out.append("\tj label{0}".format(block.goto-1))
+
+
+
+
     return out
 
 
@@ -318,7 +435,7 @@ def epilougeAsAsm(name, offset):
                 "\tadd $sp, $sp, {0}".format(8+offset),
                 "\tlw $fp, -4($sp)",
                 "\tlw $ra, 0($sp)",
-                "\tjr $ra  # Jump back to the called procedure",
+                "\tjr $ra\t# Jump back to the called procedure",
                 "# Epilogue ends",
         ]
     return out
