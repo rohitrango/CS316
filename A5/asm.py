@@ -3,6 +3,10 @@ from heapq import heapify, heappush, heappop
 from semantics import resolveType, resolveDeclVar
 # Methods for converting symbol tables and CFGs into assembly
 
+# This stores the type associated with each register
+# it can be int or float
+tmpToTypeMap = dict()
+
 def asAsm(globalTable, cfgs):
     '''
     Returns the MIPS assembly code for a global symbol table and an array of CFGs
@@ -26,6 +30,12 @@ def symbolTableAsAsm(globalTable):
         space = ".space	8" if (vartype == "float" and globalTable[name]['lvl'] == 0) else ".word	0"
         out.append("global_{0}:	{1}".format(name, space))
     return out
+
+
+def getTotalWidth(globalTable, name):
+    params = globalTable[name]['params'].values()
+    paramsVal = list(map(lambda x: 8 if x['lvl']==0 and x['type']=='float' else 4, params))
+    return sum(paramsVal)
 
 
 def functionAsAsm(globalTable, cfgs):
@@ -139,14 +149,16 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
         # Constant, check if int or float
         if node.vartype == "int":
             freeReg = heappop(intRegisters)
+            regType = "int"
             stmt = "li $s{0}, {1}".format(freeReg, node.name) 
 
         elif node.vartype == "float":
             freeReg = heappop(floatRegisters)
+            regType = "float"
             stmt = "li.s $f{0}, {1}".format(freeReg, node.name)
 
         out.append(stmt)
-        return indentStmts(out), freeReg
+        return indentStmts(out), freeReg, regType
 
     # TODO: Write code for it later
     elif node.operator == "NOT":
@@ -162,13 +174,13 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
         out.append("move $s{0}, $s{1}".format(moveReg, freeReg))
 
         heappush(intRegisters, freeReg)
-        return indentStmts(out), moveReg
+        return indentStmts(out), moveReg, "int"
 
     # For uminus, solve the expression recursively
     elif node.operator == "UMINUS":
         # Solve for the operand inside uminus
         node = node.operands[0]
-        tmpout, tmpLatestReg = unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap)
+        tmpout, tmpLatestReg, regType = unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap)
         out.extend(tmpout)
 
         if node.vartype == "int":
@@ -193,12 +205,12 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
             heappush(floatRegisters, freeReg)
 
         out.extend(stmts)
-        return indentStmts(out), moveReg
+        return indentStmts(out), moveReg, regType
 
     # Deal with int variables
     elif node.operator == "VAR":
         if node.tmp:
-            return [], tmpToRegMap[node.name]
+            return [], tmpToRegMap[node.name], tmpToTypeMap[node.name]
         else:
             # Non-tmp variable
             if node.vartype == "int":
@@ -209,12 +221,12 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
                 raise AssertionError("Expression/assignment cannot contain direct float variable.")
 
             out.append(stmt)
-            return indentStmts(out), freeReg
+            return indentStmts(out), freeReg, "int"
 
     # Deal with derefs
     elif node.operator == "DEREF":
 
-        # Keep the float pointer anyway
+        # Check lvl of indirection from symbol table
         ifp, lvl = isFloatPointer(node, globalTable, funcName, return_lvl=True)
         vartype = node.vartype
 
@@ -235,23 +247,27 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
             derefCount-=1
             lvl-=1
 
+        regType = "int"
         # We need the R-value of the deref, else we return the address
         if lhsMode == False:
             ## If the resultant is a float, then use a different load register
             if vartype == "float" and lvl == 1:
                 # Its a float
                 anotherFreeReg = heappop(floatRegisters)
+                regType = "float"
                 out.append("l.s $f{0}, 0($s{1})".format(anotherFreeReg, freeReg))
             else:
                 # Its an int or float pointer
                 anotherFreeReg = heappop(intRegisters)
+                regType = "int"
                 out.append("lw $s{0}, 0($s{1})".format(anotherFreeReg, freeReg))
             heappush(intRegisters, freeReg)
             freeReg = anotherFreeReg
 
-        return indentStmts(out), freeReg
+        return indentStmts(out), freeReg, regType
 
     # Deal with address
+    # Same for float
     elif node.operator == "ADDR":
         node = node.operands[0]
         freeReg = heappop(intRegisters)
@@ -260,22 +276,29 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
         else:
             stmt = "la $s{0}, global_{1}".format(freeReg, node.name)
         out.append(stmt)
-        return indentStmts(out), freeReg
+        return indentStmts(out), freeReg, "int"
 
     # Deal with functions here
     # Can get a little tricky here
     elif node.operator == "FN_CALL":
         params = node.operands[0].operands
-        paramOffset = 0
-        for param in params[::-1]:
+
+        # Work your way through the total width        
+        totalWidth = getTotalWidth(globalTable, node.name)
+        paramOffset = -totalWidth
+
+        for param in params:
+            if param.tmp:
+                print(param.lvl, param.vartype, param.name)
+
             if param.vartype == "int":
                 # Solve for the individual record
-                stmts, freeReg = unaryAsAsm(param, funcName, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap)
-                stmt = "sw $s{0}, {1}($sp)".format(freeReg, -paramOffset)
+                stmts, freeReg, regType = unaryAsAsm(param, funcName, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap)
+                stmt = "sw $s{0}, {1}($sp)".format(freeReg, paramOffset + 4)
                 stmts.append(stmt)
+                out.extend(stmts)
 
                 # Take the previous lists, and add the new param statements
-                out = stmts + out
                 heappush(intRegisters, freeReg)
                 paramOffset+=4
             else:
@@ -285,8 +308,8 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
         out.insert(0, "# setting up activation record for called function")
         # ParamsStmts contains all the statements, now time to change the stack pointer and 
         # Call the function
-        stmts = ["sub $sp, $sp, {0}".format(paramOffset), "jal {0} # function call".format(node.name), \
-        "add $sp, $sp, {0} # destroying activation record of called function".format(paramOffset)]
+        stmts = ["sub $sp, $sp, {0}".format(totalWidth), "jal {0} # function call".format(node.name), \
+        "add $sp, $sp, {0} # destroying activation record of called function".format(totalWidth)]
         out.extend(stmts)
 
         # If it returns, put the value in a free register
@@ -304,9 +327,9 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
                 heappush(intRegisters, freeReg)
                 freeReg = anotherFreeReg
                 count+=1
-            return indentStmts(out), freeReg
+            return indentStmts(out), freeReg, "int"
         else:
-            return indentStmts(out), -1
+            return indentStmts(out), -1 , "void"
 
     return out, -1
 
@@ -381,9 +404,8 @@ def isResultantPointer(lhs, globalTable, name):
     # If definition level and deref level are equal, that means the resultant is 
     # NOT a pointer
     ifp, lvl = isFloatPointer(lhs, globalTable, name, return_lvl=True)
-    varname, derefLvl, _ = resolveDeclVar(lhs)
-    vartype, _, _ = resolveType(varname, globalTable[name] )
-    return lvl!=derefLvl
+    varname, derefLvl, _ = resolveDeclVar(lhs, allowAddr=True)
+    return lvl!=derefLvl and lvl>0
 
 
 
@@ -408,7 +430,7 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                 lhs, rhs = stmt.operands
                 if len(rhs.operands) <= 1:
                     # Unary operator, can be NOT, UMINUS, VAR, DEREF, CONST
-                    outputRHS, rhsReg = unaryAsAsm(rhs, name, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap, indent=True)
+                    outputRHS, rhsReg, regType = unaryAsAsm(rhs, name, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap, indent=True)
                     out.extend(outputRHS)
 
                     # Here, it doesn't matter if the type is int or float
@@ -416,6 +438,7 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                     # Just use the register
                     if lhs.operator == "VAR" and lhs.tmp:
                         tmpToRegMap[lhs.name] = rhsReg
+                        tmpToTypeMap[lhs.name] = regType
 
                     # This could be a deref or var
                     # If this is not a float, do as before.
@@ -437,7 +460,7 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                     # If its a deref, just use unary
                     elif lhs.operator == "DEREF":
 
-                        outputLHS, lhsReg = unaryAsAsm(lhs, name, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap, indent=True, lhsMode=True)
+                        outputLHS, lhsReg, regType = unaryAsAsm(lhs, name, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap, indent=True, lhsMode=True)
                         out.extend(outputLHS)
 
                         if lhs.vartype == "int" or isResultantPointer(lhs, globalTable, name):
@@ -456,8 +479,8 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                 else:
                     # Resolve the two operands of the RHS
                     op1, op2 = rhs.operands
-                    op1Asm, op1Reg = unaryAsAsm(op1, name, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap, indent=True)
-                    op2Asm, op2Reg = unaryAsAsm(op2, name, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap, indent=True)
+                    op1Asm, op1Reg, regType1 = unaryAsAsm(op1, name, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap, indent=True)
+                    op2Asm, op2Reg, regType2 = unaryAsAsm(op2, name, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap, indent=True)
                     out.extend(op1Asm)
                     out.extend(op2Asm)
 
@@ -486,10 +509,11 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
 
                         # Store what registry the LHS temporary "variable" resides in 
                         tmpToRegMap[lhs.name] = movReg
+                        tmpToTypeMap[lhs.name] = regType1
 
             ## If the statement is not assignment, it's a function call (probably)
             elif stmt.operator == "FN_CALL":
-                fn_stmts, _ = unaryAsAsm(stmt, name, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap, indent=True, funcRet=False)
+                fn_stmts, _, _ = unaryAsAsm(stmt, name, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap, indent=True, funcRet=False)
                 out.extend(fn_stmts)
 
             ## We take care of return statements at the end of the if-statement
@@ -509,7 +533,7 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
             if len(return_stmt.operands) > 0:
                 retValue = return_stmt.operands[0]
                 # Just call unaryAsm to do the rest
-                retStmts, freeReg = unaryAsAsm(retValue, name, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap, indent=True)
+                retStmts, freeReg, regType = unaryAsAsm(retValue, name, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap, indent=True)
                 out.extend(retStmts)
 
                 # If its a variable or address or deref, move it to another register 
