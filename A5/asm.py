@@ -532,6 +532,7 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                         cAsm, cReg = conditionAsAsm(rhs.operator, rhs.vartype, intRegisters, floatRegisters, op1Reg, op2Reg)
                         out.extend(cAsm)
                         tmpToRegMap[lhs.name] = cReg
+                        tmpToTypeMap[lhs.name]= "int"
                     else:
                         # Get a result registry
                         resReg = heappop(intRegisters)
