@@ -1,5 +1,9 @@
 from utils import variablesInSymbolTable
 from heapq import heapify, heappush, heappop
+
+# Keeps track of how many floating point conditional labels have been generated
+fCondCount = 0
+
 # Methods for converting symbol tables and CFGs into assembly
 
 def asAsm(globalTable, cfgs):
@@ -267,36 +271,71 @@ operatorToAsm = {
 
 conditionalOperators = set(["EQ", "NE", "GT", "GE", "LT", "LE"])
 
-def conditionAsAsm(operator, intRegisters, reg1, reg2, goto):
+def conditionAsAsm(operator, vartype, intRegisters, reg1, reg2):
     '''
     Takes an operator and two registries and returns an array of statements for performing that comparison
     Params: operator - One of (EQ, NE, GT, GE, NT, NE) as string
+            vartype - "int" or "float"
             intRegisters - The heap of free registers
             reg1 - Registry of op1 in op1 cmp op2 as int
             reg2 - Registry of op2 in op1 cmp op2 as int
-            goto - Index of the block to goto if the condition is true
     Return: ASM statements, registry where the result was stored
     '''
     out = []
     resReg = heappop(intRegisters)
 
-    if operator == "EQ":
-        out.append("\tseq $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
-    elif operator == "NE":
-        out.append("\tsne $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
-    elif operator == "GT":
-        # reg1 > reg2 <==> reg2 < reg1
-        out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg2, reg1))
-    elif operator == "LT":
-        out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
-    elif operator == "LE":
-        out.append("\tsle $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
-    elif operator == "GE":
-        out.append("\tsle $s{0}, $s{1}, $s{2}".format(resReg, reg2, reg1))
+    if vartype == "int":
+        if operator == "EQ":
+            out.append("\tseq $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+        elif operator == "NE":
+            out.append("\tsne $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+        elif operator == "GT":
+            # reg1 > reg2 <==> reg2 < reg1
+            out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg2, reg1))
+        elif operator == "LT":
+            out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+        elif operator == "LE":
+            out.append("\tsle $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+        elif operator == "GE":
+            out.append("\tsle $s{0}, $s{1}, $s{2}".format(resReg, reg2, reg1))
+        # Free reg1 & reg2
+        heappush(intRegisters, reg1)
+        heappush(intRegisters, reg2)
+    else:
+        # When an operator is used to achieve the opposite effect
+        # Used for doing == using !=
+        invert = False
 
-    # Free reg1 & reg2
-    heappush(intRegisters, reg1)
-    heappush(intRegisters, reg2)
+        # Append the comparisons
+        if operator == "EQ":
+            out.append("\tc.eq.s $f{0}, $f{1}".format(reg1, reg2))
+        elif operator == "NE":
+            out.append("\tc.eq.s $f{0}, $f{1}".format(reg1, reg2))
+            invert = True
+        elif operator == "GT":
+            # reg1 > reg2 <==> reg2 < reg1
+            out.append("\tc.lt.s $f{0}, $f{1}".format(reg2, reg1))
+        elif operator == "LT":
+            out.append("\tc.lt.s $f{0}, $f{1}".format(reg1, reg2))
+        elif operator == "LE":
+            out.append("\tc.le.s $f{0}, $f{1}".format(reg1, reg2))
+        elif operator == "GE":
+            out.append("\tc.le.s $f{0}, $f{1}".format(reg2, reg1))
+
+        # Print the rest of the statements to handle the condition
+        # Note that != behaves a bit differently compared to the others
+        condLabel = "True" if invert else "False"
+        result = 0 if invert else 1
+        global fCondCount
+        out.extend([
+            "\tbc1f L_Cond{0}_{1}".format(condLabel, fCondCount),
+            "\tli $s{0}, {1}".format(resReg, result),
+            "\tj L_CondEnd_{0}".format(fCondCount),
+            "L_Cond{0}_{1}:".format(condLabel, fCondCount),
+            "\tli $s{0}, {1}".format(resReg, (result+1) % 2), # Result 1 -> 0 or 1 -> 0
+            "L_CondEnd_{0}:".format(fCondCount)
+        ])
+        fCondCount += 1
     
     # Move it ¯\_(ツ)_/¯
     movReg = heappop(intRegisters)    
@@ -361,7 +400,7 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
 
                     # Append the operations, handle divs separately because it stores the result differently 
                     if rhs.operator in conditionalOperators:
-                        cAsm, cReg = conditionAsAsm(rhs.operator, intRegisters, op1Reg, op2Reg, block.goto)
+                        cAsm, cReg = conditionAsAsm(rhs.operator, rhs.vartype, intRegisters, op1Reg, op2Reg)
                         out.extend(cAsm)
                         tmpToRegMap[lhs.name] = cReg
                     else:
