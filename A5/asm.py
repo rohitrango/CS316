@@ -264,37 +264,24 @@ def conditionAsAsm(operator, intRegisters, reg1, reg2, goto):
     '''
     out = []
     resReg = heappop(intRegisters)
-    if operator in ["GE", "LE"]:
-        # These require two assembly operations (slt and not)
-        if operator == "GE":
-            # reg1 >= reg2 <==> !(reg1 < reg2) 
-            out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
-        elif operator == "LE":
-            # reg1 <= reg2 <===> !(reg > reg1)
-            out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg2, reg1))
-        
-        # Free reg1 & reg2 and do a not operation 
-        heappush(intRegisters, reg1)
-        heappush(intRegisters, reg2)
-        notReg = heappop(intRegisters)
-        out.append("\tnot $s{0}, $s{1}".format(notReg, resReg))
-        heappush(intRegisters, resReg)
-        resReg = notReg
-    else:
-        # These require only one assembly operation (slt)
-        if operator == "EQ":
-            out.append("\tseq $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
-        elif operator == "NE":
-            out.append("\tsne $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
-        elif operator == "GT":
-            # reg1 > reg2 <==> reg2 < reg1
-            out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg2, reg1))
-        elif operator == "LT":
-            out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
-        
-        # Free reg1 & reg2
-        heappush(intRegisters, reg1)
-        heappush(intRegisters, reg2)
+
+    if operator == "EQ":
+        out.append("\tseq $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+    elif operator == "NE":
+        out.append("\tsne $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+    elif operator == "GT":
+        # reg1 > reg2 <==> reg2 < reg1
+        out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg2, reg1))
+    elif operator == "LT":
+        out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+    elif operator == "LE":
+        out.append("\tsle $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+    elif operator == "GE":
+        out.append("\tsle $s{0}, $s{1}, $s{2}".format(resReg, reg2, reg1))
+
+    # Free reg1 & reg2
+    heappush(intRegisters, reg1)
+    heappush(intRegisters, reg2)
     
     # Move it ¯\_(ツ)_/¯
     movReg = heappop(intRegisters)    
