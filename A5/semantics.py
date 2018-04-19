@@ -1,6 +1,9 @@
 import os, sys
 from utils import *
 
+# Also defined in asm.py...
+conditionalOperators = set(["EQ", "NE", "GT", "GE", "LT", "LE"])
+
 # TODO : Check for function main in the global Table later
 
 def generateSymbolTable(declarations):
@@ -421,6 +424,10 @@ def typeCheckExpr(expr, symbolTable):
 		errorMessages.extend(rhsErrorMessages)
 		if rhsVartype is None:
 			return None, None, errorMessages
+
+		if expr.operator in conditionalOperators:
+			lhsVartype = "int"
+			rhsVartype = "int"
 
 		# Same type expression for LHS and RHS
 		if lhsVartype != rhsVartype or lhsLvl != rhsLvl:
