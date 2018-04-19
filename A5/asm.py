@@ -138,6 +138,21 @@ def unaryAsAsm(node, globalTable, intRegisters, tmpToRegMap, varToStackMap, inde
         out.append(stmt)
         return indentStmts(out), freeReg
 
+    elif node.operator == "NOT":
+        # These are always assigned to temporaries first
+        node = node.operands[0]
+        tmpReg = tmpToRegMap[node.name]
+        freeReg = heappop(intRegisters)
+        out.append("not $s{0}, $s{1}".format(freeReg, tmpReg))
+        heappush(intRegisters, tmpReg)
+
+        # I like to move it move it
+        moveReg = heappop(intRegisters)
+        out.append("move $s{0}, $s{1}".format(moveReg, freeReg))
+
+        heappush(intRegisters, freeReg)
+        return indentStmts(out), moveReg
+
     # For uminus, solve the expression recursively
     elif node.operator == "UMINUS":
         # Solve for the operand inside uminus
