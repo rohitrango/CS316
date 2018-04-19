@@ -17,7 +17,7 @@ def symbolTableAsAsm(globalTable):
     '''
     Returns the global symbol table as an array of strings representing a MIPS .data section
     '''
-    out = ["    .data"]
+    out = ["\t.data"]
     # Retrieve the global variables and sort them by name
     globalVariables = variablesInSymbolTable(globalTable, "global")
     globalVariables = sorted(globalVariables, key=lambda x: x[0])
@@ -222,7 +222,7 @@ def unaryAsAsm(node, globalTable, intRegisters, tmpToRegMap, varToStackMap, inde
         # If it returns, put the value in a free register
         if funcRet:
             freeReg = heappop(intRegisters)
-            stmt  = "move $s{0}, $v1\t# using the return value of called function".format(freeReg)
+            stmt  = "move $s{0}, $v1 # using the return value of called function".format(freeReg)
             out.append(stmt)
 
             # Dereference the function until required
@@ -383,8 +383,18 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                         # Store what registry the LHS temporary "variable" resides in 
                         tmpToRegMap[lhs.name] = movReg
 
-        ### Time to think about function calls
+            ## If the statement is not assignment, it's a function call (probably)
+            elif stmt.operator == "FN_CALL":
+                fn_stmts, _ = unaryAsAsm(stmt, globalTable, intRegisters, tmpToRegMap, varToStackMap, indent=True, funcRet=False)
+                out.extend(fn_stmts)
 
+            ## We take care of return statements at the end of the if-statement
+            elif stmt.operator == "RETURN":
+                pass
+
+            else:
+                print(stmt.operator)
+                raise NotImplementedError
 
 
         ### End of the block statements, check goto and assign statements here
