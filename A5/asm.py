@@ -170,7 +170,7 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
         node = node.operands[0]
         tmpReg = tmpToRegMap[node.name]
         freeReg = heappop(intRegisters)
-        out.append("not $s{0}, $s{1}".format(freeReg, tmpReg))
+        out.append("xori $s{0}, $s{1}, 1".format(freeReg, tmpReg))
         heappush(intRegisters, tmpReg)
 
         # I like to move it move it
