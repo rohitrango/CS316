@@ -154,12 +154,12 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
         if node.vartype == "int":
             freeReg = heappop(intRegisters)
             regType = "int"
-            stmt = "li $s{0}, {1}".format(freeReg, node.name) 
+            stmt = "li ${0}, {1}".format(freeReg, node.name) 
 
         elif node.vartype == "float":
             freeReg = heappop(floatRegisters)
             regType = "float"
-            stmt = "li.s $f{0}, {1}".format(freeReg, node.name)
+            stmt = "li.s ${0}, {1}".format(freeReg, node.name)
 
         out.append(stmt)
         return indentStmts(out), freeReg, regType
@@ -170,12 +170,12 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
         node = node.operands[0]
         tmpReg = tmpToRegMap[node.name]
         freeReg = heappop(intRegisters)
-        out.append("xori $s{0}, $s{1}, 1".format(freeReg, tmpReg))
+        out.append("xori ${0}, ${1}, 1".format(freeReg, tmpReg))
         heappush(intRegisters, tmpReg)
 
         # I like to move it move it
         moveReg = heappop(intRegisters)
-        out.append("move $s{0}, $s{1}".format(moveReg, freeReg))
+        out.append("move ${0}, ${1}".format(moveReg, freeReg))
 
         heappush(intRegisters, freeReg)
         return indentStmts(out), moveReg, "int"
@@ -190,22 +190,22 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
         if node.vartype == "int":
             # negu the variable or whatever it is
             freeReg = heappop(intRegisters)
-            stmts = ["negu $s{0}, $s{1}".format(freeReg, tmpLatestReg)]
+            stmts = ["negu ${0}, ${1}".format(freeReg, tmpLatestReg)]
             heappush(intRegisters, tmpLatestReg)
 
             # Move it
             moveReg = heappop(intRegisters)
-            stmts.append("move $s{0}, $s{1}".format(moveReg, freeReg))
+            stmts.append("move ${0}, ${1}".format(moveReg, freeReg))
             heappush(intRegisters, freeReg)
         else:
             # It has to be a float
             freeReg = heappop(floatRegisters)
-            stmts = ["neg.s $f{0}, $f{1}".format(freeReg, tmpLatestReg)]
+            stmts = ["neg.s ${0}, ${1}".format(freeReg, tmpLatestReg)]
             heappush(floatRegisters, tmpLatestReg)
 
             # Move it
             moveReg = heappop(floatRegisters)
-            stmts.append("mov.s $f{0}, $f{1}".format(moveReg, freeReg))
+            stmts.append("mov.s ${0}, ${1}".format(moveReg, freeReg))
             heappush(floatRegisters, freeReg)
 
         out.extend(stmts)
@@ -220,7 +220,7 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
             if node.vartype == "int" or isResultantPointer(node, globalTable, funcName):
                 # Do a symbol table check
                 freeReg = heappop(intRegisters)
-                stmt = "lw $s{0}, {1}".format(freeReg, resolveOffset(node.name, globalTable, varToStackMap))
+                stmt = "lw ${0}, {1}".format(freeReg, resolveOffset(node.name, globalTable, varToStackMap))
             else:
                 raise AssertionError("Expression/assignment cannot contain direct float variable.")
 
@@ -241,11 +241,11 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
         
         # This node is now a VAR
         freeReg = heappop(intRegisters)
-        out.append("lw $s{0}, {1}".format(freeReg, resolveOffset(node.name, globalTable, varToStackMap)))
+        out.append("lw ${0}, {1}".format(freeReg, resolveOffset(node.name, globalTable, varToStackMap)))
 
         while derefCount > 1:
             anotherFreeReg = heappop(intRegisters)
-            out.append("lw $s{0}, 0($s{1})".format(anotherFreeReg, freeReg))
+            out.append("lw ${0}, 0(${1})".format(anotherFreeReg, freeReg))
             heappush(intRegisters, freeReg)
             freeReg = anotherFreeReg
             derefCount-=1
@@ -259,12 +259,12 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
                 # Its a float
                 anotherFreeReg = heappop(floatRegisters)
                 regType = "float"
-                out.append("l.s $f{0}, 0($s{1})".format(anotherFreeReg, freeReg))
+                out.append("l.s ${0}, 0(${1})".format(anotherFreeReg, freeReg))
             else:
                 # Its an int or float pointer
                 anotherFreeReg = heappop(intRegisters)
                 regType = "int"
-                out.append("lw $s{0}, 0($s{1})".format(anotherFreeReg, freeReg))
+                out.append("lw ${0}, 0(${1})".format(anotherFreeReg, freeReg))
             heappush(intRegisters, freeReg)
             freeReg = anotherFreeReg
 
@@ -276,9 +276,9 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
         node = node.operands[0]
         freeReg = heappop(intRegisters)
         if node.name in varToStackMap:
-            stmt = "addi $s{0}, $sp, {1}".format(freeReg, varToStackMap[node.name]['offset'])
+            stmt = "addi ${0}, $sp, {1}".format(freeReg, varToStackMap[node.name]['offset'])
         else:
-            stmt = "la $s{0}, global_{1}".format(freeReg, node.name)
+            stmt = "la ${0}, global_{1}".format(freeReg, node.name)
         out.append(stmt)
         return indentStmts(out), freeReg, "int"
 
@@ -300,10 +300,10 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
             #     raise NotImplementedError
             stmts, freeReg, regType = unaryAsAsm(param, funcName, globalTable, intRegisters, floatRegisters, tmpToRegMap, varToStackMap)
             if regType == "int":
-                stmt = "sw $s{0}, {1}($sp)".format(freeReg, paramOffset + 4)
+                stmt = "sw ${0}, {1}($sp)".format(freeReg, paramOffset + 4)
                 heappush(intRegisters, freeReg)
             else:
-                stmt = "s.s $f{0}, {1}($sp)".format(freeReg, paramOffset + 8)
+                stmt = "s.s ${0}, {1}($sp)".format(freeReg, paramOffset + 8)
                 heappush(floatRegisters, freeReg)
 
             stmts.append(stmt)
@@ -327,7 +327,7 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
 
             if funcType == "int" or funcLvl>0:
                 freeReg = heappop(intRegisters)
-                stmt  = "move $s{0}, $v1 # using the return value of called function".format(freeReg)
+                stmt  = "move ${0}, $v1 # using the return value of called function".format(freeReg)
                 out.append(stmt)
 
                 # Dereference the function until required
@@ -335,7 +335,7 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
                 count = 1 if funcType == "float" else 0
                 while node.lvl > count:
                     anotherFreeReg = heappop(intRegisters)
-                    out.append("lw $s{0}, 0($s{1})".format(anotherFreeReg, freeReg))
+                    out.append("lw ${0}, 0(${1})".format(anotherFreeReg, freeReg))
                     heappush(intRegisters, freeReg)
                     freeReg = anotherFreeReg
                     count+=1
@@ -343,11 +343,11 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
                 if funcType == "float":
                     if node.lvl == funcLvl:
                         anotherFreeReg = heappop(floatRegisters)
-                        out.append("l.s $f{0}, 0($s{1})".format(anotherFreeReg, freeReg))
+                        out.append("l.s ${0}, 0(${1})".format(anotherFreeReg, freeReg))
                         regType = "float"
                     else:
                         anotherFreeReg = heappop(intRegisters)
-                        out.append("lw $s{0}, 0($s{1})".format(anotherFreeReg, freeReg))
+                        out.append("lw ${0}, 0(${1})".format(anotherFreeReg, freeReg))
                     
                     heappush(intRegisters, freeReg)
                     freeReg = anotherFreeReg
@@ -355,7 +355,7 @@ def unaryAsAsm(node, funcName, globalTable, intRegisters, floatRegisters, tmpToR
                 return indentStmts(out), freeReg, regType
             else:
                 freeReg = heappop(floatRegisters)
-                stmt = "mov.s $f{0}, $f0 # using the return value of called function".format(freeReg)
+                stmt = "mov.s ${0}, $f0 # using the return value of called function".format(freeReg)
                 out.append(stmt)
                 return indentStmts(out), freeReg, "float"
         else:
@@ -390,18 +390,18 @@ def conditionAsAsm(operator, vartype, intRegisters, floatRegisters, reg1, reg2):
 
     if vartype == "int":
         if operator == "EQ":
-            out.append("\tseq $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+            out.append("\tseq ${0}, ${1}, ${2}".format(resReg, reg1, reg2))
         elif operator == "NE":
-            out.append("\tsne $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+            out.append("\tsne ${0}, ${1}, ${2}".format(resReg, reg1, reg2))
         elif operator == "GT":
             # reg1 > reg2 <==> reg2 < reg1
-            out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg2, reg1))
+            out.append("\tslt ${0}, ${1}, ${2}".format(resReg, reg2, reg1))
         elif operator == "LT":
-            out.append("\tslt $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+            out.append("\tslt ${0}, ${1}, ${2}".format(resReg, reg1, reg2))
         elif operator == "LE":
-            out.append("\tsle $s{0}, $s{1}, $s{2}".format(resReg, reg1, reg2))
+            out.append("\tsle ${0}, ${1}, ${2}".format(resReg, reg1, reg2))
         elif operator == "GE":
-            out.append("\tsle $s{0}, $s{1}, $s{2}".format(resReg, reg2, reg1))
+            out.append("\tsle ${0}, ${1}, ${2}".format(resReg, reg2, reg1))
         # Free reg1 & reg2
         heappush(intRegisters, reg1)
         heappush(intRegisters, reg2)
@@ -412,19 +412,19 @@ def conditionAsAsm(operator, vartype, intRegisters, floatRegisters, reg1, reg2):
 
         # Append the comparisons
         if operator == "EQ":
-            out.append("\tc.eq.s $f{0}, $f{1}".format(reg1, reg2))
+            out.append("\tc.eq.s ${0}, ${1}".format(reg1, reg2))
         elif operator == "NE":
-            out.append("\tc.eq.s $f{0}, $f{1}".format(reg1, reg2))
+            out.append("\tc.eq.s ${0}, ${1}".format(reg1, reg2))
             invert = True
         elif operator == "GT":
             # reg1 > reg2 <==> reg2 < reg1
-            out.append("\tc.lt.s $f{0}, $f{1}".format(reg2, reg1))
+            out.append("\tc.lt.s ${0}, ${1}".format(reg2, reg1))
         elif operator == "LT":
-            out.append("\tc.lt.s $f{0}, $f{1}".format(reg1, reg2))
+            out.append("\tc.lt.s ${0}, ${1}".format(reg1, reg2))
         elif operator == "LE":
-            out.append("\tc.le.s $f{0}, $f{1}".format(reg1, reg2))
+            out.append("\tc.le.s ${0}, ${1}".format(reg1, reg2))
         elif operator == "GE":
-            out.append("\tc.le.s $f{0}, $f{1}".format(reg2, reg1))
+            out.append("\tc.le.s ${0}, ${1}".format(reg2, reg1))
 
         # Print the rest of the statements to handle the condition
         # Note that != behaves a bit differently compared to the others
@@ -433,10 +433,10 @@ def conditionAsAsm(operator, vartype, intRegisters, floatRegisters, reg1, reg2):
         global fCondCount
         out.extend([
             "\tbc1f L_Cond{0}_{1}".format(condLabel, fCondCount),
-            "\tli $s{0}, {1}".format(resReg, result),
+            "\tli ${0}, {1}".format(resReg, result),
             "\tj L_CondEnd_{0}".format(fCondCount),
             "L_Cond{0}_{1}:".format(condLabel, fCondCount),
-            "\tli $s{0}, {1}".format(resReg, (result+1) % 2), # Result 1 -> 0 or 1 -> 0
+            "\tli ${0}, {1}".format(resReg, (result+1) % 2), # Result 1 -> 0 or 1 -> 0
             "L_CondEnd_{0}:".format(fCondCount)
         ])
 
@@ -447,7 +447,7 @@ def conditionAsAsm(operator, vartype, intRegisters, floatRegisters, reg1, reg2):
     
     # Move it ¯\_(ツ)_/¯
     movReg = heappop(intRegisters)    
-    out.append("\tmove $s{0}, $s{1}".format(movReg, resReg))
+    out.append("\tmove ${0}, ${1}".format(movReg, resReg))
     heappush(intRegisters, resReg)
 
     # Compare it
@@ -482,11 +482,12 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
     out = []
 
     # Code for heap of free registers and dictionary for tmp variables
-    intRegisters = list(range(8))
-    floatRegisters = list(range(10, 32, 2))
+    intRegisters = list(map(lambda x: "s" + str(x), range(8))) + list(map(lambda x: "t" + str(x), range(10)))
+    floatRegisters = list(map(lambda x: "f"+str(x), range(10, 32, 2)))
+
     heapify(intRegisters)
     heapify(floatRegisters)
-    tmpToRegMap  = dict()
+    tmpToRegMap = dict()
 
     for block in blocks:
         # First the label number
@@ -517,7 +518,7 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
 
                         if lhs.vartype == "int" or isFloatPointer(lhs, globalTable, name):
                             # Do a symbol table check
-                            stmt = "\tsw $s{0}, {1}".format(rhsReg, resolveOffset(lhs.name, globalTable, varToStackMap))
+                            stmt = "\tsw ${0}, {1}".format(rhsReg, resolveOffset(lhs.name, globalTable, varToStackMap))
                             # Free the RHS reg and add the statement
                             heappush(intRegisters, rhsReg)
                             out.append(stmt)
@@ -533,12 +534,12 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                         out.extend(outputLHS)
 
                         if lhs.vartype == "int" or isResultantPointer(lhs, globalTable, name):
-                            stmt = "\tsw $s{0}, 0($s{1})".format(rhsReg, lhsReg)
+                            stmt = "\tsw ${0}, 0(${1})".format(rhsReg, lhsReg)
                             heappush(intRegisters, rhsReg)
                             heappush(intRegisters, lhsReg)
                         else:
                             # It's a float assignment
-                            stmt = "\ts.s $f{0}, 0($s{1})".format(rhsReg, lhsReg)
+                            stmt = "\ts.s ${0}, 0(${1})".format(rhsReg, lhsReg)
                             heappush(intRegisters, lhsReg)
                             heappush(floatRegisters, rhsReg)
                         out.append(stmt)
@@ -565,10 +566,10 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                         if regType1 == "int":
                             resReg = heappop(intRegisters)
                             if rhs.operator == "DIV":
-                                out.append("\t{0} $s{1}, $s{2}".format(operatorToAsm[rhs.operator], op1Reg, op2Reg))
-                                out.append("\tmflo $s{0}".format(resReg))                            
+                                out.append("\t{0} ${1}, ${2}".format(operatorToAsm[rhs.operator], op1Reg, op2Reg))
+                                out.append("\tmflo ${0}".format(resReg))                            
                             else:
-                                out.append("\t{0} $s{1}, $s{2}, $s{3}".format(operatorToAsm[rhs.operator], resReg, op1Reg, op2Reg))
+                                out.append("\t{0} ${1}, ${2}, ${3}".format(operatorToAsm[rhs.operator], resReg, op1Reg, op2Reg))
                                                     
                             # Free up the registers used for the operations
                             heappush(intRegisters, op1Reg)
@@ -577,16 +578,16 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                             # Move the result into place (done by the reference implementation)
                             movReg = heappop(intRegisters)
                             heappush(intRegisters, resReg)
-                            out.append("\tmove $s{0}, $s{1}".format(movReg, resReg))
+                            out.append("\tmove ${0}, ${1}".format(movReg, resReg))
 
                         else:
                             resReg = heappop(floatRegisters)
-                            out.append("\t{0}.s $f{1}, $f{2}, $f{3}".format(operatorToAsm[rhs.operator], resReg, op1Reg, op2Reg))
+                            out.append("\t{0}.s ${1}, ${2}, ${3}".format(operatorToAsm[rhs.operator], resReg, op1Reg, op2Reg))
                             heappush(floatRegisters, op1Reg)
                             heappush(floatRegisters, op2Reg)
                             movReg = heappop(floatRegisters)
                             heappush(floatRegisters, resReg)
-                            out.append("\tmov.s $f{0}, $f{1}".format(movReg, resReg))
+                            out.append("\tmov.s ${0}, ${1}".format(movReg, resReg))
 
                         # Store what registry the LHS temporary "variable" resides in 
                         tmpToRegMap[lhs.name] = movReg
@@ -635,10 +636,10 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
 
                 # Final move
                 if regType == "int":
-                    stmt = "\tmove $v1, $s{0} # move return value to $v1".format(freeReg)
+                    stmt = "\tmove $v1, ${0} # move return value to $v1".format(freeReg)
                     heappush(intRegisters, freeReg)
                 else:
-                    stmt = "\tmov.s $f0, $f{0} # move return value to $f0".format(freeReg)
+                    stmt = "\tmov.s $f0, ${0} # move return value to $f0".format(freeReg)
                     heappush(floatRegisters, freeReg)
 
                 out.append(stmt)
@@ -654,7 +655,7 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
                 # Check what the name of the temporary variable that stored the result is
                 resultVar = block.contents[-1].operands[0].name
                 movReg = tmpToRegMap[resultVar]
-                out.append("\tbne $s{0}, $0, label{1}".format(movReg, block.goto))
+                out.append("\tbne ${0}, $0, label{1}".format(movReg, block.goto))
                 out.append("\tj label{0}".format(block.goto2))
                 heappush(intRegisters, movReg)
 
