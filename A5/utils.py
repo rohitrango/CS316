@@ -204,7 +204,7 @@ def getProcedureCFGs(proceduresAST, globalTable):
 	params : proceduresAST   - the list of procedures 
 	returns: procedureCFGs   - list of CFGs for each procedure in order of defintion
 	'''
-	bb_ctr, t_ctr = 1, 0
+	bb_ctr, t_ctr = 0, 0
 	procedureCFGs = []
 	for func in proceduresAST.operands:
 		params, decl, body = func.operands
@@ -217,7 +217,7 @@ def getProcedureCFGs(proceduresAST, globalTable):
 	return procedureCFGs
 
 # generate the CFG given a node
-def generateFunctionCFG(node, localTable, bb_ctr=1, t_ctr=0):
+def generateFunctionCFG(node, localTable, bb_ctr=0, t_ctr=0):
 	'''
 	generate CFG for a particular function
 
@@ -295,7 +295,7 @@ def update_block_list(cfg):
 
 	new_cfg = []
 	for b in cfg:
-		if b.number > 0:
+		if b.number >= 0:
 			new_cfg.append(b)
 
 	return new_cfg

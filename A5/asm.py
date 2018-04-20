@@ -490,7 +490,7 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
 
     for block in blocks:
         # First the label number
-        out.append("label{0}:".format(block.number-1))
+        out.append("label{0}:".format(block.number))
 
         # Now loop thru the statements
         for stmt in block.contents:
@@ -648,14 +648,14 @@ def functionBodyAsAsm(globalTable, blocks, name, varToStackMap):
         # This is the other part, where it jumps to a next block or two
         else:
             if block.goto2 is None:
-                out.append("\tj label{0}".format(block.goto-1))
+                out.append("\tj label{0}".format(block.goto))
             else:
                 # if/while statement
                 # Check what the name of the temporary variable that stored the result is
                 resultVar = block.contents[-1].operands[0].name
                 movReg = tmpToRegMap[resultVar]
-                out.append("\tbne $s{0}, $0, label{1}".format(movReg, block.goto-1))
-                out.append("\tj label{0}".format(block.goto2-1))
+                out.append("\tbne $s{0}, $0, label{1}".format(movReg, block.goto))
+                out.append("\tj label{0}".format(block.goto2))
                 heappush(intRegisters, movReg)
 
 
