@@ -632,9 +632,14 @@ def variablesOfGlobalTable(globalTable):
 	'''
 	procedures = { funcName:symbolTable for funcName,symbolTable in globalTable.items() if isinstance(symbolTable, dict) and symbolTable.get('func', False) and symbolTable.get('proto', True)==False}
 	variables = variablesInSymbolTable(globalTable, "global")
+	variables = sorted(variables, key=lambda x: x[0])
 	for name, symbolTable in procedures.items():
-		variables.extend(variablesInSymbolTable(symbolTable['decls'], "procedure {}".format(name)))
-		variables.extend(variablesInSymbolTable(symbolTable['params'], "procedure {}".format(name)))
+		tmp = []
+		tmp.extend(variablesInSymbolTable(symbolTable['decls'], "procedure {}".format(name)))
+		tmp.extend(variablesInSymbolTable(symbolTable['params'], "procedure {}".format(name)))
+		tmp = sorted(tmp, key=lambda x: x[0])
+		variables.extend(tmp)
+
 	return variables
 
 def getASTPrintable(prog):
